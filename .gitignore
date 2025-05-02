@@ -13,3 +13,9 @@ dist/
 # Ignore system files
 .DS_Store
 Thumbs.db
+
+# Abaikan virtual environment
+env/
+
+# Abaikan cache Python
+__pycache__/
