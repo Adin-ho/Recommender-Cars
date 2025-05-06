@@ -1,23 +1,27 @@
-from langchain.embeddings import OllamaEmbeddings
-from langchain.vectorstores import Chroma
-from langchain.llms import Ollama
-from langchain.chains import RetrievalQA
+# app/rag_qa.py
+from langchain_ollama import OllamaEmbeddings, OllamaLLM
+from langchain_chroma import Chroma
 
-def buat_rag_chain():
-    embeddings = OllamaEmbeddings(model="mistral")
-    vectordb = Chroma(persist_directory="chroma", embedding_function=embeddings)
-    llm = Ollama(model="mistral")
+def tanya_mobil(pertanyaan: str) -> str:
+    # Load database dan retriever
+    db = Chroma(persist_directory="chroma", embedding_function=OllamaEmbeddings(model="mistral"))
+    retriever = db.as_retriever()
 
-    return RetrievalQA.from_chain_type(
-        llm=llm,
-        retriever=vectordb.as_retriever(search_kwargs={"k": 3}),
-        return_source_documents=True
-    )
+    # Ambil dokumen relevan
+    dokumen = retriever.get_relevant_documents(pertanyaan)
+    context = "\n".join([doc.page_content for doc in dokumen])
 
-def jawab_pertanyaan(pertanyaan: str):
-    chain = buat_rag_chain()
-    hasil = chain(pertanyaan)
-    return {
-        "jawaban": hasil["result"],
-        "sumber": [doc.page_content for doc in hasil["source_documents"]]
-    }
+    # Buat prompt manual
+    prompt = f"""
+Saya sedang mencari rekomendasi mobil.
+Pertanyaan saya: {pertanyaan}
+
+Berikut data mobil yang mungkin relevan:
+{context}
+
+Tolong beri rekomendasi mobil terbaik berdasarkan data di atas.
+"""
+
+    llm = OllamaLLM(model="mistral")
+    jawaban = llm.invoke(prompt)
+    return jawaban

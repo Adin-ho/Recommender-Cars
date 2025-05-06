@@ -1,9 +1,14 @@
-from fastapi import FastAPI, Query
-from app.rag_qa import jawab_pertanyaan
+# app/main.py
+from fastapi import FastAPI
+from app.rag_qa import tanya_mobil
 
 app = FastAPI()
 
-@app.get("/rekomendasi")
-def rekomendasi(q: str = Query(..., description="Masukkan preferensi mobil")):
-    hasil = jawab_pertanyaan(q)
-    return hasil
+@app.get("/")
+def root():
+    return {"message": "API untuk rekomendasi mobil berdasarkan pertanyaan."}
+
+@app.get("/tanya")
+def tanya(pertanyaan: str):
+    jawaban = tanya_mobil(pertanyaan)
+    return {"jawaban": jawaban}
