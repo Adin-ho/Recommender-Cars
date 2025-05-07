@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ChatCars</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+</head>
+<body class="bg-gray-100 flex flex-col items-center min-h-screen p-4">
+  <div class="w-full max-w-2xl bg-white shadow-lg rounded-lg p-6 space-y-4">
+    <h1 class="text-2xl font-bold text-center text-blue-600">🚗 ChatCars: Rekomendasi Mobil</h1>
+    
+    <div id="chatBox" class="h-80 overflow-y-auto p-4 border rounded bg-gray-50 text-sm space-y-2"></div>
+
+    <div class="flex space-x-2">
+        <input id="pertanyaan" type="text" placeholder="Tanyakan sesuatu tentang mobil..."
+        class="flex-grow px-4 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"/>
+ 
+      <button onclick="kirimPertanyaan()" 
+              class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Kirim</button>
+    </div>
+  </div>
+
+  <script>
+    async function kirimPertanyaan() {
+  const input = document.getElementById("pertanyaan");
+  const chatBox = document.getElementById("chatBox");
+  const pesan = input.value.trim();
+  if (!pesan) return;
+
+  // Tampilkan pertanyaan
+  const userMsg = document.createElement("div");
+  userMsg.className = "text-right text-blue-600";
+  userMsg.textContent = "👤 " + pesan;
+  chatBox.appendChild(userMsg);
+
+  // Clear input
+  input.value = "";
+
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/tanya?pertanyaan=${encodeURIComponent(pesan)}`);
+    const data = await res.json();
+
+    const botMsg = document.createElement("div");
+    botMsg.className = "text-left text-gray-800";
+    botMsg.textContent = "🤖 " + data.jawaban;
+    chatBox.appendChild(botMsg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  } catch (err) {
+    const errorMsg = document.createElement("div");
+    errorMsg.className = "text-red-500";
+    errorMsg.textContent = "Gagal mengambil jawaban dari server.";
+    chatBox.appendChild(errorMsg);
+  }
+}
+
+
+    // Enter untuk kirim
+    document.getElementById("pertanyaan").addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        kirimPertanyaan();
+      }
+    });
+  </script>
+</body>
+</html>
