@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.rag_qa import tanya_mobil
+from app.rag_qa import stream_mobil
+from fastapi.responses import StreamingResponse
 
 app = FastAPI()
 
@@ -20,3 +22,7 @@ def root():
 def tanya(pertanyaan: str):
     jawaban = tanya_mobil(pertanyaan)
     return {"jawaban": jawaban}
+
+@app.get("/stream")
+async def stream(pertanyaan: str):
+    return StreamingResponse(stream_mobil(pertanyaan), media_type="text/plain")

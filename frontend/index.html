@@ -28,32 +28,41 @@
   const pesan = input.value.trim();
   if (!pesan) return;
 
-  // Tampilkan pertanyaan
   const userMsg = document.createElement("div");
   userMsg.className = "text-right text-blue-600";
   userMsg.textContent = "👤 " + pesan;
   chatBox.appendChild(userMsg);
 
-  // Clear input
   input.value = "";
 
-  try {
-    const res = await fetch(`http://127.0.0.1:8000/tanya?pertanyaan=${encodeURIComponent(pesan)}`);
-    const data = await res.json();
+  const botMsg = document.createElement("div");
+  botMsg.className = "text-left text-gray-800";
+  botMsg.textContent = "🤖 ";
+  chatBox.appendChild(botMsg);
 
-    const botMsg = document.createElement("div");
-    botMsg.className = "text-left text-gray-800";
-    botMsg.textContent = "🤖 " + data.jawaban;
-    chatBox.appendChild(botMsg);
-    chatBox.scrollTop = chatBox.scrollHeight;
-  } catch (err) {
-    const errorMsg = document.createElement("div");
-    errorMsg.className = "text-red-500";
-    errorMsg.textContent = "Gagal mengambil jawaban dari server.";
-    chatBox.appendChild(errorMsg);
+  try {
+    const response = await fetch(`http://127.0.0.1:8000/stream?pertanyaan=${encodeURIComponent(pesan)}`);
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let chunk;
+
+    while (!(chunk = await reader.read()).done) {
+  const textChunk = decoder.decode(chunk.value, { stream: true });
+
+  try {
+    const parsed = JSON.parse(textChunk);  // kalau format masih JSON
+    botMsg.textContent += parsed.assistant.message || textChunk;
+  } catch {
+    botMsg.textContent += textChunk;  // fallback teks biasa
   }
+
+  chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+  } catch (err) {
+    botMsg.textContent = "❌ Gagal mengambil jawaban.";
+  }
+}
 
     // Enter untuk kirim
     document.getElementById("pertanyaan").addEventListener("keypress", function (e) {
