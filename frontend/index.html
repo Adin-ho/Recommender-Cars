@@ -47,19 +47,18 @@
     let chunk;
 
     while (!(chunk = await reader.read()).done) {
-  const textChunk = decoder.decode(chunk.value, { stream: true });
-
-  try {
-    const parsed = JSON.parse(textChunk);  // kalau format masih JSON
-    botMsg.textContent += parsed.assistant.message || textChunk;
-  } catch {
-    botMsg.textContent += textChunk;  // fallback teks biasa
+  const lines = decoder.decode(chunk.value, { stream: true }).split("\n\n");
+  for (const line of lines) {
+    if (line.startsWith("data: ")) {
+      const payload = JSON.parse(line.slice(6));
+      if (payload.type === "stream") {
+        botMsg.textContent += payload.token;
+      }
+    }
   }
-
   chatBox.scrollTop = chatBox.scrollHeight;
 }
-
-  } catch (err) {
+} catch (err) {
     botMsg.textContent = "❌ Gagal mengambil jawaban.";
   }
 }
