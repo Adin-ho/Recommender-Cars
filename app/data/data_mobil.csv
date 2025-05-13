@@ -1,1001 +1,1083 @@
-Nama Mobil,Tahun,Usia Kendaraan (tahun),Harga,Transmisi,Bahan Bakar,Kapasitas Mesin (cc)
-Kia Picanto GT,2023,2,377675207,Manual,Diesel,1200
-Hyundai Stargazer Active,2012,13,373432726,Manual,Bensin,1500
-Toyota Avanza 1.3 G M/T,2016,9,218394701,Manual,Bensin,1300
-Wuling Confero S,2020,5,206744490,Manual,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2023,2,368469763,Manual,Diesel,2500
-Daihatsu Terios R AT,2018,7,102048949,Manual,Diesel,1500
-Wuling Almaz RS,2020,5,322337959,Manual,Bensin,1500
-Honda Brio Satya E CVT,2022,3,319058814,Otomatis,Diesel,1200
-Honda City Hatchback RS,2013,12,117387027,Otomatis,Diesel,1500
-Hyundai Creta Trend,2022,3,297958076,Manual,Bensin,1500
-Toyota Avanza 1.3 G M/T,2012,13,297565765,Otomatis,Diesel,1300
-Mitsubishi Pajero Sport Dakar,2021,4,278460327,Manual,Bensin,2500
-Hyundai Stargazer Active,2014,11,353474698,Manual,Bensin,1500
-Mitsubishi Xpander GLS M/T,2018,7,297090973,Otomatis,Diesel,1500
-Mitsubishi Xpander GLS M/T,2013,12,344688667,Otomatis,Diesel,1500
-Toyota Avanza 1.3 G M/T,2014,11,206114624,Manual,Bensin,1300
-Daihatsu Terios R AT,2016,9,184657212,Otomatis,Bensin,1500
-Hyundai Stargazer Active,2016,9,317441448,Otomatis,Bensin,1500
-Toyota Avanza 1.3 G M/T,2024,1,348325921,Manual,Diesel,1300
-Wuling Almaz RS,2020,5,111417396,Manual,Bensin,1500
-Hyundai Stargazer Active,2024,1,144125220,Manual,Bensin,1500
-Toyota Avanza 1.3 G M/T,2012,13,163230030,Otomatis,Diesel,1300
-Hyundai Stargazer Active,2023,2,204918836,Manual,Diesel,1500
-Mazda CX-5 Elite,2023,2,283024617,Manual,Diesel,2500
-Mitsubishi Xpander GLS M/T,2024,1,358194446,Otomatis,Diesel,1500
-Suzuki Baleno M/T,2024,1,281945243,Manual,Bensin,1500
-Wuling Confero S,2023,2,334117255,Otomatis,Bensin,1500
-Honda City Hatchback RS,2012,13,285430284,Manual,Bensin,1500
-Nissan Livina VE AT,2019,6,293926283,Otomatis,Diesel,1500
-Hyundai Creta Trend,2017,8,293359543,Otomatis,Bensin,1500
-Toyota Avanza 1.3 G M/T,2019,6,207590709,Otomatis,Diesel,1300
-Wuling Confero S,2017,8,238497607,Manual,Bensin,1500
-Toyota Yaris E CVT,2014,11,198091130,Otomatis,Diesel,1500
-Kia Picanto GT,2023,2,306350464,Manual,Diesel,1200
-Honda City Hatchback RS,2022,3,241153191,Manual,Bensin,1500
-Hyundai Creta Trend,2016,9,170440721,Otomatis,Bensin,1500
-Kia Picanto GT,2016,9,234129020,Otomatis,Bensin,1200
-Wuling Confero S,2016,9,211094783,Otomatis,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2023,2,176659176,Manual,Diesel,2500
-Mitsubishi Pajero Sport Dakar,2018,7,137663238,Manual,Diesel,2500
-Kia Picanto GT,2012,13,203908887,Otomatis,Bensin,1200
-Hyundai Creta Trend,2013,12,234800384,Manual,Bensin,1500
-Honda City Hatchback RS,2012,13,280912826,Otomatis,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2020,5,364974226,Manual,Bensin,2500
-Honda Brio Satya E CVT,2024,1,334099256,Manual,Diesel,1200
-Mitsubishi Xpander GLS M/T,2021,4,281305197,Otomatis,Diesel,1500
-Nissan Livina VE AT,2017,8,261841057,Manual,Diesel,1500
-Hyundai Creta Trend,2023,2,388430076,Otomatis,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2013,12,327433269,Manual,Diesel,2500
-Daihatsu Terios R AT,2023,2,242528084,Otomatis,Diesel,1500
-Toyota Yaris E CVT,2017,8,221931638,Manual,Bensin,1500
-Wuling Confero S,2013,12,386109218,Manual,Diesel,1500
-Kia Picanto GT,2017,8,255007100,Otomatis,Diesel,1200
-Honda City Hatchback RS,2020,5,204364539,Manual,Diesel,1500
-Daihatsu Terios R AT,2019,6,202434651,Otomatis,Bensin,1500
-Daihatsu Xenia R Deluxe,2012,13,203195090,Manual,Bensin,1300
-Toyota Avanza 1.3 G M/T,2024,1,96302401,Manual,Bensin,1300
-Hyundai Stargazer Active,2020,5,285918036,Otomatis,Bensin,1500
-Hyundai Stargazer Active,2013,12,307026938,Otomatis,Diesel,1500
-Daihatsu Terios R AT,2021,4,191692715,Manual,Bensin,1500
-Wuling Almaz RS,2022,3,309231927,Otomatis,Diesel,1500
-Daihatsu Terios R AT,2020,5,258920691,Manual,Diesel,1500
-Hyundai Stargazer Active,2015,10,311166382,Otomatis,Bensin,1500
-Wuling Confero S,2016,9,387198514,Manual,Bensin,1500
-Wuling Confero S,2018,7,196136274,Otomatis,Diesel,1500
-Toyota Avanza 1.3 G M/T,2020,5,177735432,Otomatis,Diesel,1300
-Hyundai Stargazer Active,2023,2,252154991,Otomatis,Diesel,1500
-Mazda CX-5 Elite,2022,3,161306669,Otomatis,Diesel,2500
-Honda Brio Satya E CVT,2023,2,163510489,Manual,Diesel,1200
-Wuling Almaz RS,2019,6,167541167,Manual,Bensin,1500
-Mazda CX-5 Elite,2021,4,317431660,Manual,Diesel,2500
-Mitsubishi Xpander GLS M/T,2013,12,185301687,Otomatis,Bensin,1500
-Toyota Yaris E CVT,2016,9,141726464,Otomatis,Bensin,1500
-Wuling Almaz RS,2017,8,234302449,Manual,Diesel,1500
-Nissan Livina VE AT,2023,2,122007023,Otomatis,Diesel,1500
-Daihatsu Terios R AT,2023,2,362309918,Otomatis,Bensin,1500
-Toyota Yaris E CVT,2024,1,299722399,Manual,Bensin,1500
-Honda City Hatchback RS,2019,6,277195933,Manual,Bensin,1500
-Daihatsu Xenia R Deluxe,2012,13,315571211,Manual,Diesel,1300
-Toyota Avanza 1.3 G M/T,2016,9,337334576,Manual,Diesel,1300
-Kia Picanto GT,2019,6,219232802,Manual,Diesel,1200
-Toyota Avanza 1.3 G M/T,2012,13,335722399,Manual,Bensin,1300
-Toyota Yaris E CVT,2013,12,240871686,Otomatis,Bensin,1500
-Wuling Confero S,2012,13,162880704,Otomatis,Bensin,1500
-Wuling Confero S,2022,3,282048825,Otomatis,Diesel,1500
-Mazda 2 R AT,2013,12,300833771,Manual,Diesel,1500
-Hyundai Stargazer Active,2022,3,316486076,Manual,Diesel,1500
-Mazda 2 R AT,2020,5,122624114,Manual,Bensin,1500
-Mazda 2 R AT,2014,11,348467794,Manual,Diesel,1500
-Wuling Almaz RS,2018,7,307912712,Manual,Diesel,1500
-Honda City Hatchback RS,2019,6,247481091,Otomatis,Diesel,1500
-Daihatsu Xenia R Deluxe,2018,7,261792270,Otomatis,Bensin,1300
-Nissan Livina VE AT,2018,7,272447908,Manual,Diesel,1500
-Suzuki Baleno M/T,2022,3,376689964,Manual,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2015,10,316833268,Manual,Bensin,2500
-Mazda 2 R AT,2020,5,90300064,Manual,Bensin,1500
-Daihatsu Xenia R Deluxe,2014,11,177209475,Otomatis,Bensin,1300
-Suzuki Baleno M/T,2015,10,225937554,Manual,Bensin,1500
-Honda City Hatchback RS,2024,1,193805250,Otomatis,Bensin,1500
-Suzuki Ertiga GL M/T,2012,13,147978475,Otomatis,Diesel,1500
-Toyota Avanza 1.3 G M/T,2024,1,323925392,Otomatis,Diesel,1300
-Suzuki Baleno M/T,2015,10,289548470,Manual,Bensin,1500
-Wuling Confero S,2015,10,90259029,Manual,Bensin,1500
-Mitsubishi Xpander GLS M/T,2020,5,259444231,Manual,Bensin,1500
-Honda City Hatchback RS,2021,4,361163227,Otomatis,Bensin,1500
-Hyundai Creta Trend,2019,6,221392641,Manual,Bensin,1500
-Mazda CX-5 Elite,2016,9,152652147,Otomatis,Diesel,2500
-Mitsubishi Xpander GLS M/T,2015,10,291874558,Otomatis,Bensin,1500
-Mazda CX-5 Elite,2020,5,354720020,Manual,Diesel,2500
-Hyundai Creta Trend,2023,2,376889305,Manual,Bensin,1500
-Honda Brio Satya E CVT,2013,12,211368564,Manual,Diesel,1200
-Suzuki Ertiga GL M/T,2024,1,259493395,Manual,Bensin,1500
-Mazda 2 R AT,2020,5,199156919,Manual,Diesel,1500
-Daihatsu Xenia R Deluxe,2022,3,394715615,Manual,Diesel,1300
-Kia Picanto GT,2016,9,352213582,Manual,Bensin,1200
-Mazda 2 R AT,2012,13,196525457,Manual,Bensin,1500
-Daihatsu Xenia R Deluxe,2013,12,90779516,Manual,Diesel,1300
-Toyota Avanza 1.3 G M/T,2019,6,369262905,Manual,Bensin,1300
-Wuling Almaz RS,2020,5,101305457,Otomatis,Bensin,1500
-Kia Picanto GT,2015,10,104988178,Manual,Diesel,1200
-Honda Brio Satya E CVT,2019,6,124493604,Manual,Bensin,1200
-Toyota Yaris E CVT,2016,9,283932217,Otomatis,Bensin,1500
-Hyundai Stargazer Active,2022,3,296657106,Manual,Diesel,1500
-Hyundai Creta Trend,2024,1,257733606,Manual,Diesel,1500
-Hyundai Stargazer Active,2015,10,105197724,Manual,Diesel,1500
-Suzuki Baleno M/T,2019,6,394599975,Manual,Bensin,1500
-Suzuki Baleno M/T,2016,9,170592061,Manual,Bensin,1500
-Toyota Avanza 1.3 G M/T,2015,10,317347331,Otomatis,Diesel,1300
-Honda Brio Satya E CVT,2023,2,179933482,Otomatis,Bensin,1200
-Kia Picanto GT,2017,8,366628367,Otomatis,Bensin,1200
-Honda City Hatchback RS,2023,2,301361906,Otomatis,Diesel,1500
-Mitsubishi Xpander GLS M/T,2012,13,200455070,Manual,Bensin,1500
-Honda City Hatchback RS,2022,3,97419764,Otomatis,Diesel,1500
-Daihatsu Xenia R Deluxe,2022,3,201407529,Otomatis,Bensin,1300
-Suzuki Baleno M/T,2021,4,295874328,Manual,Diesel,1500
-Hyundai Stargazer Active,2019,6,308038308,Otomatis,Bensin,1500
-Mazda 2 R AT,2016,9,260181574,Otomatis,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2021,4,185316398,Manual,Diesel,2500
-Wuling Confero S,2024,1,152073720,Manual,Bensin,1500
-Honda City Hatchback RS,2017,8,156135397,Otomatis,Diesel,1500
-Suzuki Baleno M/T,2015,10,372286306,Manual,Diesel,1500
-Daihatsu Xenia R Deluxe,2014,11,125691142,Manual,Bensin,1300
-Toyota Avanza 1.3 G M/T,2024,1,396080410,Otomatis,Bensin,1300
-Mitsubishi Pajero Sport Dakar,2019,6,169565065,Manual,Diesel,2500
-Mazda 2 R AT,2020,5,98906934,Manual,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2019,6,346535132,Otomatis,Bensin,2500
-Mitsubishi Pajero Sport Dakar,2022,3,311079344,Manual,Diesel,2500
-Mitsubishi Pajero Sport Dakar,2018,7,262899495,Manual,Bensin,2500
-Mazda CX-5 Elite,2022,3,287088990,Otomatis,Diesel,2500
-Hyundai Stargazer Active,2021,4,173837465,Manual,Bensin,1500
-Mitsubishi Xpander GLS M/T,2020,5,102593529,Manual,Diesel,1500
-Mitsubishi Xpander GLS M/T,2013,12,100389028,Manual,Diesel,1500
-Mazda CX-5 Elite,2014,11,369543132,Otomatis,Diesel,2500
-Kia Picanto GT,2015,10,215261287,Otomatis,Diesel,1200
-Hyundai Stargazer Active,2014,11,342446549,Manual,Diesel,1500
-Wuling Confero S,2019,6,105995133,Manual,Diesel,1500
-Honda Brio Satya E CVT,2020,5,190774061,Manual,Bensin,1200
-Mazda CX-5 Elite,2018,7,215698227,Manual,Diesel,2500
-Wuling Confero S,2020,5,231798620,Manual,Bensin,1500
-Toyota Yaris E CVT,2012,13,206188472,Otomatis,Bensin,1500
-Nissan Livina VE AT,2020,5,189727328,Otomatis,Bensin,1500
-Mitsubishi Xpander GLS M/T,2020,5,117221364,Manual,Bensin,1500
-Suzuki Ertiga GL M/T,2014,11,364370017,Otomatis,Diesel,1500
-Mazda 2 R AT,2022,3,257046688,Otomatis,Diesel,1500
-Mitsubishi Xpander GLS M/T,2017,8,109520234,Otomatis,Diesel,1500
-Daihatsu Terios R AT,2012,13,154462521,Manual,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2015,10,327860692,Manual,Diesel,2500
-Honda Brio Satya E CVT,2024,1,220616283,Manual,Bensin,1200
-Mazda CX-5 Elite,2017,8,174951066,Otomatis,Diesel,2500
-Mazda CX-5 Elite,2018,7,141660448,Manual,Diesel,2500
-Toyota Yaris E CVT,2012,13,369754837,Manual,Bensin,1500
-Toyota Yaris E CVT,2015,10,238844410,Otomatis,Diesel,1500
-Nissan Livina VE AT,2014,11,192482761,Otomatis,Diesel,1500
-Mazda CX-5 Elite,2016,9,143497510,Otomatis,Diesel,2500
-Mitsubishi Pajero Sport Dakar,2014,11,250409429,Manual,Bensin,2500
-Wuling Confero S,2020,5,134427447,Manual,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2021,4,324126892,Otomatis,Diesel,2500
-Toyota Yaris E CVT,2022,3,147469742,Manual,Diesel,1500
-Wuling Confero S,2021,4,209873325,Otomatis,Diesel,1500
-Wuling Confero S,2020,5,268916028,Otomatis,Bensin,1500
-Hyundai Creta Trend,2023,2,130797158,Otomatis,Diesel,1500
-Mazda CX-5 Elite,2015,10,180622333,Manual,Diesel,2500
-Hyundai Stargazer Active,2016,9,336819607,Otomatis,Diesel,1500
-Kia Picanto GT,2019,6,245201154,Manual,Diesel,1200
-Mazda CX-5 Elite,2019,6,210863320,Manual,Diesel,2500
-Mazda CX-5 Elite,2014,11,295046452,Otomatis,Diesel,2500
-Mazda CX-5 Elite,2013,12,153892959,Otomatis,Bensin,2500
-Hyundai Creta Trend,2024,1,107826883,Manual,Diesel,1500
-Mitsubishi Xpander GLS M/T,2019,6,123224416,Otomatis,Diesel,1500
-Wuling Confero S,2018,7,375137487,Manual,Diesel,1500
-Honda City Hatchback RS,2016,9,370542085,Manual,Bensin,1500
-Mazda 2 R AT,2019,6,152432342,Manual,Bensin,1500
-Wuling Almaz RS,2022,3,220178346,Otomatis,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2016,9,158388138,Manual,Diesel,2500
-Mitsubishi Pajero Sport Dakar,2016,9,384115555,Otomatis,Bensin,2500
-Mitsubishi Pajero Sport Dakar,2022,3,151968517,Otomatis,Diesel,2500
-Hyundai Stargazer Active,2012,13,260792726,Manual,Bensin,1500
-Daihatsu Xenia R Deluxe,2013,12,273063072,Manual,Bensin,1300
-Mitsubishi Pajero Sport Dakar,2016,9,350145777,Otomatis,Diesel,2500
-Suzuki Baleno M/T,2014,11,192625598,Otomatis,Diesel,1500
-Honda Brio Satya E CVT,2020,5,263588798,Otomatis,Bensin,1200
-Suzuki Baleno M/T,2017,8,221546363,Otomatis,Diesel,1500
-Kia Picanto GT,2024,1,291579492,Manual,Bensin,1200
-Daihatsu Xenia R Deluxe,2022,3,150575406,Otomatis,Bensin,1300
-Hyundai Creta Trend,2014,11,184832799,Otomatis,Bensin,1500
-Toyota Avanza 1.3 G M/T,2016,9,109717289,Manual,Bensin,1300
-Mazda 2 R AT,2020,5,209863767,Otomatis,Bensin,1500
-Hyundai Creta Trend,2016,9,115517657,Manual,Diesel,1500
-Mazda CX-5 Elite,2019,6,161412659,Manual,Bensin,2500
-Wuling Confero S,2023,2,387770569,Manual,Bensin,1500
-Suzuki Ertiga GL M/T,2022,3,158389008,Otomatis,Diesel,1500
-Toyota Yaris E CVT,2024,1,198563438,Manual,Diesel,1500
-Toyota Yaris E CVT,2021,4,90815982,Otomatis,Bensin,1500
-Wuling Confero S,2019,6,163623516,Manual,Diesel,1500
-Suzuki Ertiga GL M/T,2023,2,258544914,Manual,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2019,6,146069141,Otomatis,Bensin,2500
-Suzuki Baleno M/T,2013,12,171798092,Otomatis,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2018,7,324622945,Manual,Bensin,2500
-Hyundai Creta Trend,2017,8,113023359,Manual,Bensin,1500
-Hyundai Stargazer Active,2016,9,308937744,Otomatis,Bensin,1500
-Mazda CX-5 Elite,2013,12,236166877,Manual,Bensin,2500
-Hyundai Creta Trend,2022,3,144735417,Otomatis,Diesel,1500
-Nissan Livina VE AT,2017,8,232235605,Otomatis,Bensin,1500
-Daihatsu Terios R AT,2017,8,246036502,Manual,Diesel,1500
-Mazda CX-5 Elite,2021,4,171878777,Manual,Diesel,2500
-Nissan Livina VE AT,2023,2,336366650,Otomatis,Bensin,1500
-Wuling Almaz RS,2022,3,321140932,Manual,Diesel,1500
-Hyundai Stargazer Active,2022,3,314727453,Manual,Diesel,1500
-Mazda 2 R AT,2017,8,310380947,Manual,Bensin,1500
-Suzuki Baleno M/T,2014,11,332079929,Manual,Bensin,1500
-Wuling Confero S,2012,13,104720841,Otomatis,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2018,7,310629228,Manual,Diesel,2500
-Kia Picanto GT,2012,13,231656983,Manual,Diesel,1200
-Daihatsu Terios R AT,2016,9,386933632,Otomatis,Diesel,1500
-Mitsubishi Xpander GLS M/T,2022,3,194051051,Manual,Bensin,1500
-Mazda CX-5 Elite,2018,7,166301975,Manual,Diesel,2500
-Toyota Yaris E CVT,2014,11,167348387,Manual,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2013,12,227582600,Otomatis,Bensin,2500
-Mitsubishi Pajero Sport Dakar,2013,12,121536022,Otomatis,Diesel,2500
-Mazda CX-5 Elite,2014,11,233486721,Manual,Bensin,2500
-Toyota Avanza 1.3 G M/T,2016,9,118322563,Otomatis,Bensin,1300
-Hyundai Creta Trend,2023,2,277071225,Otomatis,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2023,2,353045359,Manual,Bensin,2500
-Toyota Avanza 1.3 G M/T,2014,11,380241783,Otomatis,Bensin,1300
-Hyundai Stargazer Active,2022,3,271581027,Manual,Diesel,1500
-Mazda 2 R AT,2016,9,270989013,Otomatis,Diesel,1500
-Kia Picanto GT,2012,13,99807477,Manual,Bensin,1200
-Mazda CX-5 Elite,2017,8,131596583,Manual,Diesel,2500
-Mazda CX-5 Elite,2018,7,299408257,Manual,Diesel,2500
-Daihatsu Terios R AT,2018,7,140780133,Otomatis,Bensin,1500
-Toyota Avanza 1.3 G M/T,2018,7,267164922,Manual,Diesel,1300
-Mazda CX-5 Elite,2020,5,182592978,Manual,Bensin,2500
-Kia Picanto GT,2016,9,221037810,Manual,Bensin,1200
-Honda Brio Satya E CVT,2015,10,193803200,Manual,Bensin,1200
-Hyundai Creta Trend,2016,9,334501471,Manual,Diesel,1500
-Daihatsu Xenia R Deluxe,2012,13,154461747,Manual,Diesel,1300
-Suzuki Ertiga GL M/T,2023,2,124966797,Manual,Diesel,1500
-Honda Brio Satya E CVT,2021,4,90365018,Manual,Bensin,1200
-Nissan Livina VE AT,2016,9,220770523,Manual,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2024,1,243457529,Otomatis,Bensin,2500
-Toyota Avanza 1.3 G M/T,2019,6,92833999,Otomatis,Diesel,1300
-Suzuki Baleno M/T,2015,10,272808859,Manual,Diesel,1500
-Hyundai Creta Trend,2019,6,308203360,Manual,Bensin,1500
-Nissan Livina VE AT,2024,1,325550696,Manual,Bensin,1500
-Suzuki Baleno M/T,2023,2,167225521,Manual,Bensin,1500
-Wuling Almaz RS,2017,8,391510503,Manual,Diesel,1500
-Daihatsu Terios R AT,2016,9,202235676,Manual,Bensin,1500
-Mazda 2 R AT,2019,6,216245224,Otomatis,Diesel,1500
-Toyota Yaris E CVT,2015,10,322050312,Manual,Bensin,1500
-Toyota Yaris E CVT,2022,3,155296350,Otomatis,Bensin,1500
-Nissan Livina VE AT,2012,13,254710230,Otomatis,Bensin,1500
-Daihatsu Terios R AT,2024,1,278409412,Manual,Bensin,1500
-Nissan Livina VE AT,2021,4,333847346,Manual,Bensin,1500
-Honda Brio Satya E CVT,2015,10,255493871,Manual,Diesel,1200
-Mitsubishi Pajero Sport Dakar,2022,3,199164459,Manual,Bensin,2500
-Mazda CX-5 Elite,2022,3,344200829,Manual,Bensin,2500
-Daihatsu Terios R AT,2017,8,129246269,Otomatis,Bensin,1500
-Suzuki Baleno M/T,2019,6,218013306,Otomatis,Bensin,1500
-Mazda CX-5 Elite,2024,1,156947859,Manual,Bensin,2500
-Daihatsu Xenia R Deluxe,2023,2,362202376,Otomatis,Bensin,1300
-Honda Brio Satya E CVT,2021,4,168241018,Otomatis,Bensin,1200
-Mazda 2 R AT,2012,13,127507965,Manual,Bensin,1500
-Wuling Almaz RS,2021,4,243995237,Otomatis,Diesel,1500
-Hyundai Creta Trend,2020,5,245468994,Manual,Bensin,1500
-Mitsubishi Xpander GLS M/T,2023,2,181466342,Manual,Diesel,1500
-Kia Picanto GT,2015,10,379419767,Manual,Bensin,1200
-Daihatsu Xenia R Deluxe,2022,3,363745308,Manual,Diesel,1300
-Daihatsu Xenia R Deluxe,2019,6,350452062,Otomatis,Bensin,1300
-Suzuki Ertiga GL M/T,2013,12,131007545,Manual,Diesel,1500
-Suzuki Ertiga GL M/T,2019,6,264487373,Otomatis,Diesel,1500
-Mazda CX-5 Elite,2017,8,138514055,Otomatis,Bensin,2500
-Suzuki Ertiga GL M/T,2018,7,210827559,Otomatis,Diesel,1500
-Toyota Avanza 1.3 G M/T,2021,4,338406209,Manual,Bensin,1300
-Hyundai Stargazer Active,2017,8,230779324,Otomatis,Bensin,1500
-Suzuki Ertiga GL M/T,2017,8,276634610,Manual,Bensin,1500
-Wuling Confero S,2013,12,130762244,Manual,Diesel,1500
-Daihatsu Xenia R Deluxe,2014,11,386805994,Manual,Bensin,1300
-Hyundai Creta Trend,2018,7,144023483,Manual,Bensin,1500
-Mazda 2 R AT,2013,12,229252271,Manual,Bensin,1500
-Toyota Yaris E CVT,2019,6,193031515,Otomatis,Diesel,1500
-Wuling Almaz RS,2018,7,217477177,Manual,Diesel,1500
-Daihatsu Terios R AT,2022,3,311638649,Otomatis,Bensin,1500
-Mazda 2 R AT,2023,2,336768532,Manual,Diesel,1500
-Wuling Confero S,2013,12,218227199,Otomatis,Bensin,1500
-Toyota Avanza 1.3 G M/T,2015,10,326217040,Manual,Bensin,1300
-Suzuki Ertiga GL M/T,2022,3,181170873,Manual,Bensin,1500
-Nissan Livina VE AT,2019,6,226466252,Manual,Bensin,1500
-Toyota Yaris E CVT,2024,1,321332785,Otomatis,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2022,3,182446913,Manual,Bensin,2500
-Hyundai Creta Trend,2024,1,130500134,Otomatis,Diesel,1500
-Kia Picanto GT,2019,6,116409362,Otomatis,Diesel,1200
-Hyundai Creta Trend,2021,4,261675906,Manual,Diesel,1500
-Nissan Livina VE AT,2013,12,299833629,Otomatis,Diesel,1500
-Mitsubishi Xpander GLS M/T,2023,2,275466404,Manual,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2020,5,291257146,Otomatis,Bensin,2500
-Mazda 2 R AT,2024,1,254209784,Manual,Diesel,1500
-Honda City Hatchback RS,2019,6,224334055,Otomatis,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2018,7,246342339,Manual,Diesel,2500
-Toyota Avanza 1.3 G M/T,2020,5,193122086,Manual,Bensin,1300
-Wuling Almaz RS,2016,9,164743808,Otomatis,Diesel,1500
-Toyota Avanza 1.3 G M/T,2016,9,92508893,Otomatis,Bensin,1300
-Toyota Yaris E CVT,2023,2,121113004,Manual,Bensin,1500
-Honda Brio Satya E CVT,2018,7,187363355,Otomatis,Diesel,1200
-Hyundai Stargazer Active,2024,1,297281207,Manual,Diesel,1500
-Nissan Livina VE AT,2020,5,294241681,Manual,Diesel,1500
-Mazda CX-5 Elite,2024,1,358435931,Otomatis,Diesel,2500
-Hyundai Stargazer Active,2018,7,127301048,Otomatis,Bensin,1500
-Mitsubishi Xpander GLS M/T,2021,4,364586284,Manual,Diesel,1500
-Daihatsu Xenia R Deluxe,2022,3,198698726,Otomatis,Bensin,1300
-Wuling Almaz RS,2012,13,288441927,Otomatis,Bensin,1500
-Mazda CX-5 Elite,2013,12,350521890,Otomatis,Bensin,2500
-Toyota Yaris E CVT,2020,5,236171566,Otomatis,Diesel,1500
-Mitsubishi Xpander GLS M/T,2019,6,393965084,Manual,Bensin,1500
-Mitsubishi Xpander GLS M/T,2012,13,280678782,Manual,Bensin,1500
-Hyundai Creta Trend,2024,1,395735997,Otomatis,Bensin,1500
-Toyota Avanza 1.3 G M/T,2022,3,388043064,Otomatis,Diesel,1300
-Daihatsu Terios R AT,2021,4,295963951,Manual,Bensin,1500
-Nissan Livina VE AT,2016,9,392020133,Manual,Diesel,1500
-Honda Brio Satya E CVT,2023,2,336912111,Manual,Bensin,1200
-Wuling Confero S,2022,3,346083178,Manual,Bensin,1500
-Mazda 2 R AT,2024,1,149112305,Manual,Bensin,1500
-Wuling Almaz RS,2020,5,215567269,Otomatis,Diesel,1500
-Mazda CX-5 Elite,2016,9,212659742,Otomatis,Diesel,2500
-Mazda CX-5 Elite,2022,3,194951565,Manual,Bensin,2500
-Suzuki Baleno M/T,2021,4,331741094,Manual,Diesel,1500
-Daihatsu Terios R AT,2018,7,222840704,Manual,Diesel,1500
-Daihatsu Terios R AT,2023,2,242288175,Otomatis,Diesel,1500
-Nissan Livina VE AT,2020,5,229239152,Manual,Diesel,1500
-Daihatsu Xenia R Deluxe,2018,7,103853054,Otomatis,Diesel,1300
-Kia Picanto GT,2022,3,245695181,Otomatis,Bensin,1200
-Toyota Avanza 1.3 G M/T,2022,3,208857438,Otomatis,Diesel,1300
-Mitsubishi Xpander GLS M/T,2021,4,298487812,Otomatis,Bensin,1500
-Toyota Yaris E CVT,2021,4,151264012,Otomatis,Diesel,1500
-Toyota Avanza 1.3 G M/T,2012,13,233032090,Manual,Bensin,1300
-Suzuki Ertiga GL M/T,2020,5,204300090,Manual,Bensin,1500
-Nissan Livina VE AT,2021,4,101778262,Otomatis,Diesel,1500
-Honda City Hatchback RS,2023,2,179506247,Manual,Bensin,1500
-Daihatsu Xenia R Deluxe,2014,11,303515952,Manual,Diesel,1300
-Wuling Almaz RS,2024,1,183894582,Otomatis,Bensin,1500
-Toyota Avanza 1.3 G M/T,2013,12,344505358,Otomatis,Bensin,1300
-Kia Picanto GT,2015,10,112872612,Otomatis,Bensin,1200
-Kia Picanto GT,2013,12,152517209,Manual,Bensin,1200
-Mazda 2 R AT,2013,12,243039077,Manual,Bensin,1500
-Honda Brio Satya E CVT,2014,11,244321954,Otomatis,Bensin,1200
-Nissan Livina VE AT,2017,8,275553117,Manual,Bensin,1500
-Nissan Livina VE AT,2018,7,392829151,Otomatis,Diesel,1500
-Suzuki Baleno M/T,2024,1,99364538,Otomatis,Bensin,1500
-Daihatsu Xenia R Deluxe,2022,3,302125220,Manual,Bensin,1300
-Honda Brio Satya E CVT,2019,6,295382495,Manual,Bensin,1200
-Mitsubishi Xpander GLS M/T,2014,11,277064235,Manual,Diesel,1500
-Mitsubishi Xpander GLS M/T,2024,1,255831923,Otomatis,Diesel,1500
-Honda City Hatchback RS,2017,8,255750379,Otomatis,Bensin,1500
-Wuling Almaz RS,2023,2,251978389,Otomatis,Diesel,1500
-Honda City Hatchback RS,2019,6,311534650,Otomatis,Bensin,1500
-Hyundai Creta Trend,2018,7,191395449,Otomatis,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2024,1,143459745,Otomatis,Diesel,2500
-Suzuki Baleno M/T,2020,5,126321307,Otomatis,Bensin,1500
-Daihatsu Terios R AT,2016,9,141723252,Manual,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2018,7,265351695,Otomatis,Diesel,2500
-Suzuki Baleno M/T,2022,3,359763093,Manual,Diesel,1500
-Mazda 2 R AT,2018,7,159363592,Manual,Bensin,1500
-Honda City Hatchback RS,2015,10,160052648,Manual,Diesel,1500
-Mazda 2 R AT,2013,12,209355864,Manual,Diesel,1500
-Suzuki Ertiga GL M/T,2024,1,152609267,Otomatis,Diesel,1500
-Hyundai Stargazer Active,2020,5,294810818,Manual,Diesel,1500
-Mazda 2 R AT,2019,6,264768328,Otomatis,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2015,10,118652908,Manual,Diesel,2500
-Wuling Confero S,2023,2,220075930,Manual,Bensin,1500
-Wuling Confero S,2014,11,210744156,Manual,Bensin,1500
-Toyota Avanza 1.3 G M/T,2016,9,251370637,Manual,Bensin,1300
-Daihatsu Terios R AT,2017,8,256245299,Otomatis,Bensin,1500
-Toyota Yaris E CVT,2020,5,342021761,Manual,Bensin,1500
-Wuling Almaz RS,2020,5,286906652,Manual,Bensin,1500
-Wuling Confero S,2018,7,189969183,Manual,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2018,7,318137012,Manual,Bensin,2500
-Mitsubishi Pajero Sport Dakar,2022,3,154181027,Otomatis,Bensin,2500
-Mazda CX-5 Elite,2014,11,304926409,Otomatis,Bensin,2500
-Hyundai Creta Trend,2018,7,223414680,Manual,Bensin,1500
-Toyota Yaris E CVT,2020,5,299570809,Otomatis,Diesel,1500
-Hyundai Creta Trend,2014,11,209405650,Manual,Diesel,1500
-Mitsubishi Xpander GLS M/T,2012,13,270905697,Manual,Bensin,1500
-Toyota Avanza 1.3 G M/T,2013,12,304752546,Otomatis,Diesel,1300
-Nissan Livina VE AT,2021,4,213601983,Manual,Diesel,1500
-Nissan Livina VE AT,2017,8,260435879,Manual,Diesel,1500
-Hyundai Creta Trend,2015,10,234567206,Manual,Diesel,1500
-Daihatsu Xenia R Deluxe,2018,7,342113842,Manual,Bensin,1300
-Nissan Livina VE AT,2018,7,114555540,Otomatis,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2016,9,284033618,Otomatis,Bensin,2500
-Hyundai Creta Trend,2020,5,234894137,Manual,Bensin,1500
-Mitsubishi Xpander GLS M/T,2015,10,168120831,Otomatis,Diesel,1500
-Honda Brio Satya E CVT,2024,1,110609818,Otomatis,Bensin,1200
-Hyundai Creta Trend,2014,11,277291961,Otomatis,Diesel,1500
-Mazda CX-5 Elite,2024,1,268548628,Otomatis,Bensin,2500
-Toyota Avanza 1.3 G M/T,2020,5,192272124,Manual,Diesel,1300
-Daihatsu Xenia R Deluxe,2018,7,118646991,Otomatis,Bensin,1300
-Daihatsu Terios R AT,2024,1,380027079,Manual,Bensin,1500
-Honda City Hatchback RS,2024,1,232569927,Otomatis,Diesel,1500
-Wuling Confero S,2020,5,266973163,Manual,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2021,4,267120938,Manual,Bensin,2500
-Wuling Almaz RS,2021,4,160431555,Manual,Diesel,1500
-Hyundai Stargazer Active,2012,13,143914694,Manual,Bensin,1500
-Daihatsu Terios R AT,2013,12,342841973,Otomatis,Diesel,1500
-Kia Picanto GT,2017,8,245958809,Manual,Diesel,1200
-Wuling Confero S,2016,9,393959889,Otomatis,Diesel,1500
-Mazda CX-5 Elite,2021,4,282674419,Otomatis,Bensin,2500
-Kia Picanto GT,2013,12,291355286,Otomatis,Diesel,1200
-Kia Picanto GT,2012,13,129360213,Otomatis,Bensin,1200
-Nissan Livina VE AT,2022,3,201706647,Manual,Diesel,1500
-Kia Picanto GT,2016,9,294130117,Otomatis,Bensin,1200
-Nissan Livina VE AT,2022,3,363876520,Otomatis,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2021,4,323914991,Otomatis,Diesel,2500
-Mazda 2 R AT,2020,5,336235392,Otomatis,Diesel,1500
-Mazda CX-5 Elite,2022,3,329018463,Manual,Bensin,2500
-Honda Brio Satya E CVT,2012,13,341517012,Manual,Diesel,1200
-Toyota Avanza 1.3 G M/T,2014,11,387566143,Manual,Diesel,1300
-Kia Picanto GT,2012,13,192046497,Otomatis,Diesel,1200
-Honda Brio Satya E CVT,2019,6,298221176,Manual,Diesel,1200
-Suzuki Baleno M/T,2016,9,132905630,Otomatis,Diesel,1500
-Kia Picanto GT,2015,10,386586262,Otomatis,Bensin,1200
-Mitsubishi Xpander GLS M/T,2023,2,368130061,Manual,Diesel,1500
-Nissan Livina VE AT,2022,3,331181130,Manual,Bensin,1500
-Honda Brio Satya E CVT,2023,2,329287660,Otomatis,Diesel,1200
-Toyota Avanza 1.3 G M/T,2018,7,171595087,Manual,Diesel,1300
-Mitsubishi Xpander GLS M/T,2023,2,312381956,Manual,Diesel,1500
-Daihatsu Terios R AT,2020,5,144420208,Otomatis,Bensin,1500
-Suzuki Baleno M/T,2016,9,171769837,Otomatis,Diesel,1500
-Wuling Almaz RS,2018,7,366425092,Otomatis,Bensin,1500
-Honda Brio Satya E CVT,2018,7,272504168,Manual,Bensin,1200
-Suzuki Ertiga GL M/T,2024,1,175938241,Manual,Diesel,1500
-Wuling Confero S,2018,7,190009295,Otomatis,Bensin,1500
-Suzuki Ertiga GL M/T,2018,7,292876843,Otomatis,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2022,3,376732540,Otomatis,Diesel,2500
-Suzuki Baleno M/T,2019,6,288961958,Otomatis,Bensin,1500
-Honda City Hatchback RS,2019,6,332649767,Manual,Bensin,1500
-Daihatsu Terios R AT,2015,10,168300836,Otomatis,Diesel,1500
-Nissan Livina VE AT,2022,3,155998145,Otomatis,Bensin,1500
-Daihatsu Xenia R Deluxe,2012,13,131176355,Manual,Diesel,1300
-Mitsubishi Pajero Sport Dakar,2014,11,128851589,Manual,Diesel,2500
-Wuling Confero S,2016,9,388676944,Manual,Bensin,1500
-Hyundai Stargazer Active,2017,8,142144632,Otomatis,Diesel,1500
-Honda Brio Satya E CVT,2015,10,112710687,Otomatis,Bensin,1200
-Hyundai Creta Trend,2023,2,328108001,Manual,Bensin,1500
-Honda Brio Satya E CVT,2021,4,361747726,Otomatis,Bensin,1200
-Mazda 2 R AT,2019,6,378608226,Manual,Bensin,1500
-Honda Brio Satya E CVT,2012,13,351264608,Manual,Bensin,1200
-Mazda 2 R AT,2017,8,90228501,Manual,Diesel,1500
-Mazda 2 R AT,2015,10,346368067,Manual,Diesel,1500
-Honda Brio Satya E CVT,2024,1,365353336,Otomatis,Diesel,1200
-Mazda 2 R AT,2022,3,281473117,Manual,Bensin,1500
-Mitsubishi Xpander GLS M/T,2019,6,380926374,Manual,Bensin,1500
-Daihatsu Terios R AT,2021,4,339273892,Otomatis,Diesel,1500
-Nissan Livina VE AT,2014,11,307431221,Otomatis,Bensin,1500
-Honda Brio Satya E CVT,2015,10,131869161,Manual,Bensin,1200
-Toyota Yaris E CVT,2022,3,379548935,Manual,Bensin,1500
-Kia Picanto GT,2017,8,206234904,Otomatis,Bensin,1200
-Mitsubishi Pajero Sport Dakar,2023,2,342595425,Manual,Diesel,2500
-Mazda CX-5 Elite,2018,7,390362390,Otomatis,Diesel,2500
-Hyundai Stargazer Active,2020,5,275693585,Otomatis,Bensin,1500
-Toyota Avanza 1.3 G M/T,2019,6,166574141,Manual,Bensin,1300
-Suzuki Ertiga GL M/T,2013,12,144059257,Otomatis,Diesel,1500
-Hyundai Creta Trend,2016,9,340834784,Otomatis,Bensin,1500
-Toyota Yaris E CVT,2020,5,184561073,Manual,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2012,13,369330631,Otomatis,Diesel,2500
-Daihatsu Terios R AT,2021,4,395061812,Manual,Bensin,1500
-Mitsubishi Xpander GLS M/T,2012,13,233301609,Manual,Diesel,1500
-Toyota Yaris E CVT,2017,8,278094378,Otomatis,Bensin,1500
-Kia Picanto GT,2022,3,139099757,Otomatis,Bensin,1200
-Toyota Avanza 1.3 G M/T,2023,2,284463488,Otomatis,Bensin,1300
-Toyota Yaris E CVT,2014,11,370116330,Otomatis,Diesel,1500
-Toyota Avanza 1.3 G M/T,2017,8,376944554,Otomatis,Diesel,1300
-Daihatsu Terios R AT,2023,2,202714031,Manual,Diesel,1500
-Honda City Hatchback RS,2013,12,357817376,Otomatis,Diesel,1500
-Toyota Avanza 1.3 G M/T,2023,2,368427769,Manual,Bensin,1300
-Mazda 2 R AT,2017,8,204199659,Manual,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2019,6,266389928,Manual,Diesel,2500
-Honda Brio Satya E CVT,2023,2,225180696,Otomatis,Diesel,1200
-Suzuki Baleno M/T,2023,2,233929316,Manual,Diesel,1500
-Hyundai Stargazer Active,2024,1,147364271,Manual,Diesel,1500
-Toyota Yaris E CVT,2012,13,137613709,Manual,Diesel,1500
-Honda Brio Satya E CVT,2018,7,269252946,Manual,Bensin,1200
-Suzuki Baleno M/T,2014,11,197204798,Manual,Bensin,1500
-Wuling Confero S,2016,9,129220353,Otomatis,Bensin,1500
-Honda City Hatchback RS,2013,12,211173470,Otomatis,Bensin,1500
-Honda Brio Satya E CVT,2013,12,146568489,Otomatis,Diesel,1200
-Mitsubishi Xpander GLS M/T,2018,7,290983626,Manual,Diesel,1500
-Daihatsu Terios R AT,2015,10,244419140,Manual,Diesel,1500
-Mazda 2 R AT,2021,4,115773936,Otomatis,Bensin,1500
-Honda Brio Satya E CVT,2012,13,114801584,Manual,Bensin,1200
-Mazda 2 R AT,2017,8,334670600,Manual,Bensin,1500
-Suzuki Baleno M/T,2020,5,167703641,Manual,Diesel,1500
-Wuling Almaz RS,2018,7,306498516,Manual,Diesel,1500
-Mazda CX-5 Elite,2018,7,316654730,Otomatis,Diesel,2500
-Mazda 2 R AT,2014,11,365846069,Manual,Bensin,1500
-Daihatsu Terios R AT,2022,3,180925872,Manual,Bensin,1500
-Honda City Hatchback RS,2012,13,332805032,Manual,Bensin,1500
-Nissan Livina VE AT,2014,11,355687101,Otomatis,Bensin,1500
-Wuling Confero S,2015,10,182835597,Manual,Diesel,1500
-Suzuki Baleno M/T,2016,9,342590876,Otomatis,Bensin,1500
-Suzuki Ertiga GL M/T,2022,3,108239967,Otomatis,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2018,7,382881507,Otomatis,Bensin,2500
-Daihatsu Terios R AT,2016,9,118921195,Otomatis,Diesel,1500
-Kia Picanto GT,2012,13,272419733,Otomatis,Diesel,1200
-Mazda 2 R AT,2014,11,199353441,Manual,Bensin,1500
-Wuling Almaz RS,2023,2,255797988,Otomatis,Bensin,1500
-Wuling Almaz RS,2023,2,366103067,Manual,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2013,12,115194035,Manual,Bensin,2500
-Kia Picanto GT,2015,10,294396049,Otomatis,Bensin,1200
-Toyota Yaris E CVT,2017,8,316913444,Otomatis,Diesel,1500
-Daihatsu Terios R AT,2021,4,140708116,Manual,Bensin,1500
-Toyota Avanza 1.3 G M/T,2018,7,182563101,Manual,Diesel,1300
-Mazda CX-5 Elite,2020,5,153065180,Otomatis,Bensin,2500
-Hyundai Stargazer Active,2014,11,233118867,Otomatis,Bensin,1500
-Toyota Avanza 1.3 G M/T,2021,4,324805618,Otomatis,Diesel,1300
-Toyota Yaris E CVT,2023,2,339505285,Manual,Diesel,1500
-Toyota Yaris E CVT,2016,9,245073663,Manual,Diesel,1500
-Hyundai Stargazer Active,2015,10,360154702,Manual,Bensin,1500
-Daihatsu Xenia R Deluxe,2013,12,342838516,Otomatis,Diesel,1300
-Honda City Hatchback RS,2020,5,253402218,Otomatis,Bensin,1500
-Hyundai Creta Trend,2020,5,184184723,Otomatis,Bensin,1500
-Daihatsu Terios R AT,2012,13,319952023,Manual,Bensin,1500
-Honda Brio Satya E CVT,2024,1,286543176,Otomatis,Bensin,1200
-Honda Brio Satya E CVT,2017,8,118823410,Otomatis,Bensin,1200
-Kia Picanto GT,2015,10,228724505,Manual,Diesel,1200
-Mitsubishi Pajero Sport Dakar,2015,10,127061091,Manual,Diesel,2500
-Kia Picanto GT,2012,13,264315470,Otomatis,Diesel,1200
-Toyota Avanza 1.3 G M/T,2013,12,190947196,Otomatis,Bensin,1300
-Suzuki Baleno M/T,2019,6,159004025,Otomatis,Bensin,1500
-Mazda CX-5 Elite,2024,1,332002324,Manual,Bensin,2500
-Honda Brio Satya E CVT,2023,2,181415523,Manual,Diesel,1200
-Nissan Livina VE AT,2024,1,132048383,Otomatis,Bensin,1500
-Daihatsu Xenia R Deluxe,2014,11,321797351,Manual,Bensin,1300
-Hyundai Stargazer Active,2020,5,241859614,Manual,Diesel,1500
-Honda City Hatchback RS,2017,8,99508284,Manual,Diesel,1500
-Hyundai Creta Trend,2013,12,339847317,Manual,Diesel,1500
-Hyundai Stargazer Active,2014,11,197504207,Otomatis,Diesel,1500
-Toyota Yaris E CVT,2018,7,256573837,Otomatis,Diesel,1500
-Hyundai Stargazer Active,2020,5,204470937,Manual,Bensin,1500
-Hyundai Stargazer Active,2020,5,364729069,Manual,Diesel,1500
-Suzuki Ertiga GL M/T,2017,8,373422463,Otomatis,Diesel,1500
-Wuling Almaz RS,2017,8,231340354,Otomatis,Diesel,1500
-Mitsubishi Xpander GLS M/T,2016,9,378277121,Manual,Diesel,1500
-Mazda CX-5 Elite,2016,9,217886656,Manual,Diesel,2500
-Toyota Yaris E CVT,2018,7,378037489,Otomatis,Bensin,1500
-Mazda 2 R AT,2022,3,258787648,Otomatis,Diesel,1500
-Mazda CX-5 Elite,2020,5,399990383,Otomatis,Bensin,2500
-Mazda CX-5 Elite,2024,1,279896055,Manual,Bensin,2500
-Honda Brio Satya E CVT,2024,1,261239961,Otomatis,Diesel,1200
-Daihatsu Terios R AT,2012,13,313108265,Manual,Diesel,1500
-Nissan Livina VE AT,2020,5,162423571,Manual,Diesel,1500
-Toyota Avanza 1.3 G M/T,2021,4,128352803,Otomatis,Diesel,1300
-Suzuki Ertiga GL M/T,2024,1,172488152,Otomatis,Bensin,1500
-Wuling Confero S,2021,4,349436410,Otomatis,Bensin,1500
-Toyota Yaris E CVT,2013,12,323828159,Manual,Bensin,1500
-Wuling Almaz RS,2012,13,281666312,Otomatis,Diesel,1500
-Hyundai Creta Trend,2019,6,376566787,Otomatis,Diesel,1500
-Wuling Confero S,2017,8,134303504,Manual,Bensin,1500
-Wuling Confero S,2020,5,176588036,Manual,Bensin,1500
-Honda City Hatchback RS,2020,5,298831739,Manual,Diesel,1500
-Hyundai Stargazer Active,2015,10,236282828,Manual,Diesel,1500
-Kia Picanto GT,2021,4,125673146,Manual,Bensin,1200
-Hyundai Creta Trend,2020,5,158932578,Otomatis,Diesel,1500
-Honda Brio Satya E CVT,2016,9,320615343,Manual,Diesel,1200
-Toyota Avanza 1.3 G M/T,2014,11,297665086,Otomatis,Bensin,1300
-Daihatsu Xenia R Deluxe,2012,13,247282232,Manual,Diesel,1300
-Daihatsu Terios R AT,2016,9,267010717,Otomatis,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2023,2,273527617,Manual,Diesel,2500
-Suzuki Baleno M/T,2015,10,179791642,Manual,Bensin,1500
-Suzuki Baleno M/T,2016,9,249280513,Otomatis,Bensin,1500
-Wuling Almaz RS,2013,12,352091692,Manual,Bensin,1500
-Daihatsu Xenia R Deluxe,2019,6,285490125,Manual,Diesel,1300
-Daihatsu Terios R AT,2018,7,244908502,Otomatis,Bensin,1500
-Hyundai Stargazer Active,2021,4,216957329,Manual,Diesel,1500
-Suzuki Baleno M/T,2018,7,329666959,Otomatis,Bensin,1500
-Honda Brio Satya E CVT,2015,10,95923085,Otomatis,Bensin,1200
-Honda City Hatchback RS,2024,1,326341658,Manual,Diesel,1500
-Hyundai Creta Trend,2019,6,127203436,Manual,Diesel,1500
-Wuling Confero S,2023,2,239170025,Manual,Bensin,1500
-Mazda CX-5 Elite,2020,5,263557334,Manual,Diesel,2500
-Hyundai Stargazer Active,2012,13,260187972,Otomatis,Bensin,1500
-Mitsubishi Xpander GLS M/T,2021,4,312252434,Otomatis,Diesel,1500
-Hyundai Creta Trend,2023,2,266002270,Otomatis,Diesel,1500
-Mitsubishi Xpander GLS M/T,2016,9,163638400,Manual,Diesel,1500
-Suzuki Ertiga GL M/T,2021,4,245707731,Manual,Diesel,1500
-Suzuki Ertiga GL M/T,2017,8,156246397,Otomatis,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2015,10,393805225,Otomatis,Bensin,2500
-Daihatsu Terios R AT,2023,2,147260315,Manual,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2021,4,350165180,Manual,Diesel,2500
-Suzuki Baleno M/T,2019,6,318581818,Otomatis,Diesel,1500
-Daihatsu Terios R AT,2017,8,385555314,Manual,Bensin,1500
-Suzuki Baleno M/T,2020,5,356908012,Manual,Diesel,1500
-Suzuki Baleno M/T,2020,5,252776680,Otomatis,Bensin,1500
-Honda Brio Satya E CVT,2023,2,133172222,Otomatis,Diesel,1200
-Suzuki Baleno M/T,2014,11,222445343,Manual,Diesel,1500
-Daihatsu Xenia R Deluxe,2023,2,280943177,Otomatis,Bensin,1300
-Hyundai Stargazer Active,2016,9,146408908,Otomatis,Diesel,1500
-Suzuki Ertiga GL M/T,2024,1,320790833,Manual,Diesel,1500
-Suzuki Ertiga GL M/T,2012,13,180525701,Manual,Bensin,1500
-Daihatsu Xenia R Deluxe,2013,12,186490033,Manual,Bensin,1300
-Wuling Almaz RS,2020,5,155191895,Manual,Diesel,1500
-Honda Brio Satya E CVT,2014,11,344418128,Manual,Bensin,1200
-Daihatsu Xenia R Deluxe,2015,10,394917628,Otomatis,Diesel,1300
-Mitsubishi Pajero Sport Dakar,2017,8,398289029,Manual,Bensin,2500
-Suzuki Baleno M/T,2016,9,181953928,Otomatis,Bensin,1500
-Honda Brio Satya E CVT,2018,7,381195747,Manual,Bensin,1200
-Honda Brio Satya E CVT,2016,9,335368425,Manual,Diesel,1200
-Toyota Yaris E CVT,2018,7,310051950,Manual,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2023,2,192637464,Manual,Diesel,2500
-Wuling Almaz RS,2018,7,347283543,Otomatis,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2021,4,365219647,Otomatis,Diesel,2500
-Toyota Yaris E CVT,2016,9,106036662,Manual,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2015,10,383348605,Manual,Diesel,2500
-Suzuki Baleno M/T,2012,13,359072726,Manual,Diesel,1500
-Mazda 2 R AT,2022,3,192491048,Otomatis,Diesel,1500
-Daihatsu Terios R AT,2015,10,312038991,Manual,Diesel,1500
-Daihatsu Terios R AT,2015,10,370091908,Manual,Diesel,1500
-Mazda CX-5 Elite,2014,11,259496762,Manual,Bensin,2500
-Kia Picanto GT,2015,10,301658104,Otomatis,Bensin,1200
-Hyundai Stargazer Active,2012,13,255594787,Otomatis,Diesel,1500
-Daihatsu Terios R AT,2013,12,146094522,Manual,Bensin,1500
-Mitsubishi Xpander GLS M/T,2024,1,282967748,Manual,Diesel,1500
-Wuling Almaz RS,2016,9,96706037,Otomatis,Diesel,1500
-Hyundai Creta Trend,2016,9,351580239,Otomatis,Bensin,1500
-Daihatsu Terios R AT,2013,12,101650446,Manual,Diesel,1500
-Mitsubishi Xpander GLS M/T,2020,5,248659907,Otomatis,Bensin,1500
-Mazda CX-5 Elite,2015,10,103046460,Manual,Bensin,2500
-Mazda CX-5 Elite,2022,3,95005593,Otomatis,Bensin,2500
-Mitsubishi Xpander GLS M/T,2020,5,279997733,Manual,Diesel,1500
-Mitsubishi Xpander GLS M/T,2015,10,385621578,Otomatis,Bensin,1500
-Daihatsu Terios R AT,2019,6,353248533,Manual,Diesel,1500
-Wuling Confero S,2016,9,93546579,Manual,Bensin,1500
-Suzuki Baleno M/T,2021,4,327715698,Otomatis,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2016,9,347772259,Otomatis,Diesel,2500
-Honda City Hatchback RS,2020,5,199033630,Manual,Bensin,1500
-Honda Brio Satya E CVT,2020,5,244241330,Manual,Bensin,1200
-Honda City Hatchback RS,2022,3,313108516,Manual,Diesel,1500
-Daihatsu Terios R AT,2019,6,113206177,Otomatis,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2015,10,93651582,Manual,Diesel,2500
-Toyota Yaris E CVT,2023,2,356399350,Manual,Diesel,1500
-Hyundai Stargazer Active,2020,5,115430843,Otomatis,Bensin,1500
-Wuling Confero S,2014,11,305363760,Manual,Bensin,1500
-Wuling Confero S,2017,8,307027281,Otomatis,Diesel,1500
-Honda Brio Satya E CVT,2019,6,140397755,Manual,Diesel,1200
-Mazda CX-5 Elite,2015,10,155280270,Manual,Diesel,2500
-Hyundai Stargazer Active,2019,6,150581809,Manual,Diesel,1500
-Suzuki Baleno M/T,2017,8,348450256,Manual,Bensin,1500
-Hyundai Stargazer Active,2013,12,330197403,Manual,Bensin,1500
-Wuling Confero S,2019,6,256059000,Otomatis,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2014,11,310069896,Otomatis,Bensin,2500
-Suzuki Baleno M/T,2024,1,169149357,Manual,Bensin,1500
-Suzuki Ertiga GL M/T,2017,8,207608148,Otomatis,Bensin,1500
-Hyundai Creta Trend,2014,11,334700197,Otomatis,Diesel,1500
-Daihatsu Terios R AT,2021,4,274139326,Manual,Bensin,1500
-Mitsubishi Xpander GLS M/T,2023,2,142803613,Otomatis,Diesel,1500
-Wuling Almaz RS,2020,5,332237256,Otomatis,Diesel,1500
-Toyota Avanza 1.3 G M/T,2023,2,389291801,Otomatis,Diesel,1300
-Nissan Livina VE AT,2014,11,334676913,Otomatis,Diesel,1500
-Mazda 2 R AT,2016,9,296773691,Manual,Bensin,1500
-Honda Brio Satya E CVT,2015,10,241840782,Manual,Bensin,1200
-Kia Picanto GT,2020,5,206959213,Otomatis,Diesel,1200
-Mazda CX-5 Elite,2019,6,183951613,Manual,Bensin,2500
-Mazda CX-5 Elite,2018,7,242714173,Manual,Bensin,2500
-Kia Picanto GT,2015,10,170829987,Manual,Diesel,1200
-Toyota Yaris E CVT,2019,6,352317667,Otomatis,Bensin,1500
-Nissan Livina VE AT,2017,8,117017045,Otomatis,Bensin,1500
-Hyundai Stargazer Active,2023,2,251830656,Manual,Bensin,1500
-Honda City Hatchback RS,2020,5,262501027,Otomatis,Bensin,1500
-Hyundai Stargazer Active,2023,2,374855268,Otomatis,Bensin,1500
-Honda Brio Satya E CVT,2014,11,295768214,Otomatis,Diesel,1200
-Suzuki Ertiga GL M/T,2018,7,201931559,Manual,Bensin,1500
-Mazda 2 R AT,2019,6,210868126,Otomatis,Diesel,1500
-Honda Brio Satya E CVT,2012,13,324100418,Otomatis,Bensin,1200
-Mitsubishi Xpander GLS M/T,2022,3,392844897,Manual,Diesel,1500
-Kia Picanto GT,2015,10,262433437,Otomatis,Diesel,1200
-Suzuki Baleno M/T,2017,8,200615330,Manual,Diesel,1500
-Hyundai Creta Trend,2015,10,141077964,Manual,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2020,5,93823714,Otomatis,Diesel,2500
-Hyundai Creta Trend,2015,10,396197635,Manual,Diesel,1500
-Wuling Almaz RS,2016,9,137877173,Otomatis,Bensin,1500
-Honda Brio Satya E CVT,2024,1,328742502,Otomatis,Bensin,1200
-Hyundai Stargazer Active,2017,8,305507070,Manual,Bensin,1500
-Honda Brio Satya E CVT,2021,4,125432963,Otomatis,Diesel,1200
-Mazda 2 R AT,2012,13,161885939,Otomatis,Bensin,1500
-Wuling Confero S,2014,11,306779921,Otomatis,Bensin,1500
-Daihatsu Terios R AT,2013,12,262701785,Manual,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2018,7,203498174,Otomatis,Bensin,2500
-Daihatsu Xenia R Deluxe,2023,2,219143421,Otomatis,Bensin,1300
-Daihatsu Terios R AT,2013,12,90929890,Manual,Bensin,1500
-Mazda 2 R AT,2013,12,330425419,Manual,Diesel,1500
-Daihatsu Xenia R Deluxe,2017,8,291839572,Manual,Bensin,1300
-Suzuki Baleno M/T,2013,12,179417724,Manual,Bensin,1500
-Toyota Avanza 1.3 G M/T,2016,9,176574798,Manual,Bensin,1300
-Hyundai Creta Trend,2020,5,295220920,Otomatis,Diesel,1500
-Mitsubishi Xpander GLS M/T,2022,3,227653044,Otomatis,Diesel,1500
-Daihatsu Xenia R Deluxe,2017,8,322044741,Manual,Bensin,1300
-Mazda CX-5 Elite,2023,2,318015759,Otomatis,Bensin,2500
-Daihatsu Xenia R Deluxe,2024,1,310729235,Manual,Bensin,1300
-Mitsubishi Xpander GLS M/T,2015,10,138689448,Manual,Diesel,1500
-Toyota Yaris E CVT,2019,6,118858744,Otomatis,Bensin,1500
-Nissan Livina VE AT,2015,10,239789407,Otomatis,Bensin,1500
-Suzuki Baleno M/T,2017,8,270292880,Otomatis,Diesel,1500
-Wuling Confero S,2012,13,383544982,Manual,Bensin,1500
-Mazda CX-5 Elite,2019,6,97375611,Otomatis,Bensin,2500
-Toyota Yaris E CVT,2024,1,321524767,Manual,Diesel,1500
-Mazda CX-5 Elite,2017,8,106638639,Manual,Bensin,2500
-Toyota Yaris E CVT,2022,3,293203774,Otomatis,Diesel,1500
-Suzuki Baleno M/T,2019,6,394164856,Manual,Diesel,1500
-Toyota Yaris E CVT,2016,9,294623926,Otomatis,Bensin,1500
-Honda Brio Satya E CVT,2016,9,242018870,Otomatis,Diesel,1200
-Mitsubishi Pajero Sport Dakar,2015,10,100775350,Manual,Bensin,2500
-Honda Brio Satya E CVT,2016,9,330268604,Otomatis,Bensin,1200
-Nissan Livina VE AT,2024,1,235198511,Otomatis,Diesel,1500
-Honda City Hatchback RS,2024,1,141295875,Manual,Bensin,1500
-Suzuki Baleno M/T,2022,3,138138995,Otomatis,Bensin,1500
-Wuling Confero S,2020,5,279380260,Otomatis,Bensin,1500
-Nissan Livina VE AT,2014,11,134716629,Manual,Bensin,1500
-Toyota Yaris E CVT,2015,10,268441000,Otomatis,Diesel,1500
-Daihatsu Terios R AT,2019,6,293504652,Manual,Bensin,1500
-Toyota Yaris E CVT,2014,11,203497701,Otomatis,Bensin,1500
-Honda Brio Satya E CVT,2017,8,200082894,Otomatis,Diesel,1200
-Mazda 2 R AT,2023,2,381910359,Manual,Bensin,1500
-Kia Picanto GT,2013,12,308793132,Otomatis,Diesel,1200
-Nissan Livina VE AT,2020,5,128137517,Manual,Diesel,1500
-Honda Brio Satya E CVT,2023,2,371792942,Manual,Bensin,1200
-Suzuki Baleno M/T,2016,9,350257587,Otomatis,Diesel,1500
-Wuling Almaz RS,2021,4,186918038,Manual,Bensin,1500
-Honda City Hatchback RS,2023,2,277250904,Manual,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2023,2,269161510,Otomatis,Bensin,2500
-Mitsubishi Pajero Sport Dakar,2020,5,163966273,Otomatis,Bensin,2500
-Wuling Almaz RS,2014,11,261475312,Otomatis,Bensin,1500
-Daihatsu Terios R AT,2019,6,305297747,Manual,Diesel,1500
-Suzuki Ertiga GL M/T,2019,6,160164180,Manual,Diesel,1500
-Suzuki Baleno M/T,2014,11,383528009,Manual,Diesel,1500
-Hyundai Creta Trend,2023,2,317408286,Otomatis,Diesel,1500
-Daihatsu Xenia R Deluxe,2023,2,247903456,Otomatis,Diesel,1300
-Suzuki Ertiga GL M/T,2020,5,225507298,Manual,Diesel,1500
-Hyundai Stargazer Active,2017,8,320844754,Manual,Diesel,1500
-Nissan Livina VE AT,2019,6,99270847,Otomatis,Bensin,1500
-Hyundai Creta Trend,2014,11,133617788,Otomatis,Diesel,1500
-Mazda 2 R AT,2019,6,176629352,Otomatis,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2017,8,275517701,Otomatis,Diesel,2500
-Wuling Confero S,2020,5,305091117,Manual,Diesel,1500
-Daihatsu Terios R AT,2024,1,264378037,Otomatis,Bensin,1500
-Hyundai Stargazer Active,2020,5,153302154,Otomatis,Diesel,1500
-Honda Brio Satya E CVT,2016,9,303342313,Manual,Bensin,1200
-Suzuki Baleno M/T,2016,9,114876638,Otomatis,Diesel,1500
-Daihatsu Xenia R Deluxe,2013,12,108173989,Manual,Bensin,1300
-Honda Brio Satya E CVT,2017,8,360467803,Manual,Diesel,1200
-Nissan Livina VE AT,2022,3,255330906,Manual,Diesel,1500
-Hyundai Creta Trend,2021,4,202438497,Manual,Diesel,1500
-Toyota Yaris E CVT,2023,2,268418581,Manual,Bensin,1500
-Toyota Yaris E CVT,2013,12,319400527,Otomatis,Diesel,1500
-Daihatsu Terios R AT,2013,12,162622442,Manual,Bensin,1500
-Mazda 2 R AT,2020,5,155773762,Otomatis,Diesel,1500
-Mazda CX-5 Elite,2022,3,349749260,Manual,Bensin,2500
-Mitsubishi Pajero Sport Dakar,2022,3,222983642,Manual,Diesel,2500
-Hyundai Stargazer Active,2023,2,384825166,Manual,Diesel,1500
-Toyota Yaris E CVT,2018,7,138112381,Otomatis,Diesel,1500
-Wuling Almaz RS,2018,7,369831384,Manual,Diesel,1500
-Mitsubishi Xpander GLS M/T,2013,12,355700962,Manual,Diesel,1500
-Honda City Hatchback RS,2012,13,281429185,Otomatis,Diesel,1500
-Mazda CX-5 Elite,2022,3,204488213,Otomatis,Bensin,2500
-Daihatsu Xenia R Deluxe,2020,5,150280171,Otomatis,Diesel,1300
-Toyota Yaris E CVT,2020,5,160108159,Otomatis,Diesel,1500
-Honda City Hatchback RS,2017,8,183419851,Manual,Diesel,1500
-Kia Picanto GT,2018,7,388938031,Otomatis,Diesel,1200
-Mazda CX-5 Elite,2024,1,224863390,Manual,Bensin,2500
-Toyota Avanza 1.3 G M/T,2012,13,353213894,Manual,Bensin,1300
-Honda City Hatchback RS,2016,9,281351735,Otomatis,Diesel,1500
-Wuling Confero S,2017,8,286649378,Manual,Diesel,1500
-Honda City Hatchback RS,2020,5,360604905,Otomatis,Bensin,1500
-Wuling Confero S,2019,6,154541537,Otomatis,Bensin,1500
-Mazda CX-5 Elite,2021,4,237907534,Otomatis,Diesel,2500
-Wuling Confero S,2022,3,252571365,Manual,Diesel,1500
-Hyundai Stargazer Active,2015,10,342447315,Otomatis,Bensin,1500
-Hyundai Stargazer Active,2015,10,259100322,Manual,Bensin,1500
-Hyundai Stargazer Active,2023,2,386794190,Manual,Bensin,1500
-Mazda CX-5 Elite,2019,6,204248786,Otomatis,Diesel,2500
-Daihatsu Xenia R Deluxe,2024,1,292800769,Otomatis,Diesel,1300
-Wuling Confero S,2021,4,361154121,Otomatis,Bensin,1500
-Honda City Hatchback RS,2016,9,140772174,Manual,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2021,4,203562693,Otomatis,Bensin,2500
-Wuling Almaz RS,2018,7,385616461,Manual,Diesel,1500
-Hyundai Stargazer Active,2015,10,134744772,Otomatis,Diesel,1500
-Suzuki Ertiga GL M/T,2014,11,398794334,Manual,Diesel,1500
-Suzuki Baleno M/T,2012,13,153595888,Manual,Bensin,1500
-Daihatsu Xenia R Deluxe,2014,11,194357052,Otomatis,Diesel,1300
-Daihatsu Terios R AT,2020,5,270237077,Manual,Bensin,1500
-Daihatsu Terios R AT,2015,10,381720443,Manual,Diesel,1500
-Honda Brio Satya E CVT,2014,11,341682038,Otomatis,Bensin,1200
-Hyundai Stargazer Active,2013,12,276124380,Manual,Bensin,1500
-Mazda CX-5 Elite,2018,7,170482447,Otomatis,Diesel,2500
-Mitsubishi Pajero Sport Dakar,2021,4,376813421,Manual,Diesel,2500
-Mazda 2 R AT,2024,1,291216254,Manual,Diesel,1500
-Toyota Yaris E CVT,2014,11,160739726,Otomatis,Bensin,1500
-Hyundai Stargazer Active,2017,8,245234368,Otomatis,Diesel,1500
-Toyota Yaris E CVT,2018,7,317174279,Otomatis,Diesel,1500
-Suzuki Baleno M/T,2016,9,221923783,Otomatis,Bensin,1500
-Toyota Avanza 1.3 G M/T,2017,8,338219846,Manual,Diesel,1300
-Hyundai Stargazer Active,2020,5,356342483,Otomatis,Bensin,1500
-Wuling Confero S,2020,5,314339796,Otomatis,Diesel,1500
-Suzuki Baleno M/T,2013,12,116075741,Otomatis,Diesel,1500
-Mazda 2 R AT,2021,4,117001077,Manual,Diesel,1500
-Hyundai Stargazer Active,2016,9,379995686,Manual,Bensin,1500
-Hyundai Creta Trend,2015,10,110652543,Otomatis,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2016,9,209906615,Manual,Bensin,2500
-Mazda CX-5 Elite,2016,9,333767517,Manual,Diesel,2500
-Mazda 2 R AT,2016,9,298344713,Manual,Bensin,1500
-Toyota Avanza 1.3 G M/T,2017,8,295156089,Manual,Diesel,1300
-Hyundai Stargazer Active,2018,7,254375909,Otomatis,Bensin,1500
-Kia Picanto GT,2020,5,144498191,Otomatis,Bensin,1200
-Mazda CX-5 Elite,2016,9,162045030,Manual,Bensin,2500
-Hyundai Creta Trend,2016,9,212268625,Manual,Diesel,1500
-Suzuki Ertiga GL M/T,2021,4,206534027,Manual,Diesel,1500
-Honda Brio Satya E CVT,2013,12,285451599,Manual,Diesel,1200
-Nissan Livina VE AT,2024,1,134442123,Otomatis,Diesel,1500
-Toyota Yaris E CVT,2014,11,215524966,Manual,Diesel,1500
-Wuling Confero S,2023,2,377051803,Otomatis,Diesel,1500
-Honda City Hatchback RS,2017,8,183814379,Manual,Bensin,1500
-Hyundai Creta Trend,2022,3,265885773,Otomatis,Diesel,1500
-Hyundai Creta Trend,2019,6,154333631,Manual,Bensin,1500
-Hyundai Stargazer Active,2020,5,153128141,Manual,Diesel,1500
-Honda City Hatchback RS,2018,7,290096019,Otomatis,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2017,8,275229923,Manual,Bensin,2500
-Toyota Yaris E CVT,2021,4,176138990,Otomatis,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2019,6,241986777,Manual,Diesel,2500
-Daihatsu Xenia R Deluxe,2021,4,278479386,Otomatis,Bensin,1300
-Daihatsu Terios R AT,2012,13,271537115,Otomatis,Bensin,1500
-Nissan Livina VE AT,2016,9,94905585,Manual,Bensin,1500
-Daihatsu Terios R AT,2014,11,233501759,Otomatis,Diesel,1500
-Daihatsu Xenia R Deluxe,2014,11,191667738,Manual,Bensin,1300
-Suzuki Baleno M/T,2023,2,108013095,Manual,Bensin,1500
-Mazda 2 R AT,2018,7,370378947,Manual,Bensin,1500
-Suzuki Ertiga GL M/T,2015,10,109762004,Manual,Diesel,1500
-Suzuki Baleno M/T,2014,11,153638616,Manual,Diesel,1500
-Honda City Hatchback RS,2022,3,238968845,Otomatis,Bensin,1500
-Toyota Yaris E CVT,2016,9,210845362,Otomatis,Diesel,1500
-Mazda 2 R AT,2020,5,218762785,Manual,Bensin,1500
-Toyota Yaris E CVT,2023,2,315968130,Manual,Diesel,1500
-Kia Picanto GT,2023,2,318109595,Otomatis,Bensin,1200
-Suzuki Ertiga GL M/T,2018,7,97118254,Manual,Bensin,1500
-Suzuki Ertiga GL M/T,2021,4,379388402,Manual,Diesel,1500
-Toyota Yaris E CVT,2016,9,159191258,Manual,Bensin,1500
-Mitsubishi Xpander GLS M/T,2017,8,135154761,Manual,Bensin,1500
-Toyota Avanza 1.3 G M/T,2020,5,139633286,Manual,Diesel,1300
-Toyota Avanza 1.3 G M/T,2013,12,174419461,Manual,Bensin,1300
-Daihatsu Terios R AT,2020,5,242525881,Manual,Diesel,1500
-Hyundai Stargazer Active,2012,13,350994724,Manual,Bensin,1500
-Mitsubishi Xpander GLS M/T,2017,8,118214192,Manual,Bensin,1500
-Honda City Hatchback RS,2018,7,262032190,Otomatis,Bensin,1500
-Hyundai Creta Trend,2018,7,383482001,Manual,Diesel,1500
-Toyota Avanza 1.3 G M/T,2015,10,153858983,Manual,Bensin,1300
-Hyundai Creta Trend,2017,8,178202694,Manual,Diesel,1500
-Honda Brio Satya E CVT,2014,11,106844469,Manual,Diesel,1200
-Honda City Hatchback RS,2022,3,298561781,Otomatis,Bensin,1500
-Honda Brio Satya E CVT,2022,3,98278053,Otomatis,Bensin,1200
-Wuling Confero S,2017,8,324818480,Manual,Diesel,1500
-Hyundai Stargazer Active,2013,12,293277285,Otomatis,Diesel,1500
-Daihatsu Xenia R Deluxe,2020,5,356018135,Manual,Diesel,1300
-Mitsubishi Xpander GLS M/T,2015,10,253777046,Manual,Diesel,1500
-Hyundai Stargazer Active,2022,3,369666440,Otomatis,Bensin,1500
-Daihatsu Terios R AT,2016,9,132424336,Otomatis,Bensin,1500
-Hyundai Creta Trend,2019,6,117037468,Manual,Diesel,1500
-Toyota Yaris E CVT,2015,10,153081930,Otomatis,Bensin,1500
-Wuling Almaz RS,2023,2,247204218,Otomatis,Diesel,1500
-Nissan Livina VE AT,2013,12,397013610,Otomatis,Bensin,1500
-Kia Picanto GT,2015,10,395808578,Otomatis,Bensin,1200
-Honda Brio Satya E CVT,2013,12,214954958,Manual,Bensin,1200
-Honda Brio Satya E CVT,2021,4,361322117,Otomatis,Diesel,1200
-Wuling Confero S,2020,5,185304369,Otomatis,Bensin,1500
-Toyota Avanza 1.3 G M/T,2019,6,317401171,Manual,Bensin,1300
-Daihatsu Terios R AT,2013,12,360260581,Otomatis,Diesel,1500
-Suzuki Ertiga GL M/T,2020,5,192400186,Otomatis,Bensin,1500
-Honda Brio Satya E CVT,2021,4,357070834,Manual,Bensin,1200
-Hyundai Creta Trend,2023,2,368273803,Manual,Diesel,1500
-Toyota Yaris E CVT,2018,7,187300286,Otomatis,Diesel,1500
-Wuling Confero S,2012,13,327005327,Otomatis,Bensin,1500
-Wuling Almaz RS,2014,11,200225284,Otomatis,Diesel,1500
-Toyota Yaris E CVT,2018,7,152171638,Manual,Diesel,1500
-Mitsubishi Xpander GLS M/T,2014,11,253928601,Manual,Diesel,1500
-Honda Brio Satya E CVT,2020,5,392507065,Otomatis,Bensin,1200
-Mitsubishi Pajero Sport Dakar,2014,11,150559060,Manual,Bensin,2500
-Mazda 2 R AT,2023,2,128887559,Otomatis,Bensin,1500
-Toyota Yaris E CVT,2012,13,155733814,Manual,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2022,3,283252263,Otomatis,Bensin,2500
-Honda Brio Satya E CVT,2017,8,326562691,Manual,Bensin,1200
-Suzuki Baleno M/T,2020,5,234805882,Otomatis,Diesel,1500
-Suzuki Ertiga GL M/T,2021,4,305249869,Otomatis,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2022,3,346121161,Otomatis,Bensin,2500
-Daihatsu Xenia R Deluxe,2024,1,258707809,Otomatis,Diesel,1300
-Toyota Avanza 1.3 G M/T,2024,1,104279745,Otomatis,Diesel,1300
-Toyota Avanza 1.3 G M/T,2013,12,291031674,Otomatis,Diesel,1300
-Toyota Yaris E CVT,2024,1,296234316,Otomatis,Diesel,1500
-Hyundai Creta Trend,2013,12,304951794,Manual,Bensin,1500
-Mazda CX-5 Elite,2021,4,397071465,Manual,Diesel,2500
-Toyota Yaris E CVT,2020,5,259237842,Otomatis,Bensin,1500
-Suzuki Ertiga GL M/T,2012,13,314277760,Otomatis,Diesel,1500
-Honda City Hatchback RS,2012,13,325996182,Otomatis,Diesel,1500
-Hyundai Stargazer Active,2019,6,216399375,Manual,Diesel,1500
-Honda Brio Satya E CVT,2013,12,150528471,Otomatis,Bensin,1200
-Hyundai Creta Trend,2013,12,385092614,Otomatis,Bensin,1500
-Daihatsu Terios R AT,2016,9,95370377,Manual,Bensin,1500
-Honda City Hatchback RS,2012,13,168030284,Otomatis,Diesel,1500
-Daihatsu Xenia R Deluxe,2012,13,324406447,Manual,Bensin,1300
-Suzuki Baleno M/T,2016,9,140297970,Otomatis,Diesel,1500
-Kia Picanto GT,2013,12,365584161,Otomatis,Bensin,1200
-Mitsubishi Xpander GLS M/T,2018,7,312913702,Manual,Bensin,1500
-Honda Brio Satya E CVT,2014,11,134960340,Otomatis,Bensin,1200
-Nissan Livina VE AT,2021,4,193335530,Otomatis,Bensin,1500
-Wuling Almaz RS,2020,5,110120261,Otomatis,Diesel,1500
-Daihatsu Xenia R Deluxe,2015,10,162366029,Otomatis,Bensin,1300
-Hyundai Creta Trend,2012,13,304666428,Otomatis,Diesel,1500
-Mazda 2 R AT,2020,5,95728794,Manual,Diesel,1500
-Mazda CX-5 Elite,2023,2,281221258,Manual,Diesel,2500
-Suzuki Baleno M/T,2021,4,312879199,Otomatis,Bensin,1500
-Hyundai Creta Trend,2014,11,233415816,Otomatis,Bensin,1500
-Nissan Livina VE AT,2022,3,366751724,Manual,Diesel,1500
-Daihatsu Terios R AT,2022,3,220902712,Manual,Bensin,1500
-Mazda 2 R AT,2012,13,323848614,Manual,Diesel,1500
-Nissan Livina VE AT,2018,7,315546567,Otomatis,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2018,7,333992860,Manual,Diesel,2500
-Suzuki Ertiga GL M/T,2015,10,183967429,Otomatis,Diesel,1500
-Mitsubishi Xpander GLS M/T,2022,3,379214352,Manual,Bensin,1500
-Kia Picanto GT,2024,1,376743001,Manual,Diesel,1200
-Wuling Confero S,2022,3,319838919,Manual,Bensin,1500
-Wuling Almaz RS,2024,1,363441676,Otomatis,Diesel,1500
-Kia Picanto GT,2019,6,339075550,Manual,Bensin,1200
-Hyundai Stargazer Active,2022,3,217038829,Otomatis,Bensin,1500
-Daihatsu Terios R AT,2023,2,301727754,Otomatis,Bensin,1500
-Mitsubishi Xpander GLS M/T,2021,4,358967488,Manual,Diesel,1500
-Suzuki Ertiga GL M/T,2016,9,143387215,Manual,Diesel,1500
-Toyota Yaris E CVT,2012,13,206147916,Otomatis,Diesel,1500
-Nissan Livina VE AT,2018,7,265295186,Manual,Diesel,1500
-Suzuki Baleno M/T,2024,1,176722799,Manual,Diesel,1500
-Honda Brio Satya E CVT,2020,5,116172120,Manual,Diesel,1200
-Wuling Confero S,2017,8,129144108,Otomatis,Diesel,1500
-Hyundai Stargazer Active,2015,10,177031426,Manual,Bensin,1500
-Honda Brio Satya E CVT,2024,1,199646816,Otomatis,Bensin,1200
-Suzuki Ertiga GL M/T,2021,4,184991568,Otomatis,Diesel,1500
-Suzuki Ertiga GL M/T,2022,3,179171442,Otomatis,Bensin,1500
-Suzuki Ertiga GL M/T,2012,13,291330017,Manual,Bensin,1500
-Suzuki Baleno M/T,2019,6,179916155,Otomatis,Diesel,1500
-Toyota Yaris E CVT,2014,11,161485514,Otomatis,Bensin,1500
-Kia Picanto GT,2012,13,385283943,Otomatis,Diesel,1200
-Mazda CX-5 Elite,2012,13,363173881,Otomatis,Bensin,2500
-Hyundai Creta Trend,2019,6,223612291,Otomatis,Diesel,1500
-Kia Picanto GT,2015,10,217324290,Manual,Diesel,1200
-Toyota Avanza 1.3 G M/T,2014,11,218881487,Manual,Bensin,1300
-Mitsubishi Xpander GLS M/T,2020,5,255851335,Manual,Bensin,1500
-Wuling Almaz RS,2020,5,116751988,Manual,Diesel,1500
-Wuling Confero S,2017,8,272446672,Manual,Diesel,1500
-Mitsubishi Xpander GLS M/T,2012,13,206523896,Manual,Diesel,1500
-Mazda CX-5 Elite,2013,12,115381945,Manual,Diesel,2500
-Toyota Yaris E CVT,2020,5,327671628,Manual,Bensin,1500
-Nissan Livina VE AT,2019,6,290064578,Manual,Diesel,1500
-Suzuki Baleno M/T,2024,1,349355670,Manual,Diesel,1500
-Hyundai Stargazer Active,2014,11,370214241,Manual,Diesel,1500
-Hyundai Creta Trend,2023,2,150087277,Otomatis,Diesel,1500
-Nissan Livina VE AT,2018,7,189268379,Otomatis,Diesel,1500
-Toyota Avanza 1.3 G M/T,2015,10,262911287,Otomatis,Bensin,1300
-Honda City Hatchback RS,2019,6,230528912,Manual,Bensin,1500
-Mazda CX-5 Elite,2014,11,175207506,Manual,Diesel,2500
-Wuling Confero S,2023,2,185981713,Otomatis,Diesel,1500
-Honda City Hatchback RS,2019,6,359417489,Manual,Diesel,1500
-Honda City Hatchback RS,2021,4,341034859,Manual,Bensin,1500
-Hyundai Creta Trend,2016,9,256568976,Otomatis,Diesel,1500
-Mitsubishi Xpander GLS M/T,2021,4,186718323,Manual,Bensin,1500
-Wuling Almaz RS,2024,1,332999373,Otomatis,Bensin,1500
-Wuling Almaz RS,2021,4,127794305,Otomatis,Diesel,1500
-Mitsubishi Xpander GLS M/T,2014,11,366371227,Manual,Bensin,1500
-Mitsubishi Pajero Sport Dakar,2013,12,148256350,Manual,Diesel,2500
-Honda Brio Satya E CVT,2024,1,271106816,Otomatis,Bensin,1200
-Daihatsu Xenia R Deluxe,2017,8,169993730,Manual,Diesel,1300
-Nissan Livina VE AT,2017,8,380404781,Otomatis,Bensin,1500
-Hyundai Creta Trend,2022,3,304132883,Otomatis,Bensin,1500
-Daihatsu Terios R AT,2021,4,273534996,Otomatis,Diesel,1500
-Hyundai Creta Trend,2016,9,93393441,Manual,Diesel,1500
-Mitsubishi Pajero Sport Dakar,2024,1,359734875,Manual,Diesel,2500
-Suzuki Ertiga GL M/T,2019,6,179920500,Manual,Diesel,1500
-Daihatsu Terios R AT,2021,4,208337970,Manual,Bensin,1500
-Mitsubishi Xpander GLS M/T,2022,3,98174363,Otomatis,Diesel,1500
+﻿Nama Mobil,Harga,Tahun,Usia,Bahan Bakar,Transmisi,Kapasitas Mesin
+Innova Zenix Q Modelista At Tss Hybrid Ev (2022),Rp 458.000.000,2022,3,Hybrid,Matic,2000 cc
+Toyota Fortuner 2.4vrzatdsl (2021),Rp 458.500.000,2021,4,Diesel,Matic,2500 cc
+Toyota Yaris G At  Orange (2018),Rp 157.000.000,2018,7,Bensin,Matic,1500 cc
+Honda Brio Rs (2020),Rp 155.000.000,2020,5,Bensin,Matic,1200 cc
+Daihatsu Terios (2017),Rp 159.000.000,2017,8,Bensin,Matic,1500 cc
+Toyota Kijang Innova (2022),Rp 465.000.000,2022,3,Bensin,Matic,2400 cc
+Toyota Kijang Innova G Mpv (2020),Rp 262.000.000,2020,5,Bensin,Matic,2000 cc
+Toyota Kijang Inova G Luxury Matic (2019),Rp 310.000.000,2019,6,Bensin,Matic,2500 cc
+Honda Brio 12 E At (2023),Rp 160.000.000,2023,2,Bensin,Matic,1200 cc
+Honda Jazz Rs (2017),Rp 189.000.000,2017,8,Bensin,Matic,1500 cc
+Toyota Kijang Innova G Mpv (2016),Rp 220.000.000,2016,9,Bensin,Matic,2000 cc
+Toyota Innova Zenix Q Tss Modelista (2023),Rp 535.000.000,2023,2,Hybrid,Matic,1500 cc
+Toyota All New Veloz Q Cvt (2022),Rp 245.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Camry Hybrid At (2015),Rp 165.000.000,2015,10,Hybrid,Matic,2500 cc
+Bmw 330i M Sport Sedan (2022),Rp 765.000.000,2022,3,Bensin,Matic,2000 cc
+Toyota Avanza G At (2015),Rp 118.000.000,2015,10,Bensin,Matic,1300 cc
+Honda Mobilio Rs At  Hitam (2021),Rp 187.000.000,2021,4,Bensin,Matic,1500 cc
+Brio E Cvt  Matic (2017),Rp 125.000.000,2017,8,Bensin,Matic,1500 cc
+Daihatsu Sigra D Lcgc Minor Change 1000 Mt (2021),Rp 116.000.000,2021,4,Bensin,Manual,1000 cc
+Honda City Hatchback Rs At  Putih (2022),Rp 229.000.000,2022,3,Bensin,Matic,1500 cc
+Honda Crv Turbo Prestige At (2018),Rp 295.000.000,2018,7,Bensin,Matic,1500 cc
+Mitsubishi Mirage Glx (2016),Rp 85.000.000,2016,9,Bensin,Manual,1200 cc
+Toyota Avanza Veloz Q Cvt At (2023),Rp 239.000.000,2023,2,Bensin,Matic,1500 cc
+Honda Crv Turbo Prestige (2017),Rp 310.000.000,2017,8,Bensin,Matic,1500 cc
+Honda Brio E M/t (2022),Rp 123.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Kijang Innova Zenix (2022),Rp 540.000.000,2022,3,Hybrid,Matic,2000 cc
+Toyota Kijang Innova Venturer (2019),Rp 295.000.000,2019,6,Bensin,Matic,2000 cc
+Toyota Kijang Innova Zenix V Cvt (2024),Rp 399.000.000,2024,1,Hybrid,Matic,2000 cc
+Toyota Alphard X Mpv (2018),Rp 555.000.000,2018,7,Bensin,Matic,2500 cc
+Toyota Avanza Veloz Q Bensin At (2022),Rp 225.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Innova G At Diesel (2024),Rp 375.000.000,2024,1,Diesel,Matic,2400 cc
+Honda Brio Satya E (2022),Rp 150.000.000,2022,3,Bensin,Matic,1200 cc
+Nissan Serena Hws (2019),Rp 255.000.000,2019,6,Bensin,Matic,2000 cc
+Toyota Avanza Mpv Premium (2020),Rp 151.000.000,2020,5,Bensin,Matic,1300 cc
+Toyota Agya G Trd Mt (2019),Rp 120.000.000,2019,6,Bensin,Manual,1200 cc
+Toyota Innova 20 V Bensin At (2017),Rp 258.000.000,2017,8,Bensin,Matic,1500 cc
+Toyota Kijang Innova (2021),Rp 295.000.000,2021,4,Bensin,Matic,2000 cc
+Daihatsu Sigra X (2021),Rp 123.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Avanza G Mpv (2016),Rp 139.000.000,2016,9,Bensin,Matic,1300 cc
+Mitsubishi Xpander Cross Premium Mpv (2020),Rp 229.000.000,2020,5,Bensin,Matic,1500 cc
+Toyota Camry V (2021),Rp 424.000.000,2021,4,Bensin,Matic,2500 cc
+Nissan Serena Hws (2017),Rp 195.000.000,2017,8,Bensin,Matic,2000 cc
+Toyota Innova Zenix (2023),Rp 575.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Fortuner Gr Sport 4x4 (2024),Rp 575.000.000,2024,1,Diesel,Matic,2800 cc
+Fortuner Vrz 4x2 (2023),Rp 575.000.000,2023,2,Diesel,Matic,2800 cc
+Toyota Fortuner Vrz (2024),Rp 545.000.000,2024,1,Diesel,Matic,2800 cc
+Toyota Avanza E Cvt (2023),Rp 184.000.000,2023,2,Bensin,Matic,1300 cc
+Toyota Avanza Veloz (2021),Rp 190.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Innova G Mt (2018),Rp 330.000.000,2018,7,Diesel,Manual,2400 cc
+Toyota Avanza E At (2019),Rp 136.000.000,2019,6,Bensin,Matic,1300 cc
+Honda Hrv Prestige 1.8 At (2016),Rp 225.000.000,2016,9,Bensin,Matic,1800 cc
+Daihatsu Sigra Type D (2023),Rp 124.000.000,2023,2,Bensin,Manual,1000 cc
+Toyota Veloz Q Tss Mpv (2021),Rp 234.000.000,2021,4,Bensin,Matic,1500 cc
+Toyots Agya G Trd (2021),Rp 131.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Veloz Q Tss At  Putih (2021),Rp 232.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Kijang Innova V At (2018),Rp 260.000.000,2018,7,Bensin,Matic,2000 cc
+Innova G Bensin At (2017),Rp 235.000.000,2017,8,Bensin,Matic,2000 cc
+Daihatsu Terios R Deluxe At  Hitam (2019),Rp 197.000.000,2019,6,Bensin,Matic,1500 cc
+Toyota Kijang Innova V At (2022),Rp 308.000.000,2022,3,Bensin,Matic,2000 cc
+Daihatsu Ayla X Mt (2023),Rp 119.000.000,2023,2,Bensin,Manual,1200 cc
+Mazda Cx3 Sport At (2024),Rp 329.000.000,2024,1,Bensin,Matic,1500 cc
+Honda Brio Satya E (2018),Rp 124.000.000,2018,7,Bensin,Matic,1200 cc
+Nissan Terra Vl 4x4 Diesel (2023),Rp 615.000.000,2023,2,Diesel,Matic,2500 cc
+Honda Hrv Prestige Suv (2021),Rp 286.000.000,2021,4,Bensin,Matic,1800 cc
+Toyota New Avanza Veloz Mpv 1500 At (2021),Rp 215.000.000,2021,4,Bensin,Matic,1500 cc
+Honda Jazz Gk5 Rs Cvt Ckd  Merah (2016),Rp 180.000.000,2016,9,Bensin,Matic,1500 cc
+Daihatsu Sigra Type D Minor Change 1000 Mt (2022),Rp 120.000.000,2022,3,Bensin,Manual,1000 cc
+Wuling Confero Type Std Double Blower Special Edition 1500 Mt (2022),Rp 118.000.000,2022,3,Bensin,Manual,1500 cc
+Toyota Calya G At  Silver (2016),Rp 106.000.000,2016,9,Bensin,Matic,1500 cc
+Wuling Confero Type Std Double Blower Special Edition 1500 Mt (2022),Rp 118.000.000,2022,3,Bensin,Manual,1500 cc
+Daihatsu Sigra Type D Minor Change 1000 Mt (2024),Rp 128.000.000,2024,1,Bensin,Manual,1000 cc
+Toyota Avanza G Mpv  Hitam (2022),Rp 203.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza E Bensin Mt (2016),Rp 123.000.000,2016,9,Bensin,Manual,1300 cc
+Toyota Avanza 13 G Mt (2017),Rp 142.000.000,2017,8,Bensin,Manual,1500 cc
+Honda Brio Satya E Hatchback (2022),Rp 156.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Alphard G Atpm Hitam (2017),Rp 625.000.000,2017,8,Bensin,Matic,2500 cc
+Toyota Avanza Veloz Q Cvt (2024),Rp 230.000.000,2024,1,Bensin,Matic,1500 cc
+Toyota All New Avanza Veloz Q (2022),Rp 225.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza G Mt (2015),Rp 125.000.000,2015,10,Bensin,Manual,1300 cc
+Bmw 528i Msport F10 Lci Tahun (2015),Rp 314.000.000,2015,10,Bensin,Matic,2000 cc
+Bmw 528i Luxury Sedan (2015),Rp 390.000.000,2015,10,Bensin,Matic,2000 cc
+Honda Mobilio E At (2019),Rp 160.000.000,2019,6,Bensin,Matic,1500 cc
+Toyota Fortuner Vrz Trd (2020),Rp 426.000.000,2020,5,Diesel,Matic,2400 cc
+Toyota Avanza G Tss At (2021),Rp 196.000.000,2021,4,Bensin,Matic,1500 cc
+Mitsubishi Xpander Ultimate At  Silver (2019),Rp 205.000.000,2019,6,Bensin,Matic,1500 cc
+Daihatsu Sigra R Mt (2021),Rp 142.500.000,2021,4,Bensin,Manual,1200 cc
+Toyota Yaris Gr Sport At  Putih (2022),Rp 232.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Kijang Innova V Mt (2021),Rp 295.000.000,2021,4,Bensin,Manual,2000 cc
+Suzuki Ertiga Gx At (2018),Rp 165.000.000,2018,7,Bensin,Matic,1500 cc
+Honda Brio Satya E  Merah (2020),Rp 132.000.000,2020,5,Bensin,Manual,1200 cc
+Nissan All New X Trail 2500 At (2015),Rp 205.000.000,2015,10,Bensin,Matic,2500 cc
+Toyota Alphard G Atpm (2017),Rp 650.000.000,2017,8,Bensin,Matic,2400 cc
+Toyota Veloz Q Tss Premium Color Mpv (2025),Rp 243.000.000,2025,0,Bensin,Matic,1500 cc
+Toyota Avanza G Mpv (2021),Rp 163.000.000,2021,4,Bensin,Matic,1300 cc
+Toyota Kijang Innova Zenix V Premium Color Mpv (2023),Rp 387.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Avanza Veloz (2021),Rp 219.500.000,2021,4,Bensin,Matic,1500 cc
+Daihatsu All New Xenia X Mpv 1300 Mt (2024),Rp 211.000.000,2024,1,Bensin,Manual,1300 cc
+Daihatsu All New Xenia X Mpv 1300 Cvt (2023),Rp 211.000.000,2023,2,Bensin,Matic,1300 cc
+Honda Jazz Rs (2020),Rp 230.000.000,2020,5,Bensin,Matic,1500 cc
+Toyota Kijang Innova Zenix V Cvt (2022),Rp 382.000.000,2022,3,Hybrid,Matic,2000 cc
+Toyota Innova Venturer  Hitam (2019),Rp 307.000.000,2019,6,Bensin,Matic,2000 cc
+Honda Jazz (2016),Rp 185.000.000,2016,9,Bensin,Matic,1500 cc
+Honda Brio Satya E  Abu (2019),Rp 139.000.000,2019,6,Bensin,Manual,1200 cc
+Toyota Innova Zenix Q Hybrid At (2024),Rp 541.000.000,2024,1,Hybrid,Matic,2000 cc
+Toyota Avanza G Matic (2019),Rp 165.000.000,2019,6,Bensin,Matic,1300 cc
+Toyota Kijang Innova G Mpv Luxury  Cc Mt 2021 (2021),Rp 305.000.000,2021,4,Bensin,Matic,2000 cc
+Daihatsu Sigra Type D Minor Change 1000 Mt (2022),Rp 120.000.000,2022,3,Bensin,Manual,1000 cc
+Honda Brio Satya E (2021),Rp 136.000.000,2021,4,Bensin,Manual,1200 cc
+Toyota Avanza Veloz (2023),Rp 220.000.000,2023,2,Bensin,Manual,1500 cc
+Toyota Avanza G Mt (2015),Rp 125.000.000,2015,10,Bensin,Manual,1300 cc
+Suzuki Ertiga Gx Hybrid (2023),Rp 211.000.000,2023,2,Hybrid,Matic,1500 cc
+Suzuki Ertiga Gx Hybrid AT (2022),Rp 194.000.000,2022,3,Hybrid,Matic,1500 cc
+Honda Brio Satya E Cvt (2021),Rp 148.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Zenix V At (2022),Rp 375.000.000,2022,3,Hybrid,Matic,2000 cc
+Toyota Avanza E Mpv  Hitam (2019),Rp 140.000.000,2019,6,Bensin,Matic,1300 cc
+Toyota Kijang Innova Zenix G At (2024),Rp 345.000.000,2024,1,Hybrid,Matic,2000 cc
+Toyota Calya G Mt  Silver (2024),Rp 141.000.000,2024,1,Bensin,Manual,1200 cc
+Daihatsu Ayla  R (2022),Rp 131.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota New Agya Type G Trd Sportivo 1200 Mt (2019),Rp 132.000.000,2019,6,Bensin,Manual,1200 cc
+Toyota Innova Venturer Wagon Km 36 Rbuan (2022),Rp 495.000.000,2022,3,Bensin,Matic,2000 cc
+Toyota Kijang Innova Zenix (2023),Rp 525.000.000,2023,2,Hybrid,Matic,2000 cc
+Mazda 2 Gt At (2022),Rp 228.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Veloz Q Tss (2022),Rp 243.000.000,2022,3,Bensin,Matic,1500 cc
+Honda All New Brv Type Prestige Sensing 1500 Cvt (2023),Rp 255.000.000,2023,2,Bensin,Matic,1500 cc
+Mazda Biante At (2015),Rp 130.000.000,2015,10,Bensin,Matic,2000 cc
+Suzuki Ignis (2023),Rp 167.000.000,2023,2,Bensin,Matic,1200 cc
+Honda Jazz Rs Silver (2016),Rp 184.000.000,2016,9,Bensin,Matic,1500 cc
+Toyota Avanza G Mt (2019),Rp 162.000.000,2019,6,Bensin,Manual,1300 cc
+Hrv Prestige (2015),Rp 205.000.000,2015,10,Bensin,Matic,1800 cc
+Toyota Innova V Zenix Bensin At (2022),Rp 398.000.000,2022,3,Hybrid,Matic,2000 cc
+Honda Hrv E 15 Matic  2017 Grey Antik Km Rendah (2016),Rp 177.850.000,2016,9,Bensin,Matic,1500 cc
+Suzuki New Baleno 1400 At (2021),Rp 185.000.000,2021,4,Bensin,Matic,1400 cc
+Toyota Avanza E Mpv (2020),Rp 153.000.000,2020,5,Bensin,Matic,1300 cc
+Honda Brio Satya E At (2021),Rp 148.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Avanza Veloz Q Cvt At (2022),Rp 223.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Q Cvt At (2022),Rp 232.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Putih (2021),Rp 193.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Kijang Innova Zenix (2023),Rp 390.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Fortuner Vrz Gr Sport (2022),Rp 494.000.000,2022,3,Diesel,Matic,2800 cc
+Honda Brio Rs Hatchback (2017),Rp 126.000.000,2017,8,Bensin,Matic,1200 cc
+Toyota Innova Mt Diesel (2020),Rp 348.000.000,2020,5,Diesel,Manual,2400 cc
+Mitsubishi Pajero Dakkar 4x2 At (2015),Rp 360.000.000,2015,10,Diesel,Matic,2400 cc
+Honda Jazz Rs Honda Jazz Rs (2015),Rp 147.000.000,2015,10,Bensin,Matic,1500 cc
+Honda Brio E Cvt At (2022),Rp 157.000.000,2022,3,Bensin,Matic,1200 cc
+Honda Brio Rs  Silver (2021),Rp 172.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Kijang Innova Venturer Solar At (2019),Rp 420.000.000,2019,6,Diesel,Matic,2400 cc
+Mitsubishi Xpander Ultimate Mpv (2019),Rp 205.000.000,2019,6,Bensin,Matic,1500 cc
+Honda Brio Rs (2017),Rp 124.000.000,2017,8,Bensin,Manual,1200 cc
+Honda Jazz Rs  Putih (2019),Rp 217.000.000,2019,6,Bensin,Matic,1500 cc
+Avanza Veloz Matic (2017),Rp 156.000.000,2017,8,Bensin,Matic,1500 cc
+Daihatsu New Ayla Type D Plus Minor Change 1000 Mt (2018),Rp 101.000.000,2018,7,Bensin,Manual,1000 cc
+Toyota Avanza Veloz Q (2023),Rp 243.000.000,2023,2,Bensin,Matic,1500 cc
+Daihatsu Sirion At (2018),Rp 142.000.000,2018,7,Bensin,Matic,1300 cc
+Honda Crv Turbo Prestige At (2020),Rp 375.000.000,2020,5,Bensin,Matic,1500 cc
+Toyota Avanza G Mpv (2021),Rp 165.000.000,2021,4,Bensin,Matic,1300 cc
+Toyota Kijang Innova Venturer Solar At (2021),Rp 468.000.000,2021,4,Diesel,Matic,2400 cc
+Toyota Kijang Innova Zenix G Cvt Bensin At (2024),Rp 378.000.000,2024,1,Hybrid,Matic,2000 cc
+Mitsubishi Xpander Exceed At  Silver (2019),Rp 185.000.000,2019,6,Bensin,Matic,1500 cc
+Toyota New Avanza G Mpv Facelift 1300 Mt (2019),Rp 179.000.000,2019,6,Bensin,Manual,1300 cc
+Honda Jazz Rs At (2020),Rp 225.000.000,2020,5,Bensin,Matic,1500 cc
+Toyota Kijang Innova V Bensin At (2022),Rp 385.000.000,2022,3,Bensin,Matic,2000 cc
+Mitsubishi Pajero Sport (2016),Rp 359.500.000,2016,9,Diesel,Manual,2400 cc
+Honda Jazz S  Abu (2018),Rp 169.000.000,2018,7,Bensin,Matic,1500 cc
+Toyota Alphard G Mpv (2025),Rp 895.000.000,2025,0,Bensin,Matic,2500 cc
+Toyota Fortuner Trd Vrz 4x2 At (2019),Rp 350.000.000,2019,6,Bensin,Matic,2755 cc
+Toyota Voxy At Cbu (2018),Rp 315.000.000,2018,7,Bensin,Matic,2000 cc
+Dijual Mitsubishi Delica D5 Non Royal Tahun (2015),Rp 160.000.000,2015,10,Bensin,Matic,2000 cc
+Toyota Calya G Mt (2019),Rp 135.000.000,2019,6,Bensin,Manual,1200 cc
+Nissan Xtrail Xt Suv (2018),Rp 215.000.000,2018,7,Bensin,Matic,2500 cc
+Toyota Innova Zenix G At (2023),Rp 360.000.000,2023,2,Hybrid,Matic,2000 cc
+Nissan Terra Vl At Diesel (2018),Rp 325.000.000,2018,7,Diesel,Matic,2500 cc
+Toyota New Avanza Type E Facelift 1300 Mt (2021),Rp 175.000.000,2021,4,Bensin,Manual,1300 cc
+Honda Hrv S Cvt (2018),Rp 195.000.000,2018,7,Bensin,Matic,1500 cc
+Toyota Calya G At  Nik 2023 (2023),Rp 125.000.000,2023,2,Bensin,Matic,1200 cc
+Toyota Grn New Avanza G Mt (2020),Rp 195.000.000,2020,5,Bensin,Manual,1300 cc
+Toyota Innova G At (2015),Rp 179.000.000,2015,10,Bensin,Matic,2000 cc
+Nissan Serena Highway Starr (2019),Rp 250.000.000,2019,6,Bensin,Matic,2000 cc
+Toyota Kijang Innova (2021),Rp 292.000.000,2021,4,Bensin,Matic,2400 cc
+Toyota Avanza G Mt (2016),Rp 140.000.000,2016,9,Bensin,Manual,1300 cc
+Honda Jazz Rs (2017),Rp 200.000.000,2017,8,Bensin,Matic,1500 cc
+Toyota Veloz Q Tss Mpv (2021),Rp 235.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Kijang Innova Zenix  Silver (2023),Rp 397.000.000,2023,2,Hybrid,Matic,2000 cc
+Mitsubishi Outlander Gls At (2015),Rp 140.000.000,2015,10,Bensin,Matic,2000 cc
+Honda Brio Satya E Cvt (2019),Rp 138.000.000,2019,6,Bensin,Matic,1200 cc
+Mitsubishi Xpander (2021),Rp 222.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Avanza Veloz (2021),Rp 193.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Calya G Mt (2024),Rp 165.000.000,2024,1,Bensin,Manual,1200 cc
+Toyota Avanza G At Matic  Merah (2015),Rp 118.500.000,2015,10,Bensin,Matic,1300 cc
+Honda Brio E At (2019),Rp 145.000.000,2019,6,Bensin,Matic,1200 cc
+Honda Brio E Cvt (2018),Rp 127.500.000,2018,7,Bensin,Matic,1200 cc
+Suzuki Baleno Hatchback At (2019),Rp 171.000.000,2019,6,Bensin,Matic,1500 cc
+Mercedes Benz C200 Eq Boost W205 Avantgarde (2019),Rp 442.000.000,2019,6,Bensin,Matic,1500 cc
+Toyota Innova V At (2022),Rp 365.000.000,2022,3,Diesel,Matic,2400 cc
+Honda Hrv S Cvt (2018),Rp 205.000.000,2018,7,Bensin,Matic,1500 cc
+Toyota Kijang Innova Venturer Mpv (2019),Rp 291.000.000,2019,6,Bensin,Matic,2000 cc
+Toyota Kijang Innova (2015),Rp 135.000.000,2015,10,Bensin,Matic,2000 cc
+Honda Brio E (2016),Rp 117.000.000,2016,9,Bensin,Matic,1500 cc
+Toyota Kijang Innova G Mpv (2020),Rp 257.000.000,2020,5,Bensin,Matic,2000 cc
+Jual Yaris Trd (2018),Rp 205.000.000,2018,7,Bensin,Matic,1500 cc
+Honda Brio Rs (2022),Rp 167.500.000,2022,3,Bensin,Matic,1200 cc
+Honda Brio Rs Hatchback (2021),Rp 170.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Innova G 20 At (2020),Rp 288.000.000,2020,5,Bensin,Matic,1500 cc
+Daihatsu Ayla (2022),Rp 131.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Avanza Veloz 1 5 Matic (2015),Rp 143.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Veloz Q Tss Premium Color Mpv (2022),Rp 242.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Calya G Mt (2021),Rp 145.000.000,2021,4,Bensin,Manual,1200 cc
+Toyota Avanza (2021),Rp 165.000.000,2021,4,Bensin,Manual,1300 cc
+Honda Brv Prestige Cvt At (2022),Rp 232.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Vellfire Z At (2015),Rp 230.000.000,2015,10,Bensin,Matic,2400 cc
+Jazz Rs Matic (2015),Rp 137.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Innova G At (2017),Rp 220.000.000,2017,8,Bensin,Matic,2000 cc
+Toyota Kijang Innova V Mpv (2021),Rp 382.000.000,2021,4,Bensin,Matic,2400 cc
+Suzuki Ertiga Sport At (2019),Rp 185.000.000,2019,6,Bensin,Matic,1500 cc
+Toyota Innova V Luxury (2015),Rp 149.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Hiace Type Commuter 2500 Mt (2019),Rp 475.000.000,2019,6,Diesel,Manual,2500 cc
+Toyota Kijang Innova G Bensin At (2022),Rp 287.000.000,2022,3,Bensin,Matic,2000 cc
+Honda Brio Rs Abu (2021),Rp 171.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Kijang Innova G Bensin At (2015),Rp 165.000.000,2015,10,Bensin,Matic,2000 cc
+Honda Brio Rs At (2021),Rp 176.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Yaris S Trd Heykers (2017),Rp 170.000.000,2017,8,Bensin,Matic,1500 cc
+Toyota Veloz Q Tss At  Hitam (2022),Rp 238.000.000,2022,3,Bensin,Matic,1500 cc
+Daihatsu Ayla X Mt (2015),Rp 73.000.000,2015,10,Bensin,Manual,1000 cc
+Toyota Veloz Q Tss Mpv (2021),Rp 232.000.000,2021,4,Bensin,Matic,1500 cc
+Mitsubishi Xpander Ultimate At  Silver (2018),Rp 195.000.000,2018,7,Bensin,Matic,1500 cc
+Toyota Avanza (2021),Rp 202.000.000,2021,4,Bensin,Matic,1500 cc
+Ayla 12 R  Manual (2017),Rp 100.100.100,2017,8,Bensin,Manual,1200 cc
+Honda Jazz Rs Cvt (2018),Rp 205.000.000,2018,7,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Luxury At (2015),Rp 126.000.000,2015,10,Bensin,Matic,1500 cc
+Honda New Crv Prestige (2015),Rp 225.000.000,2015,10,Bensin,Matic,2400 cc
+Toyotq Sienta Q At (2017),Rp 170.000.000,2017,8,Bensin,Matic,1500 cc
+Toyota Avanza G Bensin At (2017),Rp 124.500.000,2017,8,Bensin,Matic,1300 cc
+Toyota Innova 20 G At (2018),Rp 229.000.000,2018,7,Bensin,Matic,2000 cc
+Toyota Kijang V At (2019),Rp 338.000.000,2019,6,Bensin,Matic,2400 cc
+Toyota Innova Zenix V Hybrid Modelista (2023),Rp 425.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Yaris Gr Sport At  Hitam (2022),Rp 232.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza 13 G At (2020),Rp 175.000.000,2020,5,Bensin,Matic,1500 cc
+Honda Brio E Cvt (2017),Rp 124.900.000,2017,8,Bensin,Matic,1200 cc
+Honda Brio Satya E At (2015),Rp 121.000.000,2015,10,Bensin,Matic,1200 cc
+Toyota Kijang Innova G Bensin At (2018),Rp 225.000.000,2018,7,Bensin,Matic,2000 cc
+Toyota Kijang Innova Zenix (2023),Rp 495.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Kijang Innova G Solar Mt (2024),Rp 395.000.000,2024,1,Diesel,Matic,2400 cc
+Suzuki Ertiga Gl At (2020),Rp 175.000.000,2020,5,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Q  Putih (2022),Rp 229.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza Veloz (2022),Rp 243.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Kijang Innova G Bensin At (2021),Rp 289.000.000,2021,4,Bensin,Matic,2000 cc
+Daihatsu Granmax Minibus Type D Ff Fh 1300 Mt (2020),Rp 141.000.000,2020,5,Bensin,Manual,1300 cc
+Honda Hrv E At  Hitam (2018),Rp 215.000.000,2018,7,Bensin,Matic,1500 cc
+Honda Jazz Rs Hatchback (2017),Rp 187.000.000,2017,8,Bensin,Matic,1500 cc
+Mitsubishi Pajero Sport Dakar Ultimate (2019),Rp 435.000.000,2019,6,Diesel,Matic,2400 cc
+Toyota Fortuner Vnt Trd Sportivo Diesel  At (2015),Rp 285.000.000,2015,10,Diesel,Matic,2500 cc
+Toyota Avanza E Bensin Mt (2023),Rp 205.000.000,2023,2,Bensin,Manual,1300 cc
+Toyota Sienta Q Bensin (2017),Rp 150.000.000,2017,8,Bensin,Matic,1500 cc
+Honda Brv E Prestige At  Putih (2021),Rp 207.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Kijang Innova G Bensin At (2021),Rp 270.000.000,2021,4,Bensin,Matic,2000 cc
+Toyota Calya G Mt (2018),Rp 135.000.000,2018,7,Bensin,Manual,1200 cc
+Honda Jazz Rs At (2019),Rp 255.000.000,2019,6,Bensin,Matic,1500 cc
+Honda Brv Prestige (2017),Rp 175.000.000,2017,8,Bensin,Matic,1500 cc
+Nissan Juke Rx At (2015),Rp 127.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Innova Reborn V Solar Matic (2018),Rp 357.000.000,2018,7,Diesel,Matic,2400 cc
+Toyota Avanza Veloz Mpv (2020),Rp 178.000.000,2020,5,Bensin,Matic,1400 cc
+Honda Brio E Satya At  Merah (2022),Rp 156.000.000,2022,3,Bensin,Matic,1200 cc
+Veloz Q Matic (2022),Rp 258.000.000,2022,3,Bensin,Matic,1500 cc
+Honda Brio Rs (2018),Rp 140.000.000,2018,7,Bensin,Matic,1200 cc
+Toyota Avanza G Mt (2016),Rp 158.000.000,2016,9,Bensin,Manual,1500 cc
+Toyota Innova G At Diesel (2018),Rp 299.000.000,2018,7,Diesel,Matic,2400 cc
+Toyota Fortuner Vnt Trd (2015),Rp 299.000.000,2015,10,Diesel,Matic,2500 cc
+Honda Brio Satya  Merah (2022),Rp 156.000.000,2022,3,Bensin,Matic,1200 cc
+Honda Jazz Hatchback (2018),Rp 169.000.000,2018,7,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Q Tss Automatic (2022),Rp 240.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza G Mt (2023),Rp 215.000.000,2023,2,Bensin,Manual,1500 cc
+Toyota All New Avanza G Cvt At (2023),Rp 219.000.000,2023,2,Bensin,Matic,1500 cc
+Honda Jazz Rs At  At (2016),Rp 178.000.000,2016,9,Bensin,Matic,1500 cc
+Mitsubishi Pajero Sport Dakar 4x2 Solar (2018),Rp 380.000.000,2018,7,Diesel,Matic,2400 cc
+Daihatsu Sigra R Deluxe At  Putih (2016),Rp 108.000.000,2016,9,Bensin,Matic,1200 cc
+Suzuki Xl7 Alpha Hybrid (2024),Rp 255.000.000,2024,1,Hybrid,Matic,1462 cc
+Suzuki Xl7 Alpha Hybrid (2025),Rp 205.000.000,2025,1,Hybrid,Matic,1462 cc
+Honda Brio Rs  Oranye (2023),Rp 174.000.000,2023,2,Bensin,Manual,1200 cc
+Toyota Innova Reborn V  At (2019),Rp 299.000.000,2019,6,Bensin,Matic,2000 cc
+Honda Brio Rs Bensin At (2022),Rp 185.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Calya G Mt (2017),Rp 120.000.000,2017,8,Bensin,Manual,1200 cc
+Toyota All New Veloz Q Cvt (2022),Rp 240.000.000,2022,3,Bensin,Matic,1500 cc
+Kia Sportage At (2015),Rp 125.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Kijang Innova (2019),Rp 315.000.000,2019,6,Bensin,Matic,2400 cc
+Toyota Innova Zenix 2 0 At (2023),Rp 499.000.000,2023,2,Hybrid,Matic,2000 cc
+Mitsubishi Outlander Sport Px Action At  Hitam (2018),Rp 215.000.000,2018,7,Bensin,Matic,2000 cc
+Toyota Avanza G Mpv (2021),Rp 165.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Avanza Q Non Tss (2023),Rp 235.500.000,2023,2,Bensin,Matic,1500 cc
+Kijang Innova V At  Hitam (2021),Rp 300.000.000,2021,4,Bensin,Matic,2000 cc
+Toyota Innova Reborn V (2016),Rp 245.000.000,2016,9,Bensin,Matic,2000 cc
+Toyota Avanza G Mt (2017),Rp 135.000.000,2017,8,Bensin,Matic,1300 cc
+Suzuki Xl7 Alpha Mt (2023),Rp 202.500.000,2023,2,Bensin,Manual,1500 cc
+Honda Brio E Satya Mt (2022),Rp 143.000.000,2022,3,Bensin,Manual,1200 cc
+Honda Brio Satya E (2021),Rp 155.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Avanza Veloz Mpv (2021),Rp 192.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Innova Venturer 4x2 (2019),Rp 315.000.000,2019,6,Bensin,Matic,2000 cc
+Toyota New Rush S Suv Gr Sport Mt (2022),Rp 245.000.000,2022,3,Bensin,Manual,1500 cc
+Honda Jazz Rs  Merah (2019),Rp 199.000.000,2019,6,Bensin,Manual,1500 cc
+Mitsubishi Xpander Ultimate At (2019),Rp 195.000.000,2019,6,Bensin,Matic,1500 cc
+Toyota Veloz Type Q Tss Cvt (2022),Rp 254.900.000,2022,3,Bensin,Matic,1500 cc
+Toyota Calya Type G Lux 1200 Mt (2022),Rp 148.000.000,2022,3,Bensin,Manual,1200 cc
+Bmw 520i M Sport Package (2023),Rp 1.080.000.000,2023,2,Bensin,Matic,2000 cc
+Wuling Rs Almaz (2023),Rp 255.000.000,2023,2,Bensin,Matic,1500 cc
+Toyota New Rush Type S Gr Sport 1500 Mt (2022),Rp 245.000.000,2022,3,Bensin,Manual,1500 cc
+Mazda 3 Hb Skyactiv At (2018),Rp 255.000.000,2018,7,Bensin,Matic,2000 cc
+Toyota Avanza G Bensin At (2019),Rp 157.000.000,2019,6,Bensin,Matic,1300 cc
+Toyota Kijang Innova (2020),Rp 257.000.000,2020,5,Bensin,Matic,2000 cc
+Toyota Avanza Veloz Q At (2022),Rp 225.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Kijang Innova (2024),Rp 339.000.000,2024,1,Bensin,Matic,2000 cc
+Suzuki Spresso Matic (2023),Rp 128.000.000,2023,2,Bensin,Matic,1000 cc
+Honda Brio E Satya  Hitam (2021),Rp 150.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Rush G At  Black (2021),Rp 230.000.000,2021,4,Bensin,Matic,1500 cc
+Suzuki Baleno Hb At (2017),Rp 155.000.000,2017,8,Bensin,Matic,1400 cc
+Honda Brio Rs Hatchback (2023),Rp 174.000.000,2023,2,Bensin,Matic,1200 cc
+Honda Brio Satya E At (2022),Rp 156.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Innova Reborn G  Mt (2022),Rp 345.000.000,2022,3,Diesel,Manual,2400 cc
+Renault Kwid Climber At (2021),Rp 100.000.000,2021,4,Bensin,Matic,1000 cc
+Toyota Kijang Innova G At  Silver (2020),Rp 278.000.000,2020,5,Bensin,Matic,2000 cc
+Toyota Avanza G Mpv (2020),Rp 168.000.000,2020,5,Bensin,Matic,1300 cc
+Honda Crv Prestige At (2015),Rp 220.000.000,2015,10,Bensin,Matic,2400 cc
+Toyota Kijang Innova Zenix Q Hv Tss Modellista Wagon (2023),Rp 540.000.000,2023,2,Hybrid,Matic,2000 cc
+Honda Brio Rs Hatchback (2016),Rp 118.000.000,2016,9,Bensin,Matic,1200 cc
+Toyota Kijang Innova G At (2022),Rp 345.000.000,2022,3,Bensin,Matic,2400 cc
+Toyota Innova Venturer Diesel At (2022),Rp 455.000.000,2022,3,Diesel,Matic,2400 cc
+Daihatsu Sigra R At  Putih (2022),Rp 132.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Innova Venturer At (2020),Rp 410.000.000,2020,5,Diesel,Matic,2400 cc
+Toyota Kijang Innova Zenix (2024),Rp 369.000.000,2024,1,Hybrid,Matic,2000 cc
+Toyota Avanza 15 G Mt (2022),Rp 213.000.000,2022,3,Bensin,Manual,1500 cc
+Toyota Innova Reborn G  At (2017),Rp 250.000.000,2017,8,Bensin,Matic,2000 cc
+Toyota Kijang Innova Zenix V Cvt (2022),Rp 385.000.000,2022,3,Hybrid,Matic,2000 cc
+Hyundai Creta Prime (2022),Rp 280.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza G Bensin At (2019),Rp 157.000.000,2019,6,Bensin,Matic,1300 cc
+Toyota Calya G At (2019),Rp 110.000.000,2019,6,Bensin,Matic,1200 cc
+Toyota Kijang Innova Zenix (2024),Rp 368.000.000,2024,1,Hybrid,Matic,2000 cc
+H1 Royal Diesel (2019),Rp 410.000.000,2019,6,Diesel,Matic,2500 cc
+Honda Brio (2023),Rp 159.500.000,2023,2,Bensin,Matic,1200 cc
+Toyota Kijang Innova Reborn G Diesel (2024),Rp 372.000.000,2024,1,Diesel,Matic,2400 cc
+Toyota Avanza G Mt (2020),Rp 165.000.000,2020,5,Bensin,Manual,1300 cc
+Honda Brv E Prestige Sensing At  Hitam (2022),Rp 239.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Kijang Innova G Mpv (2019),Rp 251.000.000,2019,6,Diesel,Matic,2000 cc
+Toyota Kijang Innova Reborn G Diesel (2023),Rp 366.000.000,2023,2,Diesel,Matic,2400 cc
+Toyota Kijang Innova Venturer (2018),Rp 289.000.000,2018,7,Bensin,Matic,2000 cc
+Honda Brio Rs Mt  Merah (2017),Rp 126.000.000,2017,8,Bensin,Manual,1200 cc
+Honda Brio Rs (2021),Rp 173.000.000,2021,4,Bensin,Matic,1200 cc
+Honda Crv Turbo (2018),Rp 265.000.000,2018,7,Bensin,Matic,1500 cc
+Nissan Teana Xv At (2015),Rp 185.000.000,2015,10,Bensin,Matic,2500 cc
+Toyota Kijang Innova (2023),Rp 595.000.000,2023,2,Bensin,Matic,2000 cc
+Innova Zenix G At (2024),Rp 340.000.000,2024,1,Hybrid,Matic,2000 cc
+Toyota Avanza G  Mt (2017),Rp 150.000.000,2017,8,Bensin,Manual,1300 cc
+Toyota Rush (2024),Rp 254.500.000,2024,1,Bensin,Matic,1500 cc
+Mazda Cx 5 (2017),Rp 278.500.000,2017,8,Bensin,Matic,2500 cc
+Toyota Kijang Innova Type G Luxury  At 2019 (2019),Rp 245.000.000,2019,6,Bensin,Matic,2000 cc
+Toyota Innova 24 G Diesel At (2022),Rp 385.000.000,2022,3,Bensin,Matic,1500 cc
+Suzuki Ignis Gx Mt  Putih (2017),Rp 109.000.000,2017,8,Bensin,Manual,1200 cc
+Toyota Vellfire Z At (2015),Rp 220.000.000,2015,10,Bensin,Matic,2400 cc
+Toyota Kijang Innova G At (2020),Rp 268.000.000,2020,5,Bensin,Matic,2000 cc
+Nissan Grand Livina Sv  Manual (2017),Rp 105.000.000,2017,8,Bensin,Manual,1500 cc
+Honda Brio Rs  Abu (2018),Rp 115.000.000,2018,7,Bensin,Manual,1200 cc
+Toyota Avanza (2020),Rp 168.000.000,2020,5,Bensin,Matic,1300 cc
+Honda Brio Satya E  Silver (2020),Rp 135.000.000,2020,5,Bensin,Manual,1200 cc
+6000km Only  Agya 12 G Mt (2018),Rp 115.000.000,2018,7,Bensin,Manual,1200 cc
+Honda All New Hrv Rs 15 Turbo (2022),Rp 330.000.000,2022,3,Bensin,Matic,1500 cc
+Honda Mobilio 15 E Prestige At (2015),Rp 105.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Kijang Innova V Bensin At (2017),Rp 250.000.000,2017,8,Bensin,Matic,2000 cc
+Daihatsu Xenia R Mt Sporty (2016),Rp 115.000.000,2016,9,Bensin,Matic,1300 cc
+Toyota Fortuner Vrz Diesel (2022),Rp 465.000.000,2022,3,Diesel,Matic,2400 cc
+Toyota Kijang Innova G At (2022),Rp 300.000.000,2022,3,Bensin,Matic,2000 cc
+Honda Brio E At (2022),Rp 150.000.000,2022,3,Bensin,Matic,1200 cc
+Hrv E  Sangat Baik (2017),Rp 220.000.000,2017,8,Bensin,Matic,1500 cc
+Toyota Kijang Innova G Solar V At (2020),Rp 320.000.000,2020,5,Diesel,Matic,2400 cc
+Honda Brio 12 E Cvt (2015),Rp 160.000.000,2015,10,Bensin,Matic,1500 cc
+Honda Brio Rs  Merah (2016),Rp 122.000.000,2016,9,Bensin,Manual,1200 cc
+Honda All New Jazz Rs (2018),Rp 208.000.000,2018,7,Bensin,Matic,1500 cc
+Mitsubishi Xpander Cross Premium At  Silver (2020),Rp 229.000.000,2020,5,Bensin,Matic,1500 cc
+Toyota Kijang Innova G Bensin At (2016),Rp 222.000.000,2016,9,Bensin,Matic,2000 cc
+Toyota Corolla Cross Hybrid (2021),Rp 330.000.000,2021,4,Hybrid,Matic,1800 cc
+Xpander Cross Gray Matic (2023),Rp 299.000.000,2023,2,Bensin,Matic,1500 cc
+Honda Brio E Satya At (2022),Rp 156.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Avanza G At (2024),Rp 238.000.000,2024,1,Bensin,Matic,1500 cc
+Honda Jazz Rs At (2015),Rp 137.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Avanza G  Abu (2022),Rp 201.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza G Mpv Premium (2019),Rp 158.000.000,2019,6,Bensin,Matic,1300 cc
+Honda Brio Satya E Hatchback (2021),Rp 138.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Avanza Veloz (2015),Rp 139.000.000,2015,10,Bensin,Matic,1500 cc
+Mitsubishi Xpander Cross At (2023),Rp 285.000.000,2023,2,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Q Cvt At (2022),Rp 223.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Innova Q At (2016),Rp 230.000.000,2016,9,Bensin,Matic,2000 cc
+Daihatsu Xenia (2021),Rp 165.000.000,2021,4,Bensin,Manual,1500 cc
+Wuling Confero Std Double Blower Mpv Special Edition 1500 Mt (2022),Rp 118.000.000,2022,3,Bensin,Manual,1500 cc
+Hrv E Cvt Lokasi Kediri (2016),Rp 205.000.000,2016,9,Bensin,Matic,1500 cc
+Nissan Grand Livina Hws At (2015),Rp 125.000.000,2015,10,Bensin,Matic,1500 cc
+Honda Jazz Rs Cvt  At (2015),Rp 179.000.000,2015,10,Bensin,Matic,1500 cc
+Honda Brio Satya E Mt (2021),Rp 146.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Alphard S At (2015),Rp 260.000.000,2015,10,Bensin,Matic,2400 cc
+Toyota Aln Avanza G Mt (2024),Rp 240.000.000,2024,1,Bensin,Manual,1500 cc
+Suzuki Ignis Gx (2019),Rp 130.000.000,2019,6,Bensin,Matic,1200 cc
+Toyota Innova Zenix Q Hybrid Modelista Panoramic At (2023),Rp 540.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Hilux D Cab E 4x4 Solar Mt (2018),Rp 250.000.000,2018,7,Bensin,Manual,2400 cc
+Power Liftgate Fortuner  Vrz 4x2 Solar (2016),Rp 365.000.000,2016,9,Diesel,Matic,2400 cc
+Toyota Avanza New Model G  Mt (2019),Rp 150.000.000,2019,6,Bensin,Manual,1300 cc
+Honda Brio Rs Hatchback (2018),Rp 141.000.000,2018,7,Bensin,Matic,1200 cc
+Toyota Fortuner G At Diesel (2019),Rp 365.000.000,2019,6,Diesel,Matic,2400 cc
+Toyota Kijang Innova G Bensin At (2019),Rp 245.000.000,2019,6,Bensin,Matic,2000 cc
+Wuling Cortez T Lux (2022),Rp 182.000.000,2022,3,Bensin,Matic,1500 cc
+Honda Brio E Satya (2022),Rp 150.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Grand New Avanza G Mt (2019),Rp 178.000.000,2019,6,Bensin,Manual,1300 cc
+Toyota All New Yaris Cross S Gr Hev (2023),Rp 355.000.000,2023,2,Bensin,Matic,1500 cc
+Toyota Yaris Cross Gr Hybrid (2023),Rp 337.000.000,2023,2,Hybrid,Matic,1500 cc
+Honda Brio E Mt (2016),Rp 100.000.000,2016,9,Bensin,Matic,1200 cc
+Toyota Avanza Veloz Bensin At (2019),Rp 175.000.000,2019,6,Bensin,Matic,1500 cc
+Toyota Fortuner Vrz At (2019),Rp 390.000.000,2019,6,Diesel,Matic,2400 cc
+Toyota Kijang Innova Zenix V Premium Color Mpv (2023),Rp 390.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Kijang Innova Reborn G Lux (2021),Rp 295.000.000,2021,4,Bensin,Matic,2000 cc
+Toyota Kijang Innova Venturer Mpv (2017),Rp 271.000.000,2017,8,Bensin,Matic,2000 cc
+Honda Jazz Rs Cvt (2016),Rp 190.000.000,2016,9,Bensin,Matic,1500 cc
+Honda Brio E Cvt (2021),Rp 160.000.000,2021,4,Bensin,Matic,1500 cc
+Mitsubishi Xforce Ultimate At  Putih (2023),Rp 308.000.000,2023,2,Bensin,Matic,1500 cc
+Toyota Avanza G Mpv At  Hitam (2023),Rp 213.000.000,2023,2,Bensin,Matic,1500 cc
+Honda Brio 12 E Cvt (2015),Rp 190.000.000,2015,10,Bensin,Matic,1500 cc
+Honda Jazz Rs At (2019),Rp 238.000.000,2019,6,Bensin,Matic,1500 cc
+Innova Zenix V Hybrid Modelista (2023),Rp 455.000.000,2023,2,Hybrid,Matic,2000 cc
+Nissan Serena Highway Starr (2019),Rp 265.000.000,2019,6,Bensin,Matic,2000 cc
+Toyota Innova Zenix V Bensin (2023),Rp 360.000.000,2023,2,Hybrid,Matic,2000 cc
+Mazda Cx 5 Grand Touring (2018),Rp 294.000.000,2018,7,Bensin,Matic,2000 cc
+Toyota Kijang Innova G Mt (2020),Rp 328.000.000,2020,5,Bensin,Manual,2400 cc
+Honda Brio Rs Cvt At (2020),Rp 158.500.000,2020,5,Bensin,Matic,1200 cc
+Mitsubishi Xpander Cross Premium At  Hitam (2021),Rp 231.000.000,2021,4,Bensin,Matic,1500 cc
+Honda Jazz Rs At2015 (2015),Rp 185.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Avanza G Mpv (2019),Rp 160.000.000,2019,6,Bensin,Matic,1300 cc
+Honda Jazz Rs Hatchback (2017),Rp 189.000.000,2017,8,Bensin,Matic,1500 cc
+Toyota Rush Gr Sport At  Silver (2022),Rp 234.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Innova Reborn G Matic (2017),Rp 253.000.000,2017,8,Bensin,Matic,1500 cc
+Toyota Avanza E At (2023),Rp 194.000.000,2023,2,Bensin,Matic,1300 cc
+Honda Brv E Prestige At  Hitam (2023),Rp 244.000.000,2023,2,Bensin,Matic,1500 cc
+Innova Venturerat Diesel  Facelift (2021),Rp 400.000.000,2021,4,Diesel,Matic,2400 cc
+Dijual Cepat Toyota Calya G At (2020),Rp 125.000.000,2020,5,Bensin,Matic,1200 cc
+Toyota Avanza G At  Abu Abu (2018),Rp 160.000.000,2018,7,Bensin,Matic,1500 cc
+Toyota Avanza 13 G Mt (2018),Rp 150.000.000,2018,7,Bensin,Matic,1500 cc
+Daihatsu Sirion Mt (2018),Rp 127.000.000,2018,7,Bensin,Manual,1300 cc
+Toyota Kijang Innova G Mpv (2019),Rp 317.000.000,2019,6,Diesel,Matic,2400 cc
+Toyota Innova Reborn G  Mt (2020),Rp 280.000.000,2020,5,Bensin,Manual,2000 cc
+Daihatsu Sigra R At (2024),Rp 139.000.000,2024,1,Bensin,Matic,1200 cc
+Jual Nissan Grand Livina Xv 15 Hws Autech (2015),Rp 115.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Kijang Innova Luxury Mpv (2022),Rp 298.000.000,2022,3,Bensin,Matic,2000 cc
+Honda Brv E Prestige Suv (2020),Rp 199.000.000,2020,5,Bensin,Matic,1500 cc
+All New Kijang Innova Diesel Manual (2019),Rp 310.000.000,2019,6,Diesel,Manual,2400 cc
+Toyota Veloz Q Tss Mpv (2021),Rp 234.000.000,2021,4,Bensin,Matic,1500 cc
+Honda Mobilio Rs At (2015),Rp 140.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Kijang Innova G Mpv (2019),Rp 247.000.000,2019,6,Bensin,Matic,2000 cc
+Toyota Avanza Veloz Q Cvt At (2022),Rp 230.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Innova G At (2019),Rp 245.000.000,2019,6,Bensin,Matic,2000 cc
+Toyota Kijang Innova G At (2019),Rp 340.000.000,2019,6,Diesel,Matic,2400 cc
+Honda Mobilio Rs At (2015),Rp 140.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Avanza (2020),Rp 168.000.000,2020,5,Bensin,Matic,1300 cc
+Toyota Avanza E Manual (2015),Rp 115.000.000,2015,10,Bensin,Manual,1500 cc
+Toyota Avanza E Mt (2021),Rp 146.000.000,2021,4,Bensin,Manual,1300 cc
+Toyota Avanza G Mpv (2022),Rp 202.000.000,2022,3,Bensin,Matic,1500 cc
+Suzuki Apv Arena Gl Mt  Silver (2019),Rp 119.000.000,2019,6,Bensin,Manual,1500 cc
+Toyota Avanza E  At (2018),Rp 150.000.000,2018,7,Bensin,Matic,1300 cc
+Daihatsu Terios R At  Silver (2021),Rp 208.000.000,2021,4,Bensin,Matic,1500 cc
+Avanza G Matic (2019),Rp 185.000.000,2019,6,Bensin,Matic,1300 cc
+Honda Brio E Cvt  At (2020),Rp 155.000.000,2020,5,Bensin,Matic,1200 cc
+Toyota Innova V At (2019),Rp 290.000.000,2019,6,Bensin,Matic,2000 cc
+Honda Brio E Satya  Merah (2023),Rp 161.000.000,2023,2,Bensin,Matic,1200 cc
+Toyota Fortuner Vrz Gr Diesel (2023),Rp 509.000.000,2023,2,Diesel,Matic,2800 cc
+Toyota Alphard Sc At (2015),Rp 285.000.000,2015,10,Bensin,Matic,2400 cc
+Toyota Avanza G Mt (2019),Rp 160.000.000,2019,6,Bensin,Matic,1300 cc
+Toyota Kijang Innova G (2021),Rp 350.000.000,2021,4,Diesel,Matic,2400 cc
+Toyota Calya G (2018),Rp 116.000.000,2018,7,Bensin,Matic,1200 cc
+Honda Brio Satya E (2019),Rp 129.000.000,2019,6,Bensin,Manual,1200 cc
+Toyota Avanza 13 G Mt (2019),Rp 167.000.000,2019,6,Bensin,Manual,1500 cc
+Honda Civic Turbo  Prestige (2017),Rp 280.000.000,2017,8,Bensin,Matic,1500 cc
+Toyota Yaris G At  Putih (2020),Rp 171.000.000,2020,5,Bensin,Matic,1500 cc
+Toyota Voxy At (2020),Rp 335.000.000,2020,5,Bensin,Matic,2000 cc
+Honda Brio Rs At  Abu Metalik (2017),Rp 130.000.000,2017,8,Bensin,Matic,1500 cc
+Mitsubishi Outlander Gls At (2016),Rp 165.000.000,2016,9,Bensin,Matic,2000 cc
+Toyota Innova Venturer (2017),Rp 266.000.000,2017,8,Bensin,Matic,2000 cc
+Toyota Kijang Innova Zenix V (2023),Rp 405.000.000,2023,2,Hybrid,Matic,2000 cc
+Honda Hrv E Se (2019),Rp 234.000.000,2019,6,Bensin,Matic,1500 cc
+Toyota Innova 2.4 G Deisel At (2019),Rp 345.000.000,2019,6,Diesel,Matic,2400 cc
+Toyota Avanza G At  Hitam (2023),Rp 219.000.000,2023,2,Bensin,Matic,1300 cc
+Toyota Kijang Innova Zenix V Premium Color Mpv (2023),Rp 389.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Aln Agya G Mt (2024),Rp 165.000.000,2024,1,Bensin,Manual,1200 cc
+Toyota Kijang Innova Zenix  Hitam (2023),Rp 393.000.000,2023,2,Hybrid,Matic,2000 cc
+Daihatsu Terios R At  Silver (2022),Rp 203.000.000,2022,3,Bensin,Matic,1500 cc
+Honda Jazz Rs At  Nik 2019 (2020),Rp 225.000.000,2020,5,Bensin,Matic,1500 cc
+Toyota Avanza G Cvt  Abu (2023),Rp 212.000.000,2023,2,Bensin,Matic,1500 cc
+Honda Brio E At (2022),Rp 160.000.000,2022,3,Bensin,Matic,1200 cc
+Honda Brio Rs Hatchback  Putih (2022),Rp 159.000.000,2022,3,Bensin,Manual,1200 cc
+Chevrolet Captiva Ltz Diesel (2017),Rp 230.000.000,2017,8,Diesel,Matic,2000 cc
+Honda Jazz Rs At (2019),Rp 209.000.000,2019,6,Bensin,Matic,1500 cc
+Toyota Rush S Trd Sportivo At  Silver (2018),Rp 188.000.000,2018,7,Bensin,Matic,1500 cc
+Toyota Kijang Innova Reborn G Bensin At (2020),Rp 265.000.000,2020,5,Bensin,Matic,2000 cc
+Toyota Innova Venturer  Hitam (2020),Rp 331.000.000,2020,5,Bensin,Matic,2000 cc
+Honda Jazz Rs At (2016),Rp 173.000.000,2016,9,Bensin,Matic,1500 cc
+Toyota All New Avanza G Cvt At (2023),Rp 218.000.000,2023,2,Bensin,Matic,1500 cc
+Honda Crv Turbo  Nik 2022 (2022),Rp 378.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Innova G At Bensin (2020),Rp 303.000.000,2020,5,Bensin,Matic,2000 cc
+Honda Brio Rs At (2017),Rp 130.000.000,2017,8,Bensin,Matic,1500 cc
+Toyota Avanza G Mpv (2022),Rp 200.000.000,2022,3,Bensin,Matic,1500 cc
+Honda City E Sedan (2020),Rp 205.000.000,2020,5,Bensin,Matic,1500 cc
+Toyota Fortuner Vrz At (2022),Rp 488.000.000,2022,3,Diesel,Matic,2800 cc
+Innova Reborn G At Diesel  Facelift (2021),Rp 354.000.000,2021,4,Diesel,Matic,2400 cc
+Toyota Kijang Innova Zenix V Cvt Bensin At (2023),Rp 385.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Fortuner Vrz Trd 4x4 (2020),Rp 385.000.000,2020,5,Diesel,Matic,2500 cc
+Toyota Fortuner Trd At (2021),Rp 454.000.000,2020,4,Diesel,Matic,2695 cc
+Toyota Calya E Std Mt (2016),Rp 120.000.000,2016,9,Bensin,Manual,1200 cc
+Toyota All New Avanza G Mt (2022),Rp 185.000.000,2022,3,Bensin,Manual,1500 cc
+Toyota Kijang Innova (2021),Rp 550.000.000,2021,4,Bensin,Matic,2000 cc
+Daihatsu Sigra R Mt  Putih (2023),Rp 128.000.000,2023,2,Bensin,Manual,1200 cc
+Kijang Innova G At  Silver Metalik (2020),Rp 278.000.000,2020,5,Bensin,Matic,2000 cc
+Toyota Veloz Q Tss At  Hitam (2022),Rp 241.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota New Rush S Gr Sport 1500 Mt (2022),Rp 245.000.000,2022,3,Bensin,Manual,1500 cc
+Honda Brio E Cvt At (2018),Rp 120.000.000,2018,7,Bensin,Matic,1200 cc
+Honda Brio E Cvt Kuning Metic Kediri (2022),Rp 160.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Fortuner Srz Bensin (2016),Rp 320.000.000,2016,9,Bensin,Matic,2700 cc
+Toyota Altis V At (2016),Rp 253.000.000,2016,9,Bensin,Matic,1800 cc
+Toyota Kijang Innova Zenix Hv Tss Modellista (2023),Rp 565.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Kijang Innova G Mpv (2019),Rp 249.000.000,2019,6,Bensin,Matic,2000 cc
+Toyota Veloz Q Tss Mpv (2022),Rp 242.000.000,2022,3,Bensin,Matic,1500 cc
+Suzuki Ertiga Gx Mpv (2018),Rp 165.000.000,2018,7,Bensin,Matic,1400 cc
+Toyota Avanza At  Hitam (2023),Rp 190.000.000,2023,2,Bensin,Matic,1300 cc
+Toyota Calya G Mpv (2022),Rp 142.000.000,2022,3,Bensin,Matic,1200 cc
+Honda Hrv E Prestige At (2019),Rp 250.000.000,2019,6,Bensin,Matic,1500 cc
+Toyota Voxy  Hitam (2019),Rp 325.000.000,2019,6,Bensin,Matic,2000 cc
+Toyota Kijang Innova G Mt (2024),Rp 360.000.000,2024,1,Diesel,Matic,2400 cc
+Toyota Kijang Innova V Solar At (2021),Rp 395.000.000,2021,4,Bensin,Matic,2400 cc
+Honda Crv At (2015),Rp 172.000.000,2015,10,Bensin,Matic,2000 cc
+Toyota Avanza Veloz (2021),Rp 193.000.000,2021,4,Bensin,Matic,1500 cc
+Bmw 740li 30 Pure Excellence (2018),Rp 790.000.000,2018,7,Bensin,Matic,3000 cc
+BMW 740Li G12 B58 Luxury Sedan (2016),Rp 698.000.000,2016,9,Bensin,Matic,3000 cc
+Toyota Innova G Bensin At (2021),Rp 315.000.000,2021,4,Bensin,Matic,2000 cc
+Toyota Avanza Veloz At (2021),Rp 182.000.000,2021,4,Bensin,Matic,1500 cc
+Mitsubishi Xpander Cross Premium At  Putih (2020),Rp 228.000.000,2020,5,Bensin,Matic,1500 cc
+Honda Hrv E (2021),Rp 244.000.000,2021,4,Bensin,Matic,1500 cc
+Honda Brio Satya E Cvt (2019),Rp 138.000.000,2019,6,Bensin,Matic,1200 cc
+Honda Brio Rs  Silver (2019),Rp 158.000.000,2019,6,Bensin,Matic,1200 cc
+Toyota All New Avanza Veloz Q Cvt (2022),Rp 239.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Kijang Innova G Mpv (2020),Rp 259.000.000,2020,5,Bensin,Matic,2000 cc
+Toyota Innova G 2 0 Matic (2015),Rp 185.000.000,2015,10,Bensin,Matic,1500 cc
+Honda Brio Rs (2023),Rp 173.000.000,2023,2,Bensin,Manual,1200 cc
+Honda Brio Satya E (2019),Rp 143.000.000,2019,6,Bensin,Matic,1200 cc
+Toyota Innova 20 J Bensin Mt (2015),Rp 148.000.000,2015,10,Bensin,Manual,1500 cc
+Toyota Veloz Q Tss Mpv (2022),Rp 238.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Camry V At (2015),Rp 215.000.000,2015,10,Bensin,Matic,2500 cc
+Wuling Cortez L Lux Mt (2018),Rp 137.000.000,2018,7,Bensin,Manual,1800 cc
+Toyota Innova 20 V Bensin (2015),Rp 285.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Calya G Mpv (2018),Rp 116.000.000,2018,7,Bensin,Matic,1200 cc
+Honda Brio  E Satya Putih (2021),Rp 138.000.000,2021,4,Bensin,Manual,1200 cc
+Daihatsu New Ayla Type X 1000 Mt (2019),Rp 109.000.000,2019,6,Bensin,Manual,1000 cc
+Tangan Pertama Pemakaian Wanita Hrv 15se Tahun (2021),Rp 270.000.000,2021,4,Bensin,Matic,1500 cc
+Suzuki Jimny Two Tone (2023),Rp 449.000.000,2023,2,Bensin,Matic,1500 cc
+Toyota Kijang Innova G Lux Capt Seat (2021),Rp 295.000.000,2021,4,Bensin,Matic,2000 cc
+Toyota Calya Type G Lux 1200 Mt (2023),Rp 153.000.000,2023,2,Bensin,Manual,1200 cc
+Toyota Fortuner Vrz Diesel (2024),Rp 564.000.000,2024,1,Diesel,Matic,2800 cc
+Toyota Fortuner Vrz (2025),Rp 671.900.000,2025,1,Diesel,Matic,2400 cc
+Toyota Avanza G Mt (2019),Rp 162.000.000,2019,6,Bensin,Manual,1300 cc
+Toyota All New Avanza G Cvt At (2023),Rp 211.000.000,2023,2,Bensin,Matic,1500 cc
+Toyota Calya G At (2017),Rp 120.000.000,2017,8,Bensin,Matic,1200 cc
+Toyota Kijang Innova Zenix V (2022),Rp 395.000.000,2022,3,Hybrid,Matic,2000 cc
+Honda Jazz Rshatchback (2015),Rp 135.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Q Cvt At (2022),Rp 232.000.000,2022,3,Bensin,Matic,1500 cc
+Honda Brio Rs (2021),Rp 167.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Corolla Cross Hybrid (2021),Rp 335.000.000,2021,4,Hybrid,Matic,1800 cc
+Toyota All New Avanza G Cvt At (2022),Rp 195.000.000,2022,3,Bensin,Matic,1500 cc
+Honda Brio Rs (2021),Rp 181.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Avanza Veloz (2020),Rp 178.000.000,2020,5,Bensin,Matic,1300 cc
+Toyota Avanza G Mpv (2022),Rp 200.000.000,2022,3,Bensin,Matic,1500 cc
+Mitsubishi Xpander Gls At (2023),Rp 209.000.000,2023,2,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Q Cvt At (2022),Rp 219.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Vios G At (2018),Rp 183.000.000,2018,7,Bensin,Matic,1500 cc
+Toyota Avanza Mpv (2022),Rp 201.000.000,2022,3,Bensin,Matic,1500 cc
+Honda Mobilio Rs Cvt (2015),Rp 145.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Mt (2020),Rp 195.000.000,2020,5,Bensin,Manual,1500 cc
+Toyota Avanza Veloz (2021),Rp 200.000.000,2021,4,Bensin,Matic,1500 cc
+Honda Brio Rs Cvt (2017),Rp 135.000.000,2017,8,Bensin,Matic,1200 cc
+Honda Brio Satya E Mt (2021),Rp 140.000.000,2021,4,Bensin,Manual,1200 cc
+Brio E  Manual (2015),Rp 103.000.000,2015,10,Bensin,Manual,1500 cc
+Honda Brio Satya E Mt (2021),Rp 144.000.000,2021,4,Bensin,Manual,1200 cc
+Toyota Avanza G Mt (2021),Rp 210.000.000,2021,4,Bensin,Manual,1500 cc
+Bmw 740li G12 M Sport (2022),Rp 1.450.000.000,2022,3,Bensin,Matic,3000 cc
+Toyota Altis V 2021 Record (2020),Rp 265.000.000,2020,5,Bensin,Matic,1800 cc
+Toyota Kijang Innova Zenix Automatic (2022),Rp 401.000.000,2022,3,Hybrid,Matic,2000 cc
+Xenia X Mt  Pajak Panjang Tahun Depan Kondisi Mulus Seperti Baru (2023),Rp 185.000.000,2023,2,Bensin,Manual,1300 cc
+Toyota Avanza G At (2024),Rp 230.000.000,2024,1,Bensin,Matic,1500 cc
+Toyota Innova V At (2022),Rp 325.000.000,2022,3,Bensin,Matic,2000 cc
+Honda Brio Rs Hatchback (2019),Rp 144.000.000,2019,6,Bensin,Matic,1200 cc
+Daihatsu Sigra R Dlx Mt (2020),Rp 140.000.000,2020,5,Bensin,Manual,1200 cc
+Toyota Kijang Innova G Diesel At (2018),Rp 290.000.000,2018,7,Diesel,Matic,2400 cc
+Honda Jazz Rs (2019),Rp 217.000.000,2019,6,Bensin,Matic,1500 cc
+Mitsubishi Outlander Sport Gls At (2016),Rp 160.000.000,2016,9,Bensin,Matic,2000 cc
+Toyota Agya G Mt (2021),Rp 129.000.000,2021,4,Bensin,Manual,1200 cc
+Toyota Avanza G Tss Bensin At (2021),Rp 195.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Kijang Innova G Manual (2016),Rp 199.000.000,2016,9,Bensin,Manual,2000 cc
+Jazz Rs (2018),Rp 204.900.000,2018,7,Bensin,Matic,1500 cc
+Honda Hrv Prestige Cvt (2016),Rp 235.000.000,2016,9,Bensin,Matic,1800 cc
+Honda Crv Turbo Suv (2022),Rp 402.000.000,2022,3,Bensin,Matic,1500 cc
+Honda Jazz Rs Hatchback (2016),Rp 185.000.000,2016,9,Bensin,Matic,1500 cc
+Honda Brio E Satya At  Abu (2022),Rp 157.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Innova G  Automatic Silver (2021),Rp 355.000.000,2021,4,Diesel,Matic,2400 cc
+Nissan Serena Highway Starr (2019),Rp 265.000.000,2019,6,Bensin,Matic,2000 cc
+Toyota Avanza Type G Manual (2018),Rp 141.000.000,2018,7,Bensin,Manual,1300 cc
+Honda Brio Rs Urbanite At (2023),Rp 180.000.000,2023,2,Bensin,Matic,1200 cc
+Honda Brio Rs Cvt  Abu Abu (2021),Rp 181.000.000,2021,4,Bensin,Matic,1200 cc
+Honda Brio Satya E Hatchback (2022),Rp 157.000.000,2022,3,Bensin,Matic,1200 cc
+Honda Brio E At Putih (2015),Rp 110.000.000,2015,10,Bensin,Matic,1200 cc
+Daihatsu Terios X Deluxe At  Hitam (2021),Rp 192.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Kijang Innova Zenix Tss Modellista Wagon Km 1 Rbuan (2022),Rp 540.000.000,2022,3,Hybrid,Matic,2000 cc
+Toyota Voxy  Hitam (2018),Rp 310.000.000,2018,7,Bensin,Matic,2000 cc
+Honda Accord Turbo Sensing (2020),Rp 390.000.000,2020,5,Bensin,Matic,1500 cc
+Honda New Accord 1.5 Cvt (2022),Rp 545.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza G  Abu (2023),Rp 212.000.000,2023,2,Bensin,Matic,1500 cc
+Honda Hrv Prestige (2021),Rp 295.000.000,2021,4,Bensin,Matic,1800 cc
+Honda Jazz Rs Cvt (2015),Rp 135.000.000,2015,10,Bensin,Matic,1500 cc
+Suzuki Baleno Hatchback At (2020),Rp 175.000.000,2020,5,Bensin,Matic,1400 cc
+Toyota Innova G  At (2015),Rp 198.000.000,2015,10,Bensin,Matic,2000 cc
+Toyota Avanza Veloz (2022),Rp 235.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza G Mt (2021),Rp 165.000.000,2021,4,Bensin,Manual,1300 cc
+Kijang Innova Tahun  Bensin Automatic (2019),Rp 270.000.000,2019,6,Bensin,Matic,1980 cc
+Daihatsu All New Xenia R Cvt (2021),Rp 189.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Kijang Innova G (2019),Rp 289.000.000,2019,6,Diesel,Manual,2400 cc
+Mitsubishi Xpander Cross Mpv (2020),Rp 220.000.000,2020,5,Bensin,Matic,1500 cc
+Toyota Agya (2022),Rp 142.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Avanza Tipe G At (2020),Rp 157.000.000,2020,5,Bensin,Matic,1300 cc
+Toyota Rush Gr Sport At (2022),Rp 235.000.000,2022,3,Bensin,Matic,1500 cc
+Mobil Wuling Formo S (2024),Rp 95.000.000,2024,1,Bensin,Manual,1200 cc
+Honda Crv Turbo Prestige 15 At (2018),Rp 327.000.000,2018,7,Bensin,Matic,1500 cc
+Honda Brio Satya E (2016),Rp 110.000.000,2016,9,Bensin,Manual,1200 cc
+Honda Hrv E Cvt (2019),Rp 240.000.000,2019,6,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Q Cvt At (2023),Rp 235.000.000,2023,2,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Q Cvt At (2024),Rp 256.000.000,2024,1,Bensin,Matic,1500 cc
+Toyota Innova Zenix V (2023),Rp 390.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Avanza Type Veloz Gr Limited 1500 At (2021),Rp 225.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Innova Zenix Q Hybrid Modelista (2022),Rp 550.000.000,2022,3,Hybrid,Matic,1500 cc
+Toyota Voxy At (2018),Rp 295.000.000,2018,7,Bensin,Matic,2000 cc
+Toyota Kijang Innova Zenix V Premium Color Mpv (2023),Rp 395.000.000,2023,2,Hybrid,Matic,2000 cc
+Honda Brio E Satya (2022),Rp 157.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Calya G Lcgc Lux 1200 Mt (2024),Rp 158.000.000,2024,1,Bensin,Manual,1200 cc
+Toyota Rush Gr Sport At  Silver (2022),Rp 234.000.000,2022,3,Bensin,Matic,1500 cc
+Suzuki Xl7 (2020),Rp 199.000.000,2020,5,Bensin,Matic,1500 cc
+Honda New Brio Type E 1200 Cvt (2023),Rp 183.000.000,2023,2,Bensin,Matic,1200 cc
+Toyota Innova Zenix G Hv Hybrid At (2024),Rp 398.000.000,2024,1,Hybrid,Matic,2000 cc
+Honda Crv Turbo (2022),Rp 402.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Innova G Matic  Hitam (2022),Rp 294.000.000,2022,3,Bensin,Matic,2000 cc
+Toyota Kijang Innova Zenix Q Hv Cvt Tss Modellista Hybrid At (2022),Rp 528.000.000,2022,3,Hybrid,Matic,2000 cc
+Honda Brio Satya E At (2019),Rp 147.000.000,2019,6,Bensin,Matic,1200 cc
+Fortuner Gr Sport 4x2 (2022),Rp 528.000.000,2022,3,Diesel,Matic,2800 cc
+Toyota Avanza Veloz 15  Putih (2021),Rp 191.500.000,2021,4,Bensin,Matic,1500 cc
+Toyota Avanza (2022),Rp 200.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza Veloz (2021),Rp 235.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Q  Non Tss At (2022),Rp 229.000.000,2022,3,Bensin,Matic,1500 cc
+Ayla X Manual (2024),Rp 119.000.000,2024,1,Bensin,Manual,1000 cc
+Honda Mobilio E (2017),Rp 144.000.000,2017,8,Bensin,Matic,1500 cc
+Toyota Kijang Innova Zenix (2023),Rp 462.000.000,2023,2,Hybrid,Matic,2000 cc
+Honda Brio Rs Cvt Urbanite Edition  At (2021),Rp 190.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Avanza G  At (2023),Rp 200.000.000,2023,2,Bensin,Matic,1500 cc
+Honda Hrv 18 Prestige Automatic (2016),Rp 191.000.000,2016,9,Bensin,Matic,1800 cc
+Bmw 520i Luxury Sedan Tahun (2017),Rp 345.000.000,2017,8,Bensin,Matic,2000 cc
+Honda Brio Rs (2021),Rp 169.000.000,2021,4,Bensin,Matic,1200 cc
+Honda Brio Satya E (2022),Rp 155.000.000,2022,3,Bensin,Matic,1200 cc
+Xpander Sport (2021),Rp 210.000.000,2021,4,Bensin,Matic,1500 cc
+Mini Cooper S (2015),Rp 280.000.000,2015,10,Bensin,Matic,1600 cc
+Ford Ecosport Titanium At (2015),Rp 120.000.000,2015,10,Bensin,Matic,1500 cc
+Mitsubishi Xpander Cross (2021),Rp 239.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Q Cvt At (2021),Rp 235.000.000,2021,4,Bensin,Matic,1500 cc
+Pajero Dakar 4x2 At (2017),Rp 420.000.000,2017,8,Diesel,Matic,2400 cc
+Honda Jazz Rs At  Putih (2019),Rp 221.000.000,2019,6,Bensin,Matic,1500 cc
+Toyota Avanza E Mpv (2025),Rp 230.000.000,2025,0,Bensin,Matic,1300 cc
+Bmw 320i At Silver (2015),Rp 115.000.000,2015,10,Bensin,Matic,2000 cc
+Bmw F30 320d 2.0 sport (2015),Rp 279.000.000,2015,10,Diesel,Matic,2000 cc
+Bmw 320d 2.0 sport (2016),Rp 380.000.000,2016,9,Diesel,Matic,2000 cc
+Toyota Innova Zenix Hybrid Tss Modellista Rse (2022),Rp 520.000.000,2022,3,Hybrid,Matic,2000 cc
+Toyota Avanza G Mt (2023),Rp 219.000.000,2023,2,Bensin,Manual,1500 cc
+Toyota Calya G At  Silver (2022),Rp 142.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Avanza G At (2023),Rp 210.000.000,2023,2,Bensin,Matic,1500 cc
+Toyota Avanza G Mpv (2024),Rp 218.000.000,2024,1,Bensin,Matic,1500 cc
+Toyota Avanza (2021),Rp 176.000.000,2021,4,Bensin,Matic,1300 cc
+Toyota Kijang Innova Zenix Q Hv Cvt Tss Modellista Hybrid (2024),Rp 539.000.000,2024,1,Hybrid,Matic,2000 cc
+Honda Jazz Rs At (2016),Rp 185.000.000,2016,9,Bensin,Matic,1500 cc
+Honda Brio Satya E Hatchback (2020),Rp 134.000.000,2020,5,Bensin,Matic,1200 cc
+Toyota Avanza Veloz L Q Cvt At (2022),Rp 235.000.000,2022,3,Bensin,Matic,1500 cc
+Suzuki Ertiga Gx At Hitam (2020),Rp 183.000.000,2020,5,Bensin,Matic,1500 cc
+Mobil Mitsubishi Mirage (2016),Rp 90.000.000,2016,9,Bensin,Manual,1200 cc
+Toyota Kijang Innova Venturer Solar At (2022),Rp 475.000.000,2022,3,Diesel,Matic,2400 cc
+Mitsubishi Pajero Sport Dakar 4x2 (2021),Rp 475.000.000,2021,4,Diesel,Matic,2400 cc
+Toyota Kijang Innova Reborn G Diesel (2023),Rp 365.000.000,2023,2,Diesel,Matic,2400 cc
+Toyota Avanza G Bensin At (2022),Rp 195.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Innova Venturer (2022),Rp 495.000.000,2022,3,Diesel,Matic,2400 cc
+Honda Brio Rs At (2018),Rp 165.000.000,2018,7,Bensin,Matic,1200 cc
+Toyota Kijang Innova Zenix Q Hybrid Cvt Modelista Tss At (2023),Rp 499.000.000,2023,2,Hybrid,Matic,2000 cc
+Honda Jazz Rs (2021),Rp 279.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Yaris G Hatchback (2018),Rp 157.000.000,2018,7,Bensin,Matic,1500 cc
+Honda Jazz Rs At (2020),Rp 248.000.000,2020,5,Bensin,Matic,1500 cc
+Toyota Calya G Mt (2019),Rp 135.000.000,2019,6,Bensin,Manual,1200 cc
+Honda Brio Satya E Cvt (2019),Rp 151.000.000,2019,6,Bensin,Matic,1200 cc
+Honda Brio E Satya (2019),Rp 127.000.000,2019,6,Bensin,Manual,1200 cc
+Brio E Satya Mt (2019),Rp 129.000.000,2019,6,Bensin,Manual,1200 cc
+Toyota Agya G Trd (2016),Rp 101.000.000,2016,9,Bensin,Matic,1000 cc
+Mitsubishi Pajero Sport Dakar (2022),Rp 500.000.000,2022,3,Diesel,Matic,2400 cc
+Toyota Fortuner Vrz At (2023),Rp 500.000.000,2023,2,Diesel,Matic,2800 cc
+Toyota Avanza G Mpv  Putih (2022),Rp 187.000.000,2022,3,Bensin,Manual,1500 cc
+Honda Jazz Rs Cvt  Merah (2016),Rp 185.000.000,2016,9,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Q  Non Tss (2023),Rp 245.000.000,2023,2,Bensin,Matic,1500 cc
+Mitshubishi Pajero Sport Dakar 4x2 At (2022),Rp 490.000.000,2022,3,Diesel,Matic,2400 cc
+Honda Brio E At (2015),Rp 112.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Kijang Innova G Mpv (2016),Rp 218.000.000,2016,9,Bensin,Matic,2000 cc
+Toyota Avanza Veloz Q  Non Tss (2024),Rp 255.000.000,2024,1,Bensin,Matic,1500 cc
+Wuling Confero Std Double Blower Mpv Special Edition 1500 Mt (2022),Rp 118.000.000,2022,3,Bensin,Manual,1500 cc
+Honda Brio Rs Matic (2017),Rp 130.000.000,2017,8,Bensin,Matic,1200 cc
+Honda Brio Rs Cvt At (2018),Rp 142.000.000,2018,7,Bensin,Matic,1200 cc
+Daihatsu Sigra Type D Minor Change 1000 Mt (2023),Rp 124.000.000,2023,2,Bensin,Manual,1000 cc
+Honda Odyssey S At (2015),Rp 230.000.000,2015,10,Bensin,Matic,1500 cc
+Daihatsu Sirion (2018),Rp 142.000.000,2018,7,Bensin,Matic,1300 cc
+Toyota Alphard G Atpm (2017),Rp 655.000.000,2017,8,Bensin,Matic,2400 cc
+Hyundai H 1 Royale Diesel (2015),Rp 250.000.000,2015,10,Diesel,Matic,2500 cc
+Wuling Almaz Ex (2019),Rp 172.000.000,2019,6,Bensin,Matic,1500 cc
+Brio E Cvt (2018),Rp 130.000.000,2018,7,Bensin,Matic,1200 cc
+Innova Manual Diesel (2020),Rp 325.000.000,2020,5,Diesel,Manual,24000 cc
+Toyota Avanza G Mpv (2021),Rp 192.000.000,2021,4,Bensin,Matic,1400 cc
+Mitshubishi Pajero Sport Dakar 4x2 At (2022),Rp 490.000.000,2022,3,Diesel,Matic,2400 cc
+Toyota Avanza E Mt (2022),Rp 174.000.000,2022,3,Bensin,Manual,1300 cc
+Honda Brio Satya E Cvt At Matic  Silver (2016),Rp 99.500.000,2016,9,Bensin,Matic,1200 cc
+Toyota Yaris S Trd Cvt (2021),Rp 191.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota New Rush S Suv Gr Sport 1500 Mt (2022),Rp 245.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Q Automatic (2023),Rp 248.000.000,2023,2,Bensin,Matic,1500 cc
+Honda Brv E Prestige (2022),Rp 235.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza G (2022),Rp 198.000.000,2022,3,Bensin,Matic,1500 cc
+Honda City Rs Hb Mt (2021),Rp 205.000.000,2021,4,Bensin,Manual,1500 cc
+Jazz Rs Cvt  Matic (2018),Rp 230.000.000,2018,7,Bensin,Matic,1500 cc
+Toyota Innova G At Bensin (2019),Rp 251.000.000,2019,6,Bensin,Matic,2000 cc
+Toyota Avanza G At (2023),Rp 215.000.000,2023,2,Bensin,Matic,1500 cc
+Toyota Avanza 1 5 G At (2023),Rp 212.000.000,2023,2,Bensin,Matic,1500 cc
+Toyota Avanza G Mt (2020),Rp 150.000.000,2020,5,Bensin,Manual,1300 cc
+Honda Hrv E Se (2019),Rp 234.000.000,2019,6,Bensin,Matic,1500 cc
+Mitsubishi Pajero Sport Dakar (2015),Rp 265.000.000,2015,10,Diesel,Matic,2500 cc
+Toyota Avanza 13 E At (2022),Rp 180.000.000,2022,3,Bensin,Matic,1300 cc
+Toyota Kijang Innova Zenix V Cvt Bensin At (2022),Rp 385.000.000,2022,3,Hybrid,Matic,2000 cc
+Hyundai Santa Fe At (2020),Rp 310.000.000,2020,5,Bensin,Matic,2400 cc
+Toyota Yaris S Trd At  Merah (2021),Rp 210.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Voxy  Hitam (2018),Rp 310.000.000,2018,7,Bensin,Matic,2000 cc
+All New Kijang Innova V Diesel Automatic (2022),Rp 405.000.000,2022,3,Diesel,Matic,2400 cc
+Xpander Ultimate Cvt Km Rendah Lok Kediri (2023),Rp 285.000.000,2023,2,Bensin,Matic,1500 cc
+Daihatsu Ayla X Mt (2015),Rp 78.000.000,2015,10,Bensin,Manual,1000 cc
+Toyota Avanza G At (2023),Rp 215.000.000,2023,2,Bensin,Matic,1500 cc
+Toyota Rush G Suv (2018),Rp 188.000.000,2018,7,Bensin,Matic,1500 cc
+Toyota New Agya Type G Trd Sportivo 1200 Mt (2022),Rp 149.000.000,2022,3,Bensin,Manual,1200 cc
+Honda Brio E Mt (2022),Rp 135.000.000,2022,3,Bensin,Manual,1200 cc
+Honda Brio Rs Cvt At Kuning (2020),Rp 168.500.000,2020,5,Bensin,Matic,1200 cc
+Toyota Avanza G Mt (2019),Rp 160.000.000,2019,6,Bensin,Matic,1300 cc
+Toyota Innova Zenix V  Automatic Putih (2023),Rp 414.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Calya G Mt (2023),Rp 153.000.000,2023,2,Bensin,Manual,1200 cc
+Toyota Rush G Suv (2021),Rp 203.000.000,2021,4,Bensin,Matic,1500 cc
+Honda Jazz S Cvt (2015),Rp 152.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Avanza E Mpv (2023),Rp 177.000.000,2023,2,Bensin,Matic,1300 cc
+Toyota Avanza G At (2017),Rp 150.000.000,2017,8,Bensin,Matic,1300 cc
+Toyota Gr Corolla Hatchback (2024),Rp 1.899.000.000,2024,1,Bensin,Manual,1600 cc
+Honda Brio Satya E Hatchback (2021),Rp 138.000.000,2021,4,Bensin,Matic,1200 cc
+Honda Brio Rs Mt (2019),Rp 148.000.000,2019,6,Bensin,Manual,1200 cc
+Honda Crv Prestige Turbo (2017),Rp 335.000.000,2017,8,Bensin,Matic,1500 cc
+Honda Brio E Satya  At (2022),Rp 150.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Kijang Innova (2020),Rp 260.000.000,2020,5,Bensin,Matic,2000 cc
+Toyota Avanza Veloz 15 Mt (2021),Rp 190.000.000,2021,4,Bensin,Matic,1500 cc
+Honda Brio E At (2017),Rp 125.000.000,2017,8,Bensin,Matic,1200 cc
+Honda Brio Rs Mt (2016),Rp 140.000.000,2016,9,Bensin,Manual,1200 cc
+Toyota Veloz Q  Putih (2021),Rp 235.000.000,2021,4,Bensin,Matic,1500 cc
+Daihatsu All New Terios Type X 1500 Mt (2021),Rp 207.000.000,2021,4,Bensin,Manual,1500 cc
+Toyota Avanza G Mpv (2021),Rp 175.000.000,2021,4,Bensin,Matic,1300 cc
+Honda Brio (2019),Rp 143.000.000,2019,6,Bensin,Manual,1200 cc
+Toyota Kijang Innova G Mpv (2019),Rp 249.000.000,2019,6,Bensin,Manual,2000 cc
+Honda Brio Rs (2018),Rp 144.000.000,2018,7,Bensin,Matic,1200 cc
+Ford Fiesta Matic (2015),Rp 78.000.000,2015,10,Bensin,Matic,1400 cc
+Toyota Fortuner Vrz  Diesel 2020 Hitam (2019),Rp 370.000.000,2019,6,Diesel,Matic,2400 cc
+Toyota Avanza Veloz Q (2022),Rp 219.000.000,2022,3,Bensin,Matic,1500 cc
+Honda Brio Rs Hatchback (2018),Rp 142.000.000,2018,7,Bensin,Matic,1200 cc
+Toyota Kijang Innova Zenix Q Hv Cvt Tss Modellista Hybrid At (2023),Rp 539.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Yaris Gr Sport At (2022),Rp 232.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza (2022),Rp 243.000.000,2022,3,Bensin,Matic,1500 cc
+Brio E  Mt 2015 (2015),Rp 97.000.000,2015,10,Bensin,Manual,1500 cc
+Toyota Avanza G At (2024),Rp 229.000.000,2024,1,Bensin,Matic,1500 cc
+Toyota Kijang Innova Venturer (2021),Rp 333.500.000,2021,4,Bensin,Matic,2000 cc
+Daihatsu New Terios R At (2018),Rp 180.000.000,2018,7,Bensin,Matic,1500 cc
+Brio Rs  At (2016),Rp 124.000.000,2016,9,Bensin,Matic,1200 cc
+Toyota Avanza Veloz Q Tss (2022),Rp 233.000.000,2022,3,Bensin,Matic,1500 cc
+Honda Brio E Mt (2015),Rp 102.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Avanza G At Matic  Putih (2018),Rp 137.500.000,2018,7,Bensin,Matic,1300 cc
+Toyota Kijang Innova 20 G (2022),Rp 320.000.000,2022,3,Bensin,Matic,2000 cc
+Toyota Avanza Veloz Q Cvt At (2022),Rp 229.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Innova V Solar Matic (2018),Rp 358.000.000,2018,7,Diesel,Matic,2400 cc
+Toyota Avanza G Mpv (2023),Rp 210.000.000,2023,2,Bensin,Matic,1500 cc
+Honda Brio Satya E At (2018),Rp 135.000.000,2018,7,Bensin,Matic,1200 cc
+Toyota Kijang Innova Zenix Q Hybrid Cvt (2024),Rp 534.000.000,2024,1,Hybrid,Matic,2000 cc
+Toyota Innova Reborn V Solar Manual (2021),Rp 392.000.000,2021,4,Diesel,Manual,2400 cc
+Mercedes Benz Cla 200 Amg (2020),Rp 730.000.000,2020,5,Bensin,Matic,1332 cc
+Toyota Agya (2024),Rp 149.500.000,2024,1,Bensin,Matic,1200 cc
+Toyota All New Avanza G Mt (2024),Rp 215.000.000,2024,1,Bensin,Manual,1500 cc
+Honda City Es Turbo At (2018),Rp 334.000.000,2018,7,Bensin,Matic,1500 cc
+Toyota Veloz Q Tss At (2022),Rp 235.000.000,2022,3,Bensin,Matic,1500 cc
+Honda Brio Rs Cvt (2024),Rp 225.000.000,2024,1,Bensin,Matic,1200 cc
+Honda Brio Satya E Cvt  Putih (2019),Rp 151.000.000,2019,6,Bensin,Matic,1200 cc
+Honda Brio Rs At (2019),Rp 191.500.000,2019,6,Bensin,Matic,1200 cc
+Honda Brio E Satya Cvt At Abu (2021),Rp 148.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Avanza E Bensin Mt (2019),Rp 148.000.000,2019,6,Bensin,Manual,1300 cc
+Toyota Fortuner Vrz Diesel (2021),Rp 475.000.000,2021,4,Diesel,Matic,2400 cc
+Toyota Innova Reborn Zenix Hb V Cvt (2023),Rp 490.000.000,2023,2,Hybrid,Matic,2000 cc
+Honda Jazz Rs At (2018),Rp 195.000.000,2018,7,Bensin,Matic,1500 cc
+Honda Brio E At (2023),Rp 188.000.000,2023,2,Bensin,Matic,1200 cc
+Toyota Kijang Innova (2015),Rp 250.000.000,2015,10,Bensin,Matic,2400 cc
+Toyota Yaris S Trd At  Hitam (2021),Rp 212.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Kijang Innova (2020),Rp 261.500.000,2020,5,Bensin,Matic,2000 cc
+Honda Brio Rs Hatchback (2021),Rp 171.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Avanza Veloz Gr Limited Mpv (2021),Rp 189.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Calya G (2020),Rp 128.000.000,2020,5,Bensin,Matic,1200 cc
+Jazz Rs Manual (2019),Rp 228.000.000,2019,6,Bensin,Manual,1500 cc
+Honda Brio E Cvt (2020),Rp 124.900.000,2020,5,Bensin,Matic,1200 cc
+Toyota New Avanza G At (2019),Rp 145.000.000,2019,6,Bensin,Matic,1400 cc
+Toyota Innova G (2019),Rp 247.000.000,2019,6,Bensin,Matic,2000 cc
+Honda Brio Satya E  Putih (2020),Rp 145.000.000,2020,5,Bensin,Matic,1200 cc
+Toyota Avanza G At (2021),Rp 192.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Avanza 15 G (2022),Rp 198.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Innova Zenix V (2023),Rp 360.000.000,2023,2,Hybrid,Matic,2000 cc
+Honda Brio E (2016),Rp 105.000.000,2016,9,Bensin,Matic,1200 cc
+Toyota Aln Agya G Mt (2023),Rp 155.000.000,2023,2,Bensin,Manual,1200 cc
+Honda Brio Rs Cvt  At (2023),Rp 220.000.000,2023,2,Bensin,Matic,1200 cc
+Honda Cr V Prestige (2015),Rp 220.000.000,2015,10,Bensin,Matic,2400 cc
+Mazda 2 R Bensin At (2015),Rp 99.000.000,2015,10,Bensin,Matic,1500 cc
+Pajero Dakar 4x4 (2019),Rp 460.000.000,2019,6,Diesel,Matic,2400 cc
+Toyota Fortuner Vrz At (2022),Rp 460.000.000,2022,3,Diesel,Matic,2800 cc
+Suzuki Ignis Gx At  Orange (2022),Rp 156.000.000,2022,3,Bensin,Matic,1200 cc
+Honda Brio E  Mt (2015),Rp 110.000.000,2015,10,Bensin,Manual,1200 cc
+Toyota Avanza E  At (2023),Rp 185.000.000,2023,2,Bensin,Matic,1300 cc
+Mitsubishi Pajero Dakar At (2022),Rp 505.000.000,2022,3,Diesel,Matic,2400 cc
+Toyota Fortuner Gr Sport (2023),Rp 505.000.000,2023,2,Diesel,Matic,2800 cc
+Daihatsu Rocky R At (2021),Rp 179.000.000,2021,4,Bensin,Matic,1000 cc
+Honda Brio E Cvt At (2018),Rp 122.000.000,2018,7,Bensin,Matic,1200 cc
+Daihatsu Alya Tipe R (2023),Rp 145.000.000,2023,2,Bensin,Manual,1200 cc
+Honda Hr V E (2021),Rp 286.000.000,2021,4,Bensin,Matic,1800 cc
+Daihatsu Xenia R Bensin At (2021),Rp 139.000.000,2021,4,Bensin,Manual,1500 cc
+Toyota Rush Gr Sport At  Silver (2022),Rp 234.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Avanza Veloz (2022),Rp 235.000.000,2022,3,Bensin,Matic,1500 cc
+Honda Brio Satya  Abu (2019),Rp 129.000.000,2019,6,Bensin,Manual,1200 cc
+Toyota Avanza Veloz Mpv (2021),Rp 189.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Kijang Innova (2017),Rp 239.000.000,2017,8,Bensin,Matic,2000 cc
+Toyota Avanza G Tss Bensin At (2021),Rp 195.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Camry V At (2022),Rp 455.000.000,2022,3,Bensin,Matic,2500 cc
+Toyota Camry Hybrid (2018),Rp 329.000.000,2018,7,Hybrid,Matic,2494 cc
+Suzuki Ertiga Dreza At (2017),Rp 148.000.000,2017,8,Bensin,Matic,1400 cc
+Toyota Avanza E At (2017),Rp 134.000.000,2017,8,Bensin,Matic,1300 cc
+Toyota Avanza Veloz Q Cvt At (2023),Rp 235.000.000,2023,2,Bensin,Matic,1500 cc
+Mitsubishi Xpander Cross Premium At  Putih (2021),Rp 233.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Veloz Q At  Silver (2022),Rp 220.000.000,2022,3,Bensin,Matic,1500 cc
+Mitsubishi Xpander Cross Hitam (2021),Rp 255.000.000,2021,4,Bensin,Matic,1500 cc
+Honda Brio Satya E At (2018),Rp 145.000.000,2018,7,Bensin,Matic,1200 cc
+Toyota Avanza E Mpv (2023),Rp 192.000.000,2023,2,Bensin,Matic,1300 cc
+Honda Brio Rs At (2021),Rp 178.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Avanza (2020),Rp 166.000.000,2020,5,Bensin,Manual,1300 cc
+Toyota Avanza G Mpv  Silver (2022),Rp 200.000.000,2022,3,Bensin,Matic,1500 cc
+Honda Brio Rs Cvt At (2023),Rp 182.000.000,2023,2,Bensin,Matic,1200 cc
+Honda Brv Prestige Honda Sensing Suv (2022),Rp 245.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Alphard G Mpv (2021),Rp 883.000.000,2021,4,Bensin,Matic,2500 cc
+Toyota Alphard Hev Mpv (2023),Rp 1.860.000.000,2023,2,Hybrid,Matic,2500 cc
+Toyota Alphard Hev Modellista Mpv (2024),Rp 1.950.000.000,2024,1,Hybrid,Matic,2500 cc
+Toyota Yaris (2021),Rp 225.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Innova Venturer At (2021),Rp 444.000.000,2021,4,Diesel,Matic,2400 cc
+Mitsubishi Xpander Ultimate Mpv (2019),Rp 206.000.000,2019,6,Bensin,Matic,1500 cc
+Hyundai H1 Royale At Diesel (2015),Rp 255.000.000,2015,10,Diesel,Matic,2500 cc
+Toyota Kijang Innova Zenix Hv Tss Modellista Wagon (2023),Rp 540.000.000,2023,2,Hybrid,Matic,2000 cc
+Nissan Grand Livina Xgear At (2015),Rp 110.000.000,2015,10,Bensin,Matic,1500 cc
+Honda Jazz S At (2018),Rp 184.000.000,2018,7,Bensin,Matic,1500 cc
+Honda Brio Rs Hatchback (2021),Rp 169.000.000,2021,4,Bensin,Matic,1200 cc
+Toyota Sienta V (2019),Rp 183.000.000,2019,6,Bensin,Matic,1500 cc
+Suzuki Grand Vitara Gx Hybrid (2023),Rp 315.000.000,2023,2,Hybrid,Matic,1500 cc
+Suzuki Grand Vitara Gx Hybrid (2025),Rp 250.000.000,2025,1,Hybrid,Matic,1500 cc
+Toyota Avanza Veloz Mt (2015),Rp 120.000.000,2015,10,Bensin,Manual,1500 cc
+Honda Jazz Rs Cvt (2016),Rp 190.000.000,2016,9,Bensin,Matic,1500 cc
+Honda Brio E Satya  Putih (2022),Rp 156.000.000,2022,3,Bensin,Matic,1200 cc
+Honda Jazz S (2018),Rp 169.000.000,2018,7,Bensin,Matic,1500 cc
+Toyota Veloz  Automatic (2017),Rp 149.999.000,2017,8,Bensin,Matic,1500 cc
+Daihatsu Granmax Minibus Type D Ps Mc 1500 Mt (2020),Rp 144.000.000,2020,5,Bensin,Manual,1500 cc
+Toyota Kijang Innova Zenix G Hybrid At (2023),Rp 396.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Avanza Veloz (2015),Rp 139.000.000,2015,10,Bensin,Matic,1500 cc
+Toyota Kijang Innova Zenix (2023),Rp 420.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Alphard Sc At (2015),Rp 285.000.000,2015,10,Bensin,Matic,2400 cc
+Daihatsu Terios (2022),Rp 214.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Kijang Innova (2021),Rp 295.000.000,2021,4,Bensin,Matic,2000 cc
+Wuling AIR EV (2023),Rp 145.000.000,2023,2,Listrik,Matic,27 KwH
+Toyota Kijang Innova Zenix V Hv Modellista Wagon Km 20 Rbuan (2023),Rp 525.000.000,2023,2,Hybrid,Matic,2000 cc
+Toyota Vios G At (2018),Rp 175.000.000,2018,7,Bensin,Matic,1500 cc
+Honda Brio Rs (2022),Rp 179.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Avanza Veloz Bensin Mt (2020),Rp 175.000.000,2020,5,Bensin,Manual,1300 cc
+Toyota Rush Gr Sport At  Silver (2022),Rp 234.000.000,2022,3,Bensin,Matic,1500 cc
+Mitsubishi Xpander Ult At (2021),Rp 215.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Avanza E Mpv (2015),Rp 116.000.000,2015,10,Bensin,Matic,1300 cc
+Honda Brio 12 E Mt (2015),Rp 114.000.000,2015,10,Bensin,Matic,1500 cc
+Honda Crv Turbo  At (2018),Rp 275.000.000,2018,7,Bensin,Matic,1500 cc
+Mitshubishi Pajero Exceed (2019),Rp 345.000.000,2019,6,Diesel,Matic,2400 cc
+Mitshubishi Pajero Sport Dakar Ultimate (2024),Rp 649.000.000,2024,1,Diesel,Matic,2400 cc
+Mitsubishi Pajero Sport Dakar 4x2 At (2019)Rp 409.000.000,2019,6,Diesel,Matic,2400 cc
+Toyota Kijang Innova Venturer (2019),Rp 291.000.000,2019,6,Bensin,Matic,2000 cc
+Mitsubishi Xpander Ultimate At  Hitam (2019),Rp 206.000.000,2019,6,Bensin,Matic,1500 cc
+Toyota Avanza G Mt (2022),Rp 185.000.000,2022,3,Bensin,Manual,1300 cc
+Toyota Kijang Innova Zenix G Hv Hybrid Cvt At (2023),Rp 396.000.000,2023,2,Hybrid,Matic,2000 cc
+Honda Jazz Rs Hatchback (2019),Rp 2.375.000.000,2019,6,Bensin,Matic,1500 cc
+Toyota Kijang Innova (2021),Rp 300.000.000,2021,4,Bensin,Matic,2000 cc
+Toyota Avanza G Mpv  Silver (2021),Rp 174.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Avanza (2021),Rp 163.000.000,2021,4,Bensin,Manual,1300 cc
+Hyundai Creta 1 5 Trend At (2022),Rp 275.000.000,2022,3,Bensin,Matic,1500 cc
+Nissan Serena Highway Starr (2021),Rp 308.000.000,2021,4,Bensin,Matic,2000 cc
+Toyota Avanza G (2024),Rp 216.000.000,2024,1,Bensin,Matic,1500 cc
+Toyota Avanza Veloz Mpv (2015),Rp 143.000.000,2015,10,Bensin,Matic,1500 cc
+Honda Brio Satya E Mt (2015),Rp 105.000.000,2015,10,Bensin,Manual,1200 cc
+Mitsubishi Xpander Cross Premium At  Putih (2019),Rp 219.000.000,2019,6,Bensin,Matic,1500 cc
+Daihatsu Great New Xenia X Mpv Std 1300 Mt (2016),Rp 132.000.000,2016,9,Bensin,Manual,1300 cc
+Nissan Xtrail 2 0 At (2015),Rp 140.000.000,2015,10,Bensin,Matic,1997 cc
+Toyota Hilux 25 G Dc Mt (2016),Rp 300.000.000,2016,9,Diesel,Manual,2500 cc
+Toyota Innova (2015),Rp 160.000.000,2015,10,Bensin,Matic,1500 cc
+Honda Brio Satya E Cvt  Abu (2022),Rp 150.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Avanza G At (2022),Rp 195.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Innova Reborn G Luxury  At (2019),Rp 280.000.000,2019,6,Bensin,Matic,2000 cc
+Mitsubishi Pajero Sport 4x2 (2020),Rp 428.500.000,2020,5,Diesel,Matic,2400 cc
+Honda Brio Satya E Mt (2018),Rp 127.500.000,2018,7,Bensin,Manual,1200 cc
+Toyota Avanza E Cvt At (2024),Rp 189.500.000,2024,1,Bensin,Matic,1300 cc
+Toyota Kijang Innova G Mpv (2018),Rp 229.000.000,2018,7,Bensin,Matic,2000 cc
+Honda Brio Satya E At (2020),Rp 142.000.000,2020,5,Bensin,Matic,1200 cc
+Toyota Grand Avanza G At (2017),Rp 142.000.000,2017,8,Bensin,Matic,1300 cc
+Toyota Avanza G (2021),Rp 187.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Innova 20 V Bensin At (2018),Rp 268.000.000,2018,7,Bensin,Matic,1500 cc
+Toyota Avanza G At (2022),Rp 195.000.000,2022,3,Bensin,Matic,1500 cc
+Honda Jazz Rs Hatchback (2018),Rp 207.000.000,2018,7,Bensin,Matic,1500 cc
+Toyota Innova Zenix V At Hybrid Modellista Hitam (2022),Rp 425.000.000,2022,3,Hybrid,Matic,2000 cc
+Honda Brio E Cvt At (2022),Rp 156.000.000,2022,3,Bensin,Matic,1200 cc
+Ertiga Gx  Mt (2015),Rp 130.000.000,2015,10,Bensin,Manual,1400 cc
+Mobilio E At (2017),Rp 144.000.000,2017,8,Bensin,Matic,1500 cc
+Toyota Avanza G Mpv  Putih (2022),Rp 200.000.000,2022,3,Bensin,Matic,1500 cc
+Toyota Kijang Innova G Bensin Mt (2020),Rp 265.000.000,2020,5,Bensin,Manual,2000 cc
+Honda Jazz Rs At (2015),Rp 173.000.000,2015,10,Bensin,Matic,1500 cc
+Innova Reborn G At Bensin (2020),Rp 235.000.000,2020,5,Bensin,Matic,2000 cc
+Toyota Avanza G Mpv (2021),Rp 176.000.000,2021,4,Bensin,Matic,1500 cc
+Toyota Avanza Veloz (2023),Rp 239.000.000,2023,2,Bensin,Matic,1500 cc
+Honda Brio E Cvt (2020),Rp 154.000.000,2020,5,Bensin,Matic,1200 cc
+Toyota Avanza Veloz Mpv (2015),Rp 139.000.000,2015,10,Bensin,Matic,1500 cc
+Mitsubishi Xpander Ultimate At  Hitam (2019),Rp 205.000.000,2019,6,Bensin,Matic,1500 cc
+Toyota Kijang Innova G Mpv  Putih (2018),Rp 240.000.000,2018,7,Bensin,Matic,2000 cc
+Toyota Avanza Veloz (2023),Rp 224.500.000,2023,2,Bensin,Matic,1500 cc
+Toyota Innova G Diesel At (2015),Rp 250.000.000,2015,10,Diesel,Matic,2500 cc
+Toyota Agya Gr Sport (2022),Rp 142.000.000,2022,3,Bensin,Matic,1200 cc
+Toyota Fortuner V 25g Vnt Turbo (2015),Rp 410.000.000,2015,10,Diesel,Matic,2755 cc
+Toyota Innova Venturer Bensin At (2020),Rp 345.000.000,2020,5,Bensin,Matic,2000 cc
+Toyota Avanza Veloz (2015),Rp 137.000.000,2015,10,Bensin,Matic,1500 cc
+Honda Hrv E 1500 At (2016),Rp 170.000.000,2016,9,Bensin,Matic,1500 cc
+Hyundai Ioniq 5 Prime Standar Range AT (2022),Rp 399.000.000,2022,3,Listrik,Matic,58 kWh
+Hyundai Ioniq 5 Long Range AT (2022),Rp 470.000.000,2022,3,Listrik,Matic,72 kWh
+Wuling Bingo Premium Range (2025),Rp 315.000.000,2025,1,Listrik,Matic,38 kWh
+Chery Omoda 5 RZ Lux (2023),Rp 278.000.000,2023,2,Bensin,Matic,1498 cc
+Wuling Air Ev Long Range (2022),Rp 158.000.000,2022,3,Listrik,Matic,28 kWh
+Wuling Bingo Ev (2024),Rp 259.000.000,2024,1,Listrik,Matic,31 kWh
+Wuling Air Ev Long Range (2023),Rp 178.000.000,2023,2,Listrik,Matic,28 kWh
+Chery Omoda 5 RZ Lux (2023),Rp 302.000.000,2023,2,Bensin,Matic,1498 cc
+Wuling Air Ev Long Range (2023),Rp 205.000.000,2023,2,Listrik,Matic,28 kWh
+Wuling Bingo Ev Long Range (2023),Rp 265.000.000,2023,2,Listrik,Matic,31 kWh
+Wuling Air Ev (2022),Rp 195.000.000,2022,3,Listrik,Matic,28 kWh
+Mercedes Benz Eqs450 (2022),Rp 1.980.000.000,2022,3,Listrik,Matic,108 kWh
+Lexus Es 300 Hybrid (2014),Rp 250.000.000,2014,11,Hybrid,Matic,2500 cc
+Land Rover Defender 110 75th Limited Edition (2023),Rp 3.350.000.000,2023,2,Hybrid,Matic,2000 cc
+Mercedes Benz Gle450 Amg 4matic (2020),Rp 1.170.000.000,2020,5,Hybrid,Matic,2999 cc
+Nissan Kicks E Power Hybrid (2021),Rp 350.000.000,2021,4,Hybrid,Matic,1200 cc
+Ford Everest 4x2 At Xlt (2024),Rp 933.000.000,2024,1,Diesel,Matic,2000 cc
+Ford Everest 4x2 At Xlt (2024),Rp 825.000.000,2024,1,Diesel,Matic,2000 cc
+Hyundai Palisade 2.2L Signature 2WD Diesel AT (2021),Rp 621.000.000,2021,4,Diesel,Matic,2200 cc
+Hyundai Santa Fe Signature Cbu (2021),Rp 480.000.000,2021,4,Diesel,Matic,2200 cc
+Hyundai Santa Fe Signature Cbu (2022),Rp 485.000.000,2022,3,Diesel,Matic,2200 cc
+Hyundai Staria 2.2 Diesel At (2023),Rp 739.000.000,2023,2,Diesel,Matic,2200 cc
+Land Rover Devender 2.2l 110 Dc (2023),Rp 2.240.000.000,2023,2,Diesel,Matic,2200 cc
+Volkswagen Caravelle 2.0 Tdi (2014),Rp 310.000.000,2014,11,Diesel,Matic,2000 cc
+Hyundai Staria 2.2 Diesel At (2022),Rp 680.000.000,2023,2,Diesel,Matic,2200 cc
+Ford Everest 2.5 4x2at Xlt (2014),Rp 265.000.000,2014,11,Diesel,Matic,2500 cc
+Nissan Terra Vl At (2019),Rp 342.000.000,2019,6,Diesel,Matic,2500 cc
+Mitsubishi Pajero Sport Dakar 4x2 At (2022),Rp 485.000.000,2022,3,Diesel,Matic,2400 cc
+Mitsubishi Pajero Sport Dakar 4x2 At (2022),Rp 525.000.000,2022,3,Diesel,Matic,2400 cc
+Mitsubishi Pajero Sport Dakar 4x2 (2023),Rp 550.000.000,2023,2,Diesel,Matic,2400 cc
+Mitsubishi Pajero Sport Newdakar (2023),Rp 629.000.000,2023,2,Diesel,Matic,2400 cc
+Fortuner G 2.7 At Bdg (2014),Rp 311.000.000,2014,11,Diesel,Matic,2700 cc
+Fortuner 2.5 At Diesel (2014),Rp 265.000.000,2014,11,Diesel,Matic,2500 cc
+Toyota Kijang Innova G (2025),Rp 380.000.000,2025,1,Bensin,Manual,2000 cc
+Mazda Mazda Mx-5 2.0 At (2023),Rp 760.000.000,2023,2,Bensin,Matic,1300 cc
+Toyota Mark X 2.5 At (2014),Rp 199.000.000,2014,11,Bensin,Matic,1300 cc
+Mitsubishi All New Triton Gls Double Cabin Mt (2018),Rp 315.000.000,2018,7,Bensin,Manual,2500 cc
+Vellfire Z 2.4 At (2015),Rp 290.000.000,2015,10,Bensin,Manual,2400 cc
+Mazda Cx3 Sport At (2024),Rp 329.000.000,2024,1,Bensin,Matic,1500 cc
+Mazda Cx 5 Sporty (2017),Rp 278.500.000,2017,8,Bensin,Matic,2500 cc
+Mazda 2 Gt At (2022),Rp 228.000.000,2022,3,Bensin,Matic,1500 cc
+Mazda Cx 5 Grand Touring (2018),Rp 294.000.000,2018,7,Bensin,Matic,2000 cc
+Mazda Biante At (2015),Rp 130.000.000,2015,10,Bensin,Matic,2000 cc
+Mazda 3 Hb Skyactiv At (2018),Rp 255.000.000,7,Bensin,Matic,2000 cc
+Mazda Cx9 Turbo Skyactic (2019),Rp 415.000.000,2019,6,Bensin,Matic,2500 cc
+Mazda Biante L Skyaktive At (2017),Rp 175.000.000,2017,8,Bensin,Matic,2000 cc
+Mazda Cx5 Gt Kuro Black Edition Putih (2021),Rp 417.000.000,2021,4,Bensin,Matic,2500 cc
+Mazda Cx9 Skyactiv Suv Turbo Awd (2022),Rp 639.900.000,2022,3,Bensin,Matic,2500 cc
+Mazda 6 Elite Sedan Skyactiv (2019),Rp 365.000.000,2019,6,Bensin,Matic,2500 cc
+Mazda Mx 5 Nd Rf (2024),Rp 765.000.000,2024,1,Bensin,Matic,2000 cc
+Bmw 520i M Sport Package (2023),Rp 1.080.000.000,2023,2,Bensin,Matic,2000 cc
+Bmw X5 Xdrive40i G05 Xline (2021),Rp 826.000.000,2021,4,Bensin,Matic,3000 cc
+Bmw 320i G20 Sport Dynamic (2022),Rp 600.000.000,2022,3,Bensin,Matic,2000 cc
+Bmw 520i G30 Luxury (2020),Rp 790.000.000,2020,5,Bensin,Matic,2000 cc
+Bmw X5 Xdrive35i Xline (2016),Rp 435.000.000,2016,9,Bensin,Matic,2500 cc
+Bmw X1 Sdrive18i Xline (2018),Rp 350.000.000,2018,7,Bensin,Matic,1500 cc
+Bmw X1 Sdrive18i Sportline (2021),Rp 625.000.000,2021,4,Bensin,Matic,1500 cc
+Bmw X5 Xdrive35i Xline (2018),Rp 499.000.000,2018,7,Bensin,Matic,3000 cc
+Bmw X5 Xdrive40i Xline (2019),Rp 850.000.000,2019,6,Bensin,Matic,3000 cc
+Bmw 330i M Sport Sedan (2018),Rp 468.000.000,2018,7,Bensin,Matic,2000 cc
+Bmw 320i Sport Sedan (2017),Rp 345.000.000,2017,8,Bensin,Matic,2000 cc
+Bmw 330i M Sport At (2022),Rp 773.000.000,2022,3,Bensin,Matic,2000 cc
+Bmw 520i Alpine White (2015),Rp 315.000.000,2015,10,Bensin,Matic,2000 cc
+Bmw 330i M Sport G20 Turbo (2019),Rp 789.000.000,2019,6,Bensin,Matic,2000 cc
+Bmw 218i Sport 318i N42 (2023),Rp 534.000.000,2023,2,Bensin,Matic,1500 cc
+Bmw 218i Gran Coupe (2022),Rp 499.000.000,2022,3,Bensin,Matic,1500 cc
+Bmw X5 Diesel 2.0 X Drive (2015),Rp 440.000.000,2015,10,Diesel,Matic,2000 cc
+Bmw 330i M Sport Sedan (2021),Rp 645.000.000,2021,4,Bensin,Matic,2000 cc
+Bmw 530i Luxury Sedan (2018),Rp 5.800.000.000,2018,7,Bensin,Matic,2000 cc
+Bmw 530 I At (2022),Rp 835.000.000,2022,3,Bensin,Matic,2000 cc
+Bmw X5 Xdrive40i Xline (2023),Rp 1.350.000.000,2023,2,Bensin,Matic,3000 cc
+Bmw X3 Xdrive30i M Sport (2021),Rp 825.000.000,2021,4,Bensin,Matic,2000 cc
+Bmw X3 Xdrive30i M Sport (2022),Rp 895.000.000,2022,3,Bensin,Matic,2000 cc
+Bmw 730li Sedan M Sport (2018),Rp 799.000.000,2018,7,Bensin,Matic,2000 cc
+Bmw 535i Gt At (2015),Rp 370.000.000,2015,10,Bensin,Matic,3000 cc
+Bmw 320i At (2022),Rp 820.000.000,2022,3,Bensin,Matic,2000 cc
+Bmw X3 Sdrive 201 Xline (2023),Rp 1.030.000.000,2023,2,Bensin,Matic,2000 cc
+Bmw 640i Autometic (2014),Rp 700.000.000,2014,11,Bensin,Matic,3000 cc
+Bmw M2 Cmp Dct 3.0 (2021),Rp 1.250.000.000,2021,4,Bensin,Matic,1300 cc
+Mercedes Benz E350 Eqboost Amg Line (2022),Rp 838.000.000,2022,3,Bensin,Matic,2000 cc
+Mercedes Benz S450 (2023),Rp 2.350.000.000,2023,2,Bensin,Matic,3000 cc
+Mercedes Benz W205 C200 Eq Boost (2020),Rp 490.000.000,2020,5,Bensin,Matic,2000 cc
+Mercedes Benz C300 Amg Line Eq Boost (2020),Rp 669.000.000,2020,5,Bensin,Matic,2000 cc
+Mercedes Benz Gla 200 Amg 1.5 At (2022),Rp 615.000.000,2022,3,Bensin,Matic,1500 cc
+Mercedes Benz Glc200 1.5 (2021),Rp 879.000.000,2021,4,Bensin,Matic,2000 cc
+Mercedes Benz Cls350 (2018),Rp 899.000.000,2018,7,Bensin,Matic,2000 cc
+Mercedes Benz A200 (2021),Rp 550.000.000,2021,4,Bensin,Matic,1300 cc
+Mercedes Benz S 500 L Amg Line W222 (2014),Rp 849.000.000,2014,11,Bensin,Matic,4663 cc
+Mercedesbenz S400 L Exclusive W222 (2015),Rp 599.000.000,2015,10,Bensin,Matic,3000 cc
+Mercedes Benz S450 (2018),Rp 1.080.000.000,2018,7,Bensin,Matic,3000 cc
+Mercy E250 Bdg Mulpis (2014),Rp 387.000.000,2014,11,Bensin,Matic,2000 cc
+Lexus Lx570 F Sport At (2019),Rp 1.875.000.000,2019,6,Bensin,Matic,5663 cc
+Lexus Rx200t Luxury (2016),Rp 615.000.000,2016,9,Bensin,Matic,2000 cc
+Lexus Ux200 F Sport 4x2 Cbu (2019),Rp 415.000.000,2019,6,Bensin,Matic,2000 cc
+Lexus Rx200t Luxury (2017),Rp 649.000.000,2017,8,Bensin,Matic,2000 cc
+Lexus Ns200t F Sport (2016),Rp 415.000.000,2016,9,Bensin,Matic,2000 cc
+Lexus Es300h Ultra Luxury Hybrid Facelift (2018),Rp 565.000.000,2018,7,Bensin,Matic,2500 cc
+Lexus Rx270 Hk (2015),Rp 279.000.000,2015,10,Bensin,Matic,2000 cc
+Lexus Nx200 (2015),Rp 400.000.000,2015,10,Bensin,Matic,2000 cc
+Lexus Rx 300h Luxury Suv (2018),Rp 867.000.000,2018,7,Bensin,Matic,2000 cc
+Lexus Lm350 At 4 Seater (2021),Rp 1.450.000.000,2021,4,Bensin,Matic,3500 cc
+Lexus Ux200 Sport At (2020),Rp 528.000.000,2020,5,Bensin,Matic,2000 cc
+Lexus Es 300 Hybrid Ultra (2022),Rp 723.000.000,2022,3,Bensin,Matic,2500 cc
+Lexus Nx300 F Sport (2019),Rp 630.000.000,2019,6,Bensin,Matic,2000 cc
+Lexus Lm350 3.5 4seater At (2023),Rp 2.000.000.000,2023,2,Bensin,Matic,3500 cc
+Lexus Lm 350 (2020),Rp 1.350.000.000,2020,5,Bensin,Matic,3500 cc
+Renault Koleos Lux (2019),Rp 196.000.000,2019,6,Bensin,Matic,2500 cc
+Renault Triber Rxz (2022),Rp 119.000.000,2022,3,Bensin,Matic,1400 cc
+Volkswagen Tiguan 1.4 Tsi At (2020),Rp 315.000.000,2020,5,Bensin,Matic,1400 cc
+Volkswagen Polo (2018),Rp 179.000.000,2018,7,Bensin,Matic,1200 cc
+Volkswagen Polo Tsi At (2016),Rp 125.000.000,2016,9,Bensin,Matic,1200 cc
+Volkswagen Scirocco Tsi Hatchback Last Edition (2016),Rp 385.000.000,2016,9,Bensin,Matic,1400 cc
+Mobil Vw Touareg Hitam Tahun (2015),Rp 300.000.000,2015,10,Bensin,Matic,2500 cc
+Volkswagen Caravelle (2014),Rp 310.000.000,2014,11,Bensin,Matic,2000 cc
+Kia Sonet Premier At (2021),Rp 221.000.000,2021,4,Bensin,Matic,1500 cc
+Kia Seltos Gt At (2022),Rp 296.000.000,2022,3,Bensin,Matic,1400 cc
+Kia Carrens At (2022),Rp 325.000.000,2022,3,Bensin,Matic,2000 cc
+Kia All New Sportage At (2016),Rp 255.000.000,2016,9,Bensin,Matic,2000 cc
+Kia Rio Matic Bdg (2014),Rp 155.000.000,2014,11,Bensin,Matic,1400 cc
+Kia Grand Sedona Ultimate (2017),Rp 350.000.000,2017,8,Bensin,Matic,3300 cc
+Mini Cooper S 1.6 Con At (2015),Rp 280.000.000,2015,10,Bensin,Matic,1600 cc
+Mini Countryman Cooper S Suv Turbo (2017),Rp 475.000.000,2017,8,Bensin,Matic,2000 cc
+Mini Cooper 2.0 S Turbo (2019),Rp 545.000.000,2019,6,Bensin,Matic,2000 cc
+Mini Cooper 5 Door (2019),Rp 417.000.000,2019,6,Bensin,Matic,2000 cc
+Audi Q8 Tfsi Quattro (2019),Rp 990.000.000,2019,6,Bensin,Matic,3000 cc
+Audi Q5 Fsi At (2014),Rp 250.000.000,2014,11,Bensin,Matic,2000 cc
+Audi Q3 Quattro At (2014),Rp 279.000.000,2014,11,Bensin,Matic,20s00 cc
+Audi Tt Coupe Mk1 (2014),Rp 275.000.000,2014,11,Bensin,Manual,1800 cc
+Land Rover Range Rover2.0 evoque (2014),Rp 430.000.000,2014,11,Bensin,Matic,3000 cc
+Range Rover Vogue Swb Suv (2018),Rp 2.440.000.000,2018,7,Bensin,Matic,3000 cc
+Peugeot 3008 (2020),Rp 365.000.000,2020,5,Bensin,Matic,1600 cc
+Peugeot 5008 Gt Line (2019),Rp 368.000.000,2019,6,Bensin,Matic,1600 cc
+Morris Garage New Zs 1.5 magnify cvt (2021),Rp 225.000.000,2021,4,Bensin,Matic,1500 cc
+Porsche 992 Turbo Cabrio (2023),Rp 6.250.000.000,2023,2,Bensin,Matic,3800 cc
