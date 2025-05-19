@@ -23,47 +23,71 @@
 
   <script>
     async function kirimPertanyaan() {
-  const input = document.getElementById("pertanyaan");
-  const chatBox = document.getElementById("chatBox");
-  const pesan = input.value.trim();
-  if (!pesan) return;
+      const input = document.getElementById("pertanyaan");
+      const chatBox = document.getElementById("chatBox");
+      const pesan = input.value.trim();
+      if (!pesan) return;
 
-  const userMsg = document.createElement("div");
-  userMsg.className = "text-right text-blue-600";
-  userMsg.textContent = "👤 " + pesan;
-  chatBox.appendChild(userMsg);
+      const userMsg = document.createElement("div");
+      userMsg.className = "text-right text-blue-600 font-medium";
+      userMsg.textContent = "👤 " + pesan;
+      chatBox.appendChild(userMsg);
 
-  input.value = "";
+      input.value = "";
+      input.disabled = true;
 
-  const botMsg = document.createElement("div");
-  botMsg.className = "text-left text-gray-800";
-  botMsg.textContent = "🤖 ";
-  chatBox.appendChild(botMsg);
+      const botMsg = document.createElement("div");
+      botMsg.className = "text-left text-gray-800";
+      botMsg.textContent = "🤖 ";
+      chatBox.appendChild(botMsg);
 
-  try {
-    const response = await fetch(`http://127.0.0.1:8000/stream?pertanyaan=${encodeURIComponent(pesan)}`);
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let chunk;
+      const response = await fetch(`http://127.0.0.1:8000/stream?pertanyaan=${encodeURIComponent(pesan)}`);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let botDone = false;
 
-    while (!(chunk = await reader.read()).done) {
-  const lines = decoder.decode(chunk.value, { stream: true }).split("\n\n");
-  for (const line of lines) {
-    if (line.startsWith("data: ")) {
-      const payload = JSON.parse(line.slice(6));
-      if (payload.type === "stream") {
-        botMsg.textContent += payload.token;
+      let buffer = "";
+      const processLine = (line) => {
+        if (!line.startsWith("data: ")) return;
+        try {
+          const payload = JSON.parse(line.slice(6));
+          if (payload.type === "stream") {
+            botMsg.textContent += payload.token;
+          } else if (payload.type === "end") {
+            botDone = true;
+            input.disabled = false;
+            input.focus();
+          }
+        } catch (e) {
+          console.warn("Gagal parse JSON:", e);
+        }
+      };
+
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n\n");
+          buffer = lines.pop(); // simpan sisa incomplete untuk next
+
+          for (const line of lines) {
+            processLine(line);
+          }
+
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }
+      } catch (err) {
+        botMsg.textContent += "\n❌ Gagal mengambil jawaban.";
+        input.disabled = false;
+      }
+
+      if (!botDone) {
+        input.disabled = false;
       }
     }
-  }
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-} catch (err) {
-    botMsg.textContent = "❌ Gagal mengambil jawaban.";
-  }
-}
 
-    // Enter untuk kirim
     document.getElementById("pertanyaan").addEventListener("keypress", function (e) {
       if (e.key === "Enter") {
         kirimPertanyaan();
