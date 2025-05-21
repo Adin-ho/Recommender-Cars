@@ -23,4 +23,7 @@ def root():
 
 @app.get("/stream")
 async def stream(pertanyaan: str):
+    # streaming response tidak boleh "await" langsung
+    from app.rag_qa import stream_mobil
     return await stream_mobil(pertanyaan)
+
