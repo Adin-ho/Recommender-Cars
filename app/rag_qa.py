@@ -1,11 +1,11 @@
 import json
+import re
 from langchain_ollama import OllamaEmbeddings, OllamaLLM
 from langchain_chroma import Chroma
 from langdetect import detect
 from fastapi.responses import StreamingResponse
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-
 
 async def stream_mobil(pertanyaan: str):
     bahasa = detect(pertanyaan)
@@ -14,72 +14,92 @@ async def stream_mobil(pertanyaan: str):
         "en": "Answer strictly based on the data below. Do not fabricate or assume unknown values. If there's no exact match, suggest alternatives from data.",
     }.get(bahasa, "Answer using the same language as the question and only based on the data below.")
 
-    # Deteksi filter bahan bakar otomatis dari pertanyaan
-    bahan_bakar_filter = None
-    for keyword in ["hybrid", "bensin", "diesel", "listrik"]:
-        if keyword in pertanyaan.lower():
-            bahan_bakar_filter = keyword.lower()
-            break
+    # Parsing filter
+    filters = {}
+    pertanyaan_lc = pertanyaan.lower()
+    if "manual" in pertanyaan_lc:
+        filters["transmisi"] = {"$eq": "manual"}
+    if "matic" in pertanyaan_lc:
+        filters["transmisi"] = {"$eq": "matic"}
+    for bahan in ["diesel", "bensin", "hybrid", "listrik"]:
+        if bahan in pertanyaan_lc:
+            filters["bahan_bakar"] = {"$eq": bahan}
 
-    # Setup Chroma dan search_kwargs
+    usia_match = re.search(r"(di ?bawah|kurang dari) (\d{1,2}) tahun", pertanyaan_lc)
+    if usia_match:
+        usia_max = int(usia_match.group(2))
+        filters["usia"] = {"$lte": usia_max}
+
+    harga_match = re.search(r"(di ?bawah|maksimal|<=?) ?rp? ?(\d+[\.\d]*)", pertanyaan_lc)
+    if harga_match:
+        harga = int(harga_match.group(2).replace(".", ""))
+        filters["harga_angka"] = {"$lte": harga}
+
     db = Chroma(persist_directory="chroma", embedding_function=OllamaEmbeddings(model="mistral"))
-    retriever = None
-
-    if bahan_bakar_filter:
-        retriever = db.as_retriever(search_kwargs={
-            "filter": {"bahan_bakar": {"$eq": bahan_bakar_filter}}
-        })
-    else:
-        retriever = db.as_retriever()
+    retriever = db.as_retriever(search_kwargs={"k": 10, "filter": filters} if filters else {"k": 10})
 
     dokumen = await retriever.ainvoke(pertanyaan)
 
-    # Jika tidak ditemukan dokumen
+    # Dedup berdasarkan nama mobil
+    unique_dokumen = []
+    seen_mobil = set()
+    for doc in dokumen:
+        first_line = doc.page_content.split(",")[0].strip()
+        nama_mobil = first_line.split("(")[0].strip().lower()
+        if nama_mobil not in seen_mobil:
+            unique_dokumen.append(doc)
+            seen_mobil.add(nama_mobil)
+    dokumen = unique_dokumen
+
     if not dokumen:
         async def fallback_gen():
             yield f"data: {json.dumps({'type': 'start'})}\n\n"
-            msg = (
-                f"❌ Maaf, tidak ditemukan mobil dengan bahan bakar {bahan_bakar_filter} dalam data. "
-                "Ingin mencari berdasarkan harga, usia, atau jenis transmisi?"
-                if bahan_bakar_filter else
-                "❌ Maaf, tidak ditemukan mobil yang sesuai dari data. Silakan berikan kriteria tambahan."
-            )
+            msg = "❌ Maaf, tidak ditemukan mobil yang cocok. Anda bisa menambahkan kriteria lain seperti harga, tahun, atau jenis transmisi."
             for c in msg:
                 yield f"data: {json.dumps({'type': 'stream', 'token': c})}\n\n"
             yield f"data: {json.dumps({'type': 'end'})}\n\n"
         return StreamingResponse(fallback_gen(), media_type="text/event-stream")
 
     context = "\n".join([doc.page_content for doc in dokumen])
-
-    # Prompt yang ketat, akurat, dan adaptif
     prompt = PromptTemplate.from_template("""
-    Berikut adalah data mobil bekas yang tersedia. Jangan menyebut mobil atau data yang tidak ada di daftar ini. Jangan membuat saran tambahan jika tidak ditemukan dalam daftar.
+    Berikut adalah data mobil bekas yang tersedia dari database. Gunakan hanya informasi dari data berikut, dan jangan menyebut atau membuat mobil yang tidak disebutkan di dalam data.
 
     {context}
 
     Instruksi:
-    - Pilih mobil rekomendasi yang paling sesuai dengan pertanyaan pengguna tidak ada batas maksimal.
-    - Jika tidak ada mobil yang benar-benar memenuhi, cukup jawab dalam bentuk paragraf, misalnya:
-    - Menanyakan ulang kriteria pengguna
-    - Bertanya untuk keperluan penggunaan mobil (misal: keluarga, kerja, off-road)
-    - Atau menyarankan pengguna mempertimbangkan kriteria lain (harga, tahun, dll)
-    - Jangan menyebut atau menulis nama mobil yang tidak disebut dalam data di atas.
-    - Format list rapi hanya jika ada mobil valid. Jika tidak, gunakan format paragraf.
+    - Tampilkan minimal 1 dan maksimal 5 mobil yang benar-benar relevan dengan pertanyaan pengguna.
+    - Semua mobil yang ditampilkan HARUS memenuhi SELURUH kriteria eksplisit dari pengguna.
+    - Jangan tampilkan mobil lebih dari satu kali.
+    - Jangan buat item list tambahan (seperti poin 6 atau 7) jika tidak ada mobil lain.
+    - Jika hanya sedikit mobil yang sesuai, tetap tampilkan dan beri alasan logis, contohnya:
+    - Usia mobil di atas 6 tahun masih bisa dipertimbangkan karena harga lebih terjangkau
+    - Meskipun tahun lebih lama, kondisi atau model masih relevan dengan kebutuhan
+    - Setelah menampilkan list, tambahkan catatan atau pertimbangan rasional seperti:
+    - "Mobil dengan usia di bawah 6 tahun cenderung memiliki risiko perawatan lebih rendah, namun beberapa mobil di atas usia tersebut tetap layak dipertimbangkan karena kualitas atau harganya."
+    - Setelah itu, berikan kalimat penutup natural seperti:
+    "Semoga salah satu dari mobil di atas cocok dengan kebutuhan Anda. Jika ada kriteria tambahan seperti kapasitas mesin atau preferensi merek, saya siap bantu mencarikan opsi terbaik."
+    - Jangan menulis kalimat promosi seperti "kami sedang memperluas database" atau "kami melayani seluruh Indonesia".
+
+    Gunakan format list seperti:
+
+    1. **[Nama Mobil]**
+    - Tahun: ...
+    - Harga: ...
+    - Usia: ...
+    - Bahan Bakar: ...
+    - Transmisi: ...
+    - Alasan: Mobil ini sesuai karena ...
 
     Pertanyaan pengguna: {pertanyaan}
     Jawaban:
     """)
-
 
     llm = OllamaLLM(model="mistral", system=instruksi, stream=True)
     chain = prompt | llm | StrOutputParser()
 
     async def event_generator():
         yield f"data: {json.dumps({'type': 'start'})}\n\n"
-        async for token in chain.astream({
-            "context": context,
-            "pertanyaan": pertanyaan
-        }):
+        async for token in chain.astream({"context": context, "pertanyaan": pertanyaan}):
             yield f"data: {json.dumps({'type': 'stream', 'token': token})}\n\n"
         yield f"data: {json.dumps({'type': 'end'})}\n\n"
 
