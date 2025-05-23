@@ -14,7 +14,7 @@ async def stream_mobil(pertanyaan: str):
         "en": "Answer strictly based on the data below. Do not fabricate or assume unknown values. If there's no exact match, suggest alternatives from data.",
     }.get(bahasa, "Answer using the same language as the question and only based on the data below.")
 
-    # Parsing filter
+    # Parsing filter dari pertanyaan
     filters = {}
     pertanyaan_lc = pertanyaan.lower()
     if "manual" in pertanyaan_lc:
@@ -36,6 +36,14 @@ async def stream_mobil(pertanyaan: str):
         filters["harga_angka"] = {"$lte": harga}
 
     db = Chroma(persist_directory="chroma", embedding_function=OllamaEmbeddings(model="mistral"))
+
+    # Perbaikan: gunakan $and agar Chroma tidak error
+    if filters:
+        filter_query = {"$and": [{k: v} for k, v in filters.items()]}
+        retriever = db.as_retriever(search_kwargs={"k": 10, "filter": filter_query})
+    else:
+        retriever = db.as_retriever(search_kwargs={"k": 10})
+
     retriever = db.as_retriever(search_kwargs={"k": 10, "filter": filters} if filters else {"k": 10})
 
     dokumen = await retriever.ainvoke(pertanyaan)
@@ -67,17 +75,18 @@ async def stream_mobil(pertanyaan: str):
     {context}
 
     Instruksi:
-    - Tampilkan minimal 1 dan maksimal 5 mobil yang benar-benar relevan dengan pertanyaan pengguna.
+    - Tampilkan minimal 2 mobil. Tidak ada batas maksimal jumlah mobil jika datanya relevan dan sesuai kriteria pertanyaan pengguna.
     - Semua mobil yang ditampilkan HARUS memenuhi SELURUH kriteria eksplisit dari pengguna.
     - Jangan tampilkan mobil lebih dari satu kali.
-    - Jangan buat item list tambahan (seperti poin 6 atau 7) jika tidak ada mobil lain.
+    - Jangan buat item list tambahan jika tidak ada mobil lain.
     - Jika hanya sedikit mobil yang sesuai, tetap tampilkan dan beri alasan logis, contohnya:
-    - Usia mobil di atas 6 tahun masih bisa dipertimbangkan karena harga lebih terjangkau
-    - Meskipun tahun lebih lama, kondisi atau model masih relevan dengan kebutuhan
-    - Setelah menampilkan list, tambahkan catatan atau pertimbangan rasional seperti:
-    - "Mobil dengan usia di bawah 6 tahun cenderung memiliki risiko perawatan lebih rendah, namun beberapa mobil di atas usia tersebut tetap layak dipertimbangkan karena kualitas atau harganya."
-    - Setelah itu, berikan kalimat penutup natural seperti:
-    "Semoga salah satu dari mobil di atas cocok dengan kebutuhan Anda. Jika ada kriteria tambahan seperti kapasitas mesin atau preferensi merek, saya siap bantu mencarikan opsi terbaik."
+    - Usia mobil di atas 6 tahun tetap dapat dipertimbangkan karena harga lebih terjangkau atau kualitasnya.
+    - Jika tidak ada mobil yang cocok, tuliskan paragraf singkat menanyakan ulang kebutuhan pengguna atau ajukan pertanyaan tindak lanjut.
+    - Setelah menampilkan list, tambahkan kalimat penjelas/elaborasi/transisi seperti gaya GPT.
+    Contoh:
+    "Jika Anda ingin mengeksplorasi pilihan lain dengan kriteria berbeda, saya bisa bantu mencarikan opsi yang sesuai."
+    atau:
+    "Tentu, saya siap bantu jika Anda ingin fokus pada aspek lain seperti merek, kapasitas mesin, atau fitur tambahan."
     - Jangan menulis kalimat promosi seperti "kami sedang memperluas database" atau "kami melayani seluruh Indonesia".
 
     Gunakan format list seperti:
