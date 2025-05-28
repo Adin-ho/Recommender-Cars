@@ -26,7 +26,11 @@ def simpan_vektor_mobil():
 
             # Konversi harga string ke angka (int)
             harga_str = str(row['Harga']).replace("Rp", "").replace(".", "").replace(",", "").strip()
-            harga_angka = int(harga_str) if harga_str.isdigit() else 0
+            try:
+                harga_angka = int(harga_str)
+            except:
+                harga_angka = 0
+
 
             deskripsi = (
                 f"{row['Nama Mobil']} ({row['Tahun']}), tahun {row['Tahun']}, harga {row['Harga']}, "
@@ -49,6 +53,8 @@ def simpan_vektor_mobil():
             print(f"[SKIP] Baris dilewati karena error: {e}")
             continue
 
+    print("\n[DEBUG] Contoh metadata:", json.dumps(metadatas[0], indent=2))
+    print("[DEBUG] Contoh teks:", texts[0])
     embeddings = OllamaEmbeddings(model="mistral")
 
     print("[INFO] Menyimpan ke ChromaDB...")

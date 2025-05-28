@@ -1,71 +1,123 @@
 import pandas as pd
 import requests
-import time
+import matplotlib.pyplot as plt
+import re
 from sklearn.metrics import precision_score, recall_score, f1_score
 
-# Load data
+# Load dataset evaluasi
 df = pd.read_csv("evaluasi_semua_batch.csv")
 
-# Simpan hasil
-all_precisions, all_recalls, all_f1s = [], [], []
+# Ambil semua mobil unik dari ground truth
+all_mobil_unik = set()
+for gt in df["ground_truth"].dropna():
+    all_mobil_unik.update(x.strip().lower() for x in gt.split(";"))
 
+# ✅ Fungsi ekstraksi yang lebih fleksibel
 def extract_predicted_mobil(text):
     lines = text.split("\n")
-    predicted = []
+    predicted = set()
+
     for line in lines:
-        if line.strip().startswith("1.") or line.strip().startswith("2.") or line.strip().startswith("3.") \
-           or line.strip().startswith("4.") or line.strip().startswith("5.") or line.strip()[0].isdigit():
-            nama = line.split("**")
-            if len(nama) >= 3:
-                predicted.append(nama[1].strip())
+        # Tangkap format: **Nama Mobil**
+        match = re.search(r"\*\*(.*?)\*\*", line)
+        if match:
+            predicted.add(match.group(1).strip().lower())
     return predicted
+
+results = []
+all_precisions, all_recalls, all_f1s = [], [], []
 
 for idx, row in df.iterrows():
     pertanyaan = row["pertanyaan"]
     gt_raw = row["ground_truth"]
 
-    # Skip jika ground truth kosong
-    if not isinstance(gt_raw, str) or gt_raw.strip() == "":
+    if not isinstance(gt_raw, str) or not gt_raw.strip():
         continue
 
-    ground_truth = set([x.strip().lower() for x in gt_raw.split(";") if x.strip()])
+    ground_truth = set(x.strip().lower() for x in gt_raw.split(";") if x.strip())
 
     try:
-        res = requests.get("http://localhost:8000/stream", params={"pertanyaan": pertanyaan}, timeout=15)
+        res = requests.get("http://localhost:8000/stream", params={"pertanyaan": pertanyaan}, timeout=30)
         content = ""
         for line in res.iter_lines():
-            if line:
-                if line.startswith(b"data:"):
-                    line_decoded = line.decode()[6:]
-                    if "\"token\"" in line_decoded:
-                        try:
-                            token = eval(line_decoded).get("token")
-                            content += token
-                        except:
-                            continue
-        pred = extract_predicted_mobil(content)
-        pred_set = set([x.strip().lower() for x in pred if x.strip()])
+            if line and line.startswith(b"data:"):
+                token = eval(line.decode()[6:]).get("token")
+                if token:
+                    content += token
 
-        # hitung metrik
-        tp = len(ground_truth & pred_set)
-        precision = tp / len(pred_set) if pred_set else 0
-        recall = tp / len(ground_truth) if ground_truth else 0
-        f1 = 2 * precision * recall / (precision + recall) if precision + recall > 0 else 0
+        pred_set = extract_predicted_mobil(content)
+
+        # ✅ Debug output
+        print(f"\n🧪 {idx+1}. {pertanyaan}")
+        print("📦 Output:", content[:200], "..." if len(content) > 200 else "")
+        print("🎯 Prediksi:", pred_set)
+        print("🎯 Ground truth:", ground_truth)
+
+        domain = list(all_mobil_unik | ground_truth | pred_set)
+        y_true = [1 if x in ground_truth else 0 for x in domain]
+        y_pred = [1 if x in pred_set else 0 for x in domain]
+
+        precision = precision_score(y_true, y_pred, zero_division=0)
+        recall = recall_score(y_true, y_pred, zero_division=0)
+        f1 = f1_score(y_true, y_pred, zero_division=0)
+
+        print(f"✅ P: {precision:.2f}, R: {recall:.2f}, F1: {f1:.2f}")
 
         all_precisions.append(precision)
         all_recalls.append(recall)
         all_f1s.append(f1)
 
-        print(f"✅ {idx+1}. {pertanyaan}\n → P: {precision:.2f}, R: {recall:.2f}, F1: {f1:.2f}\n")
-
-        time.sleep(1.2)  # Hindari overload API
+        results.append({
+            "pertanyaan": pertanyaan,
+            "ground_truth": ";".join(ground_truth),
+            "prediksi": ";".join(pred_set),
+            "precision": round(precision, 3),
+            "recall": round(recall, 3),
+            "f1_score": round(f1, 3)
+        })
 
     except Exception as e:
         print(f"❌ {idx+1}. Gagal evaluasi: {pertanyaan}")
         print("   Error:", e)
 
-# Ringkasan
-print("\n📊 Ringkasan Evaluasi:")
-print(f"🔸 Precision rata-rata: {sum(all_precisions)/len(all_precisions):.3f}")
-print(f"🔸 Recall rata-rata:    {sum(all_recalls)/len(all_recalls):.3f}")
-print(f"🔸 F1 Score rata-rata:  {sum(all_f1s)/len(all_f1s):.3f}")
+# Simpan hasil ke CSV
+pd.DataFrame(results).to_csv("hasil_evaluasi.csv", index=False)
+
+# 📈 Grafik gabungan
+plt.figure(figsize=(10, 5))
+plt.plot(all_precisions, label="Precision", color="blue")
+plt.plot(all_recalls, label="Recall", color="green")
+plt.plot(all_f1s, label="F1 Score", color="red")
+plt.title("Evaluasi Model per Pertanyaan")
+plt.xlabel("Pertanyaan ke-")
+plt.ylabel("Skor")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.savefig("grafik_evaluasi_gabungan.png")
+
+# 📉 Grafik terpisah
+fig, axs = plt.subplots(3, 1, figsize=(10, 10), sharex=True)
+axs[0].plot(all_precisions, color="blue")
+axs[0].set_title("Precision per Pertanyaan")
+axs[0].set_ylabel("Precision")
+axs[0].grid(True)
+
+axs[1].plot(all_recalls, color="green")
+axs[1].set_title("Recall per Pertanyaan")
+axs[1].set_ylabel("Recall")
+axs[1].grid(True)
+
+axs[2].plot(all_f1s, color="red")
+axs[2].set_title("F1 Score per Pertanyaan")
+axs[2].set_ylabel("F1 Score")
+axs[2].set_xlabel("Pertanyaan ke-")
+axs[2].grid(True)
+
+plt.tight_layout()
+plt.savefig("grafik_evaluasi_terpisah.png")
+
+print("\n✅ Evaluasi selesai dan disimpan:")
+print("- hasil_evaluasi.csv")
+print("- grafik_evaluasi_gabungan.png")
+print("- grafik_evaluasi_terpisah.png")

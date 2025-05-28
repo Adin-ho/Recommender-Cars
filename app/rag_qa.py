@@ -37,14 +37,12 @@ async def stream_mobil(pertanyaan: str):
 
     db = Chroma(persist_directory="chroma", embedding_function=OllamaEmbeddings(model="mistral"))
 
-    # Perbaikan: gunakan $and agar Chroma tidak error
+    # Gunakan $and agar tidak error jika banyak filter
     if filters:
         filter_query = {"$and": [{k: v} for k, v in filters.items()]}
         retriever = db.as_retriever(search_kwargs={"k": 10, "filter": filter_query})
     else:
         retriever = db.as_retriever(search_kwargs={"k": 10})
-
-    retriever = db.as_retriever(search_kwargs={"k": 10, "filter": filters} if filters else {"k": 10})
 
     dokumen = await retriever.ainvoke(pertanyaan)
 
@@ -59,6 +57,7 @@ async def stream_mobil(pertanyaan: str):
             seen_mobil.add(nama_mobil)
     dokumen = unique_dokumen
 
+    # Tidak ada dokumen cocok
     if not dokumen:
         async def fallback_gen():
             yield f"data: {json.dumps({'type': 'start'})}\n\n"
@@ -68,6 +67,7 @@ async def stream_mobil(pertanyaan: str):
             yield f"data: {json.dumps({'type': 'end'})}\n\n"
         return StreamingResponse(fallback_gen(), media_type="text/event-stream")
 
+    # Siapkan prompt
     context = "\n".join([doc.page_content for doc in dokumen])
     prompt = PromptTemplate.from_template("""
     Berikut adalah data mobil bekas yang tersedia dari database. Gunakan hanya informasi dari data berikut, dan jangan menyebut atau membuat mobil yang tidak disebutkan di dalam data.
@@ -80,13 +80,13 @@ async def stream_mobil(pertanyaan: str):
     - Jangan tampilkan mobil lebih dari satu kali.
     - Jangan buat item list tambahan jika tidak ada mobil lain.
     - Jika hanya sedikit mobil yang sesuai, tetap tampilkan dan beri alasan logis, contohnya:
-    - Usia mobil di atas 6 tahun tetap dapat dipertimbangkan karena harga lebih terjangkau atau kualitasnya.
+      - Usia mobil di atas 6 tahun tetap dapat dipertimbangkan karena harga lebih terjangkau atau kualitasnya.
     - Jika tidak ada mobil yang cocok, tuliskan paragraf singkat menanyakan ulang kebutuhan pengguna atau ajukan pertanyaan tindak lanjut.
     - Setelah menampilkan list, tambahkan kalimat penjelas/elaborasi/transisi seperti gaya GPT.
-    Contoh:
-    "Jika Anda ingin mengeksplorasi pilihan lain dengan kriteria berbeda, saya bisa bantu mencarikan opsi yang sesuai."
-    atau:
-    "Tentu, saya siap bantu jika Anda ingin fokus pada aspek lain seperti merek, kapasitas mesin, atau fitur tambahan."
+      Contoh:
+      "Jika Anda ingin mengeksplorasi pilihan lain dengan kriteria berbeda, saya bisa bantu mencarikan opsi yang sesuai."
+      atau:
+      "Tentu, saya siap bantu jika Anda ingin fokus pada aspek lain seperti merek, kapasitas mesin, atau fitur tambahan."
     - Jangan menulis kalimat promosi seperti "kami sedang memperluas database" atau "kami melayani seluruh Indonesia".
 
     Gunakan format list seperti:
