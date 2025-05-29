@@ -3,11 +3,11 @@ import re
 from langchain_ollama import OllamaEmbeddings, OllamaLLM
 from langchain_chroma import Chroma
 from langdetect import detect
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-async def stream_mobil(pertanyaan: str):
+async def stream_mobil(pertanyaan: str, streaming=True):
     bahasa = detect(pertanyaan)
     instruksi = {
         "id": "Jawab hanya berdasarkan data mobil berikut. Jangan buat asumsi atau menyebut info yang tidak ada. Jika tidak cocok, beri alternatif dari data.",
@@ -37,16 +37,14 @@ async def stream_mobil(pertanyaan: str):
 
     db = Chroma(persist_directory="chroma", embedding_function=OllamaEmbeddings(model="mistral"))
 
-    # Gunakan $and agar tidak error jika banyak filter
     if filters:
-        filter_query = {"$and": [{k: v} for k, v in filters.items()]}
+        filter_query = {"$and": [{k: v} for k, v in filters.items()]} if len(filters) > 1 else filters
         retriever = db.as_retriever(search_kwargs={"k": 10, "filter": filter_query})
     else:
         retriever = db.as_retriever(search_kwargs={"k": 10})
 
     dokumen = await retriever.ainvoke(pertanyaan)
 
-    # Dedup berdasarkan nama mobil
     unique_dokumen = []
     seen_mobil = set()
     for doc in dokumen:
@@ -57,17 +55,17 @@ async def stream_mobil(pertanyaan: str):
             seen_mobil.add(nama_mobil)
     dokumen = unique_dokumen
 
-    # Tidak ada dokumen cocok
     if not dokumen:
+        fallback = "❌ Maaf, tidak ditemukan mobil yang cocok. Anda bisa menambahkan kriteria lain seperti harga, tahun, atau jenis transmisi."
+        if not streaming:
+            return fallback
         async def fallback_gen():
             yield f"data: {json.dumps({'type': 'start'})}\n\n"
-            msg = "❌ Maaf, tidak ditemukan mobil yang cocok. Anda bisa menambahkan kriteria lain seperti harga, tahun, atau jenis transmisi."
-            for c in msg:
+            for c in fallback:
                 yield f"data: {json.dumps({'type': 'stream', 'token': c})}\n\n"
             yield f"data: {json.dumps({'type': 'end'})}\n\n"
         return StreamingResponse(fallback_gen(), media_type="text/event-stream")
 
-    # Siapkan prompt
     context = "\n".join([doc.page_content for doc in dokumen])
     prompt = PromptTemplate.from_template("""
     Berikut adalah data mobil bekas yang tersedia dari database. Gunakan hanya informasi dari data berikut, dan jangan menyebut atau membuat mobil yang tidak disebutkan di dalam data.
@@ -79,18 +77,12 @@ async def stream_mobil(pertanyaan: str):
     - Semua mobil yang ditampilkan HARUS memenuhi SELURUH kriteria eksplisit dari pengguna.
     - Jangan tampilkan mobil lebih dari satu kali.
     - Jangan buat item list tambahan jika tidak ada mobil lain.
-    - Jika hanya sedikit mobil yang sesuai, tetap tampilkan dan beri alasan logis, contohnya:
-      - Usia mobil di atas 6 tahun tetap dapat dipertimbangkan karena harga lebih terjangkau atau kualitasnya.
+    - Jika hanya sedikit mobil yang sesuai, tetap tampilkan dan beri alasan logis.
     - Jika tidak ada mobil yang cocok, tuliskan paragraf singkat menanyakan ulang kebutuhan pengguna atau ajukan pertanyaan tindak lanjut.
-    - Setelah menampilkan list, tambahkan kalimat penjelas/elaborasi/transisi seperti gaya GPT.
-      Contoh:
-      "Jika Anda ingin mengeksplorasi pilihan lain dengan kriteria berbeda, saya bisa bantu mencarikan opsi yang sesuai."
-      atau:
-      "Tentu, saya siap bantu jika Anda ingin fokus pada aspek lain seperti merek, kapasitas mesin, atau fitur tambahan."
-    - Jangan menulis kalimat promosi seperti "kami sedang memperluas database" atau "kami melayani seluruh Indonesia".
+    - Setelah menampilkan list, tambahkan kalimat penjelas seperti: "Jika Anda ingin mengeksplorasi pilihan lain..."
+    - Jangan menulis kalimat promosi.
 
-    Gunakan format list seperti:
-
+    Format list:
     1. **[Nama Mobil]**
     - Tahun: ...
     - Harga: ...
@@ -106,6 +98,9 @@ async def stream_mobil(pertanyaan: str):
     llm = OllamaLLM(model="mistral", system=instruksi, stream=True)
     chain = prompt | llm | StrOutputParser()
 
+    if not streaming:
+        return await chain.ainvoke({"context": context, "pertanyaan": pertanyaan})
+
     async def event_generator():
         yield f"data: {json.dumps({'type': 'start'})}\n\n"
         async for token in chain.astream({"context": context, "pertanyaan": pertanyaan}):
@@ -113,3 +108,12 @@ async def stream_mobil(pertanyaan: str):
         yield f"data: {json.dumps({'type': 'end'})}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+# Endpoint non-streaming
+from fastapi import APIRouter
+router = APIRouter()
+
+@router.get("/jawab")
+async def jawab(pertanyaan: str):
+    hasil = await stream_mobil(pertanyaan, streaming=False)
+    return JSONResponse(content={"jawaban": hasil})
