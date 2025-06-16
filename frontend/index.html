@@ -11,16 +11,12 @@
     <h1 class="text-2xl font-bold text-center text-blue-600">🚗 ChatCars: Rekomendasi Mobil</h1>
     
     <div id="chatBox" class="h-80 overflow-y-auto p-4 border rounded bg-gray-50 text-sm space-y-2"></div>
-
     <div class="flex space-x-2">
-        <input id="pertanyaan" type="text" placeholder="Tanyakan sesuatu tentang mobil..."
+      <input id="pertanyaan" type="text" placeholder="Tanyakan sesuatu tentang mobil..."
         class="flex-grow px-4 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"/>
- 
-      <button onclick="kirimPertanyaan()" 
-              class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Kirim</button>
+      <button onclick="kirimPertanyaan()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Kirim</button>
     </div>
   </div>
-
   <script>
     async function kirimPertanyaan() {
       const input = document.getElementById("pertanyaan");
@@ -28,16 +24,17 @@
       const pesan = input.value.trim();
       if (!pesan) return;
 
+      // User message
       const userMsg = document.createElement("div");
       userMsg.className = "text-right text-blue-600 font-medium";
       userMsg.textContent = "👤 " + pesan;
       chatBox.appendChild(userMsg);
       chatBox.scrollTop = chatBox.scrollHeight;
 
-
       input.value = "";
       input.disabled = true;
 
+      // Bot message (animated streaming)
       const botMsg = document.createElement("div");
       botMsg.className = "text-left text-gray-800 whitespace-pre-wrap";
       const label = document.createElement("span");
@@ -45,60 +42,39 @@
       botMsg.appendChild(label);
       chatBox.appendChild(botMsg);
 
-
-      const response = await fetch(`http://127.0.0.1:8000/stream?pertanyaan=${encodeURIComponent(pesan)}`);
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let botDone = false;
-
-      let buffer = "";
-      const processLine = (line) => {
-        if (!line.startsWith("data: ")) return;
-        try {
-          const payload = JSON.parse(line.slice(6));
-          if (payload.type === "stream") {
-        const span = document.createElement("span");
-        span.innerText = payload.token;
-        botMsg.appendChild(span);
-        }else if (payload.type === "end") {
-            botDone = true;
-            input.disabled = false;
-            input.focus();
-          }
-        } catch (e) {
-          console.warn("Gagal parse JSON:", e);
-        }
-      };
-
+      // Streaming fetch
       try {
+        const response = await fetch(`http://127.0.0.1:8000/stream?pertanyaan=${encodeURIComponent(pesan)}`);
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let result = "";
+        let buffer = "";
         while (true) {
           const { value, done } = await reader.read();
           if (done) break;
-
           buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n\n");
-          buffer = lines.pop();
-
-          for (const line of lines) {
-            processLine(line);
+          // Ambil baris per event-stream
+          let parts = buffer.split("\n\n");
+          buffer = parts.pop();
+          for (const part of parts) {
+            if (part.startsWith("data: ")) {
+              const txt = part.slice(6);
+              botMsg.innerHTML += txt + "\n";
+              chatBox.scrollTop = chatBox.scrollHeight;
+            }
           }
-
-          chatBox.scrollTop = chatBox.scrollHeight;
         }
       } catch (err) {
         botMsg.textContent += "\n❌ Gagal mengambil jawaban.";
+      } finally {
         input.disabled = false;
-      }
-
-      if (!botDone) {
-        input.disabled = false;
+        input.focus();
+        chatBox.scrollTop = chatBox.scrollHeight;
       }
     }
 
     document.getElementById("pertanyaan").addEventListener("keypress", function (e) {
-      if (e.key === "Enter") {
-        kirimPertanyaan();
-      }
+      if (e.key === "Enter") kirimPertanyaan();
     });
   </script>
 </body>
