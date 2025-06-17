@@ -2,12 +2,19 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
-
 import pandas as pd
 import re
 import requests
+import asyncio
 
-app = FastAPI()
+# ⬇️ Tambahkan ini SETELAH import FastAPI dan SEBELUM include_router
+from app.rag_qa import router as rag_qa_router
+
+app = FastAPI()  # ⬅️ Buat objek app di sini dulu!
+
+# ⬇️ Sekarang baru include router LLM
+app.include_router(rag_qa_router)
+
 data_mobil = pd.read_csv('app/data/data_mobil.csv')
 data_mobil.columns = data_mobil.columns.str.strip().str.lower()
 
@@ -42,16 +49,14 @@ def unique_cars(output):
             cars.append(key)
     return "; ".join(cars)
 
-from fastapi.responses import StreamingResponse
-
 @app.get("/stream")
-def stream(pertanyaan: str):
-    jawaban = jawab(pertanyaan)  # gunakan fungsi jawab yang sudah ada
-    def event_stream():
-        for char in jawaban:
-            yield jawaban  # kirim jawaban sekaligus, bukan satu-satu karakter
-    return StreamingResponse(event_stream(), media_type="text/plain")
-
+async def stream(pertanyaan: str):
+    jawaban = jawab(pertanyaan)
+    async def event_stream():
+        for word in jawaban.split():
+            yield f"data: {word} \n\n"
+            await asyncio.sleep(0.06)
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
 
 @app.get("/jawab", response_class=PlainTextResponse)
 def jawab(pertanyaan: str):

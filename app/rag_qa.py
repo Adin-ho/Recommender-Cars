@@ -38,7 +38,7 @@ async def stream_mobil(pertanyaan: str, streaming=True):
 
     try:
         filter_query = {"$and": [{k: v} for k, v in filters.items()]} if len(filters) > 1 else filters
-        retriever = db.as_retriever(search_kwargs={"k": 10, "filter": filter_query})
+        retriever = db.as_retriever(search_kwargs={"k": 30, "filter": filter_query})
         dokumen = await retriever.ainvoke(pertanyaan)
     except Exception:
         retriever = db.as_retriever(search_kwargs={"k": 10})
@@ -63,18 +63,19 @@ async def stream_mobil(pertanyaan: str, streaming=True):
 
     context = "\n".join(doc.page_content for doc in dokumen)
     prompt = PromptTemplate.from_template("""
-Berikut adalah data mobil bekas yang tersedia dari database.
+Berikut adalah data mobil bekas yang tersedia dari database. Jawablah HANYA dari data berikut. Tidak boleh menambah, mengubah, atau mengarang informasi apapun yang tidak tercantum.
 
 {context}
 
 Instruksi:
-- Tampilkan minimal 2 mobil. Tidak ada batas maksimal jika data cocok.
-- Jangan buat data baru. Semua harus dari database.
-- Jika hanya ada sedikit mobil yang cocok, tetap tampilkan.
-- Jika tidak ada yang cocok, beri alasan dan tawarkan opsi terdekat.
+- HANYA tampilkan mobil dari daftar di atas.
+- TAMPILKAN SEMUA mobil yang memenuhi kriteria (jika banyak, tampilkan minimal 10).
+- Tidak boleh mengarang merk/model/tahun/harga.
+- Jika semua data tidak ada yang benar-benar sesuai, pilih yang paling mendekati, dan sebutkan alasan.
+- Akhiri jawaban dengan kalimat: "Silakan bertanya lagi jika ada kriteria atau kebutuhan lain."
 
 Format:
-1. **[Nama Mobil]**
+1. Nama Mobil
 - Tahun: .
 - Harga: .
 - Usia: .
@@ -85,6 +86,7 @@ Format:
 Pertanyaan: {pertanyaan}
 Jawaban:
 """)
+    
     llm = OllamaLLM(model="mistral", system=instruksi, stream=streaming)
     chain = prompt | llm | StrOutputParser()
 
@@ -107,3 +109,8 @@ router = APIRouter()
 async def jawab_mobil(pertanyaan: str):
     hasil = await stream_mobil(pertanyaan, streaming=False)
     return JSONResponse(content={"jawaban": hasil})
+
+@router.get("/stream")
+async def stream_mobil_stream(pertanyaan: str):
+    return await stream_mobil(pertanyaan, streaming=True)
+
