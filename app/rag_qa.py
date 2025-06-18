@@ -1,6 +1,7 @@
 # rag_qa.py (final fleksibel)
 import json
 import re
+from datetime import datetime
 from fastapi.responses import StreamingResponse, JSONResponse
 from langchain_ollama import OllamaEmbeddings, OllamaLLM
 from langchain_chroma import Chroma
@@ -62,17 +63,24 @@ async def stream_mobil(pertanyaan: str, streaming=True):
         )
 
     context = "\n".join(doc.page_content for doc in dokumen)
+    tahun_sekarang = datetime.now().year  # ⬅️ Tahun dinamis!
+
     prompt = PromptTemplate.from_template("""
 Berikut adalah data mobil bekas yang tersedia dari database. Jawablah HANYA dari data berikut. Tidak boleh menambah, mengubah, atau mengarang informasi apapun yang tidak tercantum.
 
 {context}
 
 Instruksi:
-- HANYA tampilkan mobil dari daftar di atas.
-- TAMPILKAN SEMUA mobil yang memenuhi kriteria (jika banyak, tampilkan minimal 10).
+- Tampilkan mobil yang PALING RELEVAN dan WORTH IT dibeli untuk tahun {tahun_sekarang}, utamakan:
+    - Tahun muda (2020 ke atas lebih diutamakan, tapi tampilkan juga alternatif jika user minta harga rendah).
+    - Harga masuk akal untuk pasar tahun sekarang (jangan rekomendasikan mobil yang overprice atau terlalu tua).
+    - Spesifikasi yang baik sesuai kriteria user (misal: hemat BBM, transmisi, mesin bandel, atau fitur modern).
+- Berikan minimal 3 rekomendasi, urutkan dari yang paling layak beli.
+- Untuk tiap mobil, tuliskan alasan spesifik kenapa mobil itu layak direkomendasikan di tahun sekarang.
 - Tidak boleh mengarang merk/model/tahun/harga.
-- Jika semua data tidak ada yang benar-benar sesuai, pilih yang paling mendekati, dan sebutkan alasan.
-- Akhiri jawaban dengan kalimat: "Silakan bertanya lagi jika ada kriteria atau kebutuhan lain."
+- Jika hanya ada sedikit yang cocok, tampilkan apa adanya.
+- Setelah list, tutup jawaban dengan:  
+"Jika Anda punya preferensi khusus (tahun, fitur, merk, atau budget tertentu), silakan tanyakan agar saya bisa merekomendasikan yang lebih sesuai."
 
 Format:
 1. Nama Mobil
@@ -81,21 +89,29 @@ Format:
 - Usia: .
 - Bahan Bakar: .
 - Transmisi: .
-- Alasan: Mobil ini sesuai karena .
+- Alasan: Mobil ini layak dipertimbangkan karena .
 
 Pertanyaan: {pertanyaan}
 Jawaban:
 """)
-    
+
     llm = OllamaLLM(model="mistral", system=instruksi, stream=streaming)
     chain = prompt | llm | StrOutputParser()
 
     if not streaming:
-        return await chain.ainvoke({"context": context, "pertanyaan": pertanyaan})
+        return await chain.ainvoke({
+            "context": context,
+            "pertanyaan": pertanyaan,
+            "tahun_sekarang": tahun_sekarang
+        })
 
     async def event_gen():
         yield f"data: {json.dumps({'type': 'start'})}\n\n"
-        async for t in chain.astream({"context": context, "pertanyaan": pertanyaan}):
+        async for t in chain.astream({
+            "context": context,
+            "pertanyaan": pertanyaan,
+            "tahun_sekarang": tahun_sekarang
+        }):
             yield f"data: {json.dumps({'type': 'stream', 'token': t})}\n\n"
         yield f"data: {json.dumps({'type': 'end'})}\n\n"
 
@@ -113,4 +129,3 @@ async def jawab_mobil(pertanyaan: str):
 @router.get("/stream")
 async def stream_mobil_stream(pertanyaan: str):
     return await stream_mobil(pertanyaan, streaming=True)
-
