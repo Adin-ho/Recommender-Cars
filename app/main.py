@@ -2,13 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from app.rag_qa import router as rag_qa_router
 import pandas as pd
 import re
 import requests
 import asyncio
-
-# ⬇️ Tambahkan ini SETELAH import FastAPI dan SEBELUM include_router
-from app.rag_qa import router as rag_qa_router
 
 app = FastAPI()  # ⬅️ Buat objek app di sini dulu!
 
