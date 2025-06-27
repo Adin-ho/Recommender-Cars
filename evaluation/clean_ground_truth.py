@@ -1,21 +1,27 @@
 import pandas as pd
 import re
 
-def clean_car_name(s):
-    # Ambil format: nama mobil (tahun)
-    match = re.search(r"([a-z0-9 .\-]+)\s*\((\d{4})\)", s.lower())
-    if match:
-        return f"{match.group(1).strip()} ({match.group(2)})"
-    return s.lower().strip()
+# Load file
+df_db = pd.read_csv('app/data/data_mobil.csv')
+df_new = pd.read_csv('app/data/mobil_belum_ada.csv')
 
-df = pd.read_csv('evaluation/evaluasi_semua_batch.csv')
+# Cleaning nama mobil untuk deduplikasi
+def clean_name(nama):
+    nama = str(nama).strip().lower()
+    nama = re.sub(r'[^a-z0-9 ]', '', nama)
+    nama = re.sub(r'\s+', ' ', nama)
+    return nama.strip()
 
-def dedup(val):
-    if pd.isna(val) or not isinstance(val, str): return ""
-    cars = [clean_car_name(x) for x in re.split(r"[;,\n]", val)]
-    cars = list(dict.fromkeys([c for c in cars if c]))  # unique, preserve order
-    return ";".join(cars)
+df_db['clean_nama'] = df_db['Nama Mobil'].apply(clean_name)
+df_new['clean_nama'] = df_new['Nama Mobil'].apply(clean_name)
 
-df['ground_truth'] = df['ground_truth'].apply(dedup)
-df.to_csv('evaluasi_semua_batch_dedup.csv', index=False)
-print("Selesai. Duplikat ground_truth sudah dibersihkan. File: evaluasi_semua_batch_dedup.csv")
+# Gabungkan tanpa duplikat
+clean_db = set(df_db['clean_nama'])
+df_new_unique = df_new[~df_new['clean_nama'].isin(clean_db)]
+
+df_final = pd.concat([df_db, df_new_unique], ignore_index=True)
+df_final = df_final.drop(columns=['clean_nama'])
+
+df_final.to_csv('app/data/data_mobil_final.csv', index=False)
+print("File hasil merge disimpan sebagai app/data/data_mobil_final.csv")
+print(f"Jumlah baris awal: {len(df_db)} | Baris baru: {len(df_new)} | Total setelah merge: {len(df_final)} | Tambahan unik: {df_new_unique.shape[0]}")

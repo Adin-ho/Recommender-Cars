@@ -25,18 +25,15 @@ for col in ["usia", "tahun"]:
         df_mobil[col] = df_mobil[col].apply(clean_number)
 df_mobil["harga_angka"] = df_mobil["harga"].apply(clean_number)
 
-# Logic Exclude (selain/kecuali/bukan)
 def extract_exclude_list(pertanyaan):
     pertanyaan = pertanyaan.lower()
     exclude = []
-    # pattern menangkap setelah kata selain/kecuali/bukan sampai koma/atau/dan/akhir
     patterns = [
         r"(?:selain|kecuali|bukan)\s*([^\?\.]+)"
     ]
     for pat in patterns:
         match = re.search(pat, pertanyaan)
         if match:
-            # Split dengan koma/atau/dan
             kandidat = re.split(r',| dan | atau ', match.group(1))
             for k in kandidat:
                 nama = k.strip()
@@ -88,7 +85,6 @@ async def stream_mobil(pertanyaan: str, streaming=True):
         max_harga = int(budget_harga * 1.10)
         harga_rentang = (min_harga, max_harga)
 
-    # ===== EXCLUDE LOGIC =====
     exclude_list = extract_exclude_list(pertanyaan_lc)
 
     df = df_mobil.copy()
@@ -101,10 +97,10 @@ async def stream_mobil(pertanyaan: str, streaming=True):
             df = df[df['nama mobil'].str.lower().str.contains(filters["nama mobil"])]
         if "usia" in filters:
             df = df[df['usia'] <= filters["usia"]]
-    except Exception as e:
+    except Exception:
         pass
 
-    # ====== EXCLUDE NAMA ======
+    # Exclude logic
     for excl in exclude_list:
         df = df[~df['nama mobil'].str.lower().str.contains(excl)]
 
@@ -112,45 +108,49 @@ async def stream_mobil(pertanyaan: str, streaming=True):
     df = df.sort_values(['tahun', 'usia', 'harga_angka'], ascending=[False, True, True])
 
     info_alt = ""
-
-    # ==== Logika prioritas: tahun query → usia <=5 → lainnya ====
-    tahun_query = None
-    match_tahun = re.search(r"(tahun|th|thn)[\s:]*([0-9]{4})", pertanyaan_lc)
-    if match_tahun:
-        tahun_query = int(match_tahun.group(2))
-    else:
-        for thn in range(2024, 2031):  # Cek angka tahun 2024-2030 di pertanyaan
-            if str(thn) in pertanyaan_lc:
-                tahun_query = thn
-                break
-
-    df_final = pd.DataFrame()
-    # 1. Utamakan tahun query (2025 dst) jika disebut
-    if tahun_query:
-        df_utama = df[df['tahun'] == tahun_query]
-        if not df_utama.empty:
-            df_final = df_utama
-            info_alt = ""
-    # 2. Jika kosong atau kurang dari 5, tambahkan usia <=5 tahun
-    if df_final.empty or len(df_final) < 5:
-        df_5th = df[df['usia'] <= 5]
-        if not df_5th.empty:
-            # Jangan duplicate index yang sudah ada di df_final
-            df_5th = df_5th[~df_5th.index.isin(df_final.index)]
-            df_final = pd.concat([df_final, df_5th])
-    # 3. Jika masih kurang dari 5, tambah sisanya yang lain paling muda
-    if len(df_final) < 5:
-        df_lain = df[~df.index.isin(df_final.index)]
-        df_final = pd.concat([df_final, df_lain.head(5 - len(df_final))])
-
-    # ===== Filter harga khusus (jika ada) =====
+    # ==== Prioritas harga jika ada pertanyaan harga ====
     if harga_rentang:
-        df_final = df_final[(df_final["harga_angka"] >= harga_rentang[0]) & (df_final["harga_angka"] <= harga_rentang[1])]
+        # 1. Ambil data dalam rentang ±10%
+        df_final = df[(df["harga_angka"] >= harga_rentang[0]) & (df["harga_angka"] <= harga_rentang[1])]
+        # 2. Jika kurang dari 5, tambah dari harga di bawah budget (urutan harga menurun)
+        if len(df_final) < 5:
+            df_bawah = df[df["harga_angka"] < harga_rentang[0]].sort_values("harga_angka", ascending=False)
+            df_final = pd.concat([df_final, df_bawah.head(5 - len(df_final))])
+        # 3. Jika tetap kurang, tambah dari harga di atas range maksimal (naik)
+        if len(df_final) < 5:
+            df_atas = df[df["harga_angka"] > harga_rentang[1]].sort_values("harga_angka", ascending=True)
+            df_final = pd.concat([df_final, df_atas.head(5 - len(df_final))])
+        df_final = df_final.head(5)
         if df_final.empty:
-            info_alt += f"Tidak ditemukan mobil di kisaran {budget_harga:,} (±10%). Berikut alternatif terdekat:\n"
+            info_alt = f"Tidak ditemukan mobil di kisaran {budget_harga:,} (±10%). Berikut alternatif terdekat:\n"
             df_final = df.sort_values("harga_angka").head(5)
+    else:
+        # ==== Logika prioritas tahun dan usia ====
+        tahun_query = None
+        match_tahun = re.search(r"(tahun|th|thn)[\s:]*([0-9]{4})", pertanyaan_lc)
+        if match_tahun:
+            tahun_query = int(match_tahun.group(2))
+        else:
+            for thn in range(2024, 2031):
+                if str(thn) in pertanyaan_lc:
+                    tahun_query = thn
+                    break
 
-    # ===== Fallback jika hasil benar-benar kosong (misal exclude semua) =====
+        df_final = pd.DataFrame()
+        if tahun_query:
+            df_utama = df[df['tahun'] == tahun_query]
+            if not df_utama.empty:
+                df_final = df_utama
+        if df_final.empty or len(df_final) < 5:
+            df_5th = df[df['usia'] <= 5]
+            if not df_5th.empty:
+                df_5th = df_5th[~df_5th.index.isin(df_final.index)]
+                df_final = pd.concat([df_final, df_5th])
+        if len(df_final) < 5:
+            df_lain = df[~df.index.isin(df_final.index)]
+            df_final = pd.concat([df_final, df_lain.head(5 - len(df_final))])
+        df_final = df_final.head(5)
+
     if df_final.empty:
         exclude_info = ""
         if exclude_list:
@@ -167,7 +167,6 @@ async def stream_mobil(pertanyaan: str, streaming=True):
             return '-'
         return value
 
-    # ==== HANYA BANGUN CONTEXT DARI HASIL DATA YANG ADA, TANPA DUMMY ====
     context = ""
     for idx, row in enumerate(df_final.to_dict(orient="records"), 1):
         context += (

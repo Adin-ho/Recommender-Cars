@@ -1,58 +1,78 @@
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 import pandas as pd
-import argparse
-from app.rule_based import jawab as jawab_rule
-from app.llm_core import jawab as jawab_llm
+from difflib import SequenceMatcher
+import sys, os, importlib.util
+import re
 
+def clean_name(nama):
+    nama = str(nama).strip().lower()
+    nama = re.sub(r'[^a-z0-9 ]', '', nama)
+    nama = re.sub(r'\b(putih|merah|hitam|silver|abu|metalik|km|only|promo|limited|deluxe|std|double blower|special|manual|matic)\b', '', nama)
+    nama = re.sub(r'\s+', ' ', nama)
+    return nama.strip()
 
-def evaluate_row(row, source):
-    pertanyaan = row["pertanyaan"]
-    jawaban_gt = row["ground_truth"]
-    ground_truth = set(map(str.strip, jawaban_gt.lower().split(";")))
+def bersihkan(text):
+    if pd.isna(text) or not str(text).strip():
+        return '-'
+    def clean_nm(nama):
+        n = nama.split('(')[0]
+        return clean_name(n)
+    return ';'.join([clean_nm(x) for x in str(text).split(';') if x.strip()])
 
-    try:
-        prediksi = jawab_rule(pertanyaan) if source == "rule_based" else jawab_llm(pertanyaan)
-    except Exception as e:
-        print(f"[❌ ERROR] {source.upper()} gagal. Pertanyaan: {pertanyaan}")
-        return {"pertanyaan": pertanyaan, "ground_truth": jawaban_gt, "prediksi": "", "precision": 0, "recall": 0, "f1": 0}
+def fuzzy_in(a, b_list, threshold=0.7):
+    return any(SequenceMatcher(None, a, b).ratio() >= threshold for b in b_list)
 
-    predicted = set(map(str.strip, prediksi.lower().split(";")))
+def skor_per_baris(gt, pr):
+    set_gt = [x.strip() for x in gt.split(';') if x.strip() and gt != '-']
+    set_pr = [x.strip() for x in pr.split(';') if x.strip() and pr != '-']
+    matched_pred = set()
+    tp = 0
+    for g in set_gt:
+        for i, p in enumerate(set_pr):
+            if i in matched_pred:
+                continue
+            if fuzzy_in(g, [p]):
+                tp += 1
+                matched_pred.add(i)
+                break
+    fp = len(set_pr) - tp
+    fn = len(set_gt) - tp
+    precision = tp / (tp + fp) if (tp + fp) else 0
+    recall = tp / (tp + fn) if (tp + fn) else 0
+    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else 0
+    return pd.Series([precision, recall, f1])
 
-    true_positive = len(ground_truth & predicted)
-    precision = true_positive / len(predicted) if predicted else 0
-    recall = true_positive / len(ground_truth) if ground_truth else 0
-    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0
+# Import rule_based
+rule_based_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'app', 'rule_based.py'))
+spec = importlib.util.spec_from_file_location("rule_based", rule_based_path)
+rule_based = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(rule_based)
+jawab = rule_based.jawab
 
-    return {
-        "pertanyaan": pertanyaan,
-        "ground_truth": jawaban_gt,
-        "prediksi": "; ".join(predicted),
-        "precision": round(precision, 2),
-        "recall": round(recall, 2),
-        "f1": round(f1, 2),
-    }
+# Baca file evaluasi
+import pandas as pd
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--source", choices=["rule_based", "llm"], default="rule_based")
-    args = parser.parse_args()
+df = pd.read_csv('hasil_evaluasi_final.csv')
+avg_gt = df['ground_truth'].apply(lambda x: len(str(x).split(';')) if pd.notna(x) else 0).mean()
+head_n = int(avg_gt * 2)  # head_n minimal 2x rata-rata jawaban
+print(f'Rata-rata ground_truth per pertanyaan: {avg_gt:.2f} → set head_n: {head_n}')
+print("Generate jawaban model ke kolom prediksi...")
+df['prediksi'] = df['pertanyaan'].apply(lambda x: jawab(x) if pd.notna(x) else "-")
+df['ground_truth'] = df['ground_truth'].apply(bersihkan)
+df['prediksi'] = df['prediksi'].apply(bersihkan)
 
-    print(f"\n📊 Evaluasi dimulai menggunakan sumber: {args.source}")
+df[['precision', 'recall', 'f1']] = df.apply(
+    lambda row: skor_per_baris(row['ground_truth'], row['prediksi']), axis=1
+)
+precision_global = df['precision'].mean()
+recall_global = df['recall'].mean()
+f1_global = df['f1'].mean()
+print("\nBaris recall TERTINGGI:")
+print(df.sort_values('recall', ascending=False)[['pertanyaan', 'ground_truth', 'prediksi', 'recall', 'f1']].head(5))
 
-    df = pd.read_csv("evaluation/evaluasi_semua_batch.csv")
-    if not {"pertanyaan", "ground_truth"}.issubset(df.columns):
-        raise ValueError("File CSV harus punya kolom: pertanyaan, ground_truth")
+print("\nBaris recall TERENDAH:")
+print(df.sort_values('recall')[['pertanyaan', 'ground_truth', 'prediksi', 'recall', 'f1']].head(5))
 
-    hasil = df.apply(lambda row: evaluate_row(row, args.source), axis=1)
-    df_hasil = pd.DataFrame(list(hasil))
-
-    avg = df_hasil[["precision", "recall", "f1"]].mean()
-    print("\n--- Rata-rata ---")
-    print(f"Precision: {avg['precision']:.2f}, Recall: {avg['recall']:.2f}, F1: {avg['f1']:.2f}")
-
-    output_path = "evaluation/hasil_evaluasi.csv"
-    df_hasil.to_csv(output_path, index=False)
-    print(f"\n✅ Hasil evaluasi disimpan ke: {output_path}")
+print("\n=== SKOR EVALUASI AKHIR ===")
+print(f"Precision: {precision_global:.3f}")
+print(f"Recall:    {recall_global:.3f}")
+print(f"F1 Score:  {f1_global:.3f}")
