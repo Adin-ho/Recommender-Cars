@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -8,12 +8,10 @@ import re
 import requests
 import asyncio
 
-app = FastAPI()  # ⬅️ Buat objek app di sini dulu!
-
-# ⬇️ Sekarang baru include router LLM
+app = FastAPI()
 app.include_router(rag_qa_router)
 
-data_mobil = pd.read_csv('app/data/data_mobil.csv')
+data_mobil = pd.read_csv('app/data/data_mobil_final.csv')
 data_mobil.columns = data_mobil.columns.str.strip().str.lower()
 
 if "harga_angka" not in data_mobil.columns:
@@ -48,8 +46,8 @@ def unique_cars(output):
     return "; ".join(cars)
 
 @app.get("/stream")
-async def stream(pertanyaan: str):
-    jawaban = jawab(pertanyaan)
+async def stream(pertanyaan: str, exclude: str = ""):
+    jawaban = jawab(pertanyaan, exclude)
     async def event_stream():
         for word in jawaban.split():
             yield f"data: {word} \n\n"
@@ -57,7 +55,7 @@ async def stream(pertanyaan: str):
     return StreamingResponse(event_stream(), media_type="text/event-stream")
 
 @app.get("/jawab", response_class=PlainTextResponse)
-def jawab(pertanyaan: str):
+def jawab(pertanyaan: str, exclude: str = ""):
     hasil = data_mobil.copy()
     q = pertanyaan.lower()
     tahun_sekarang = 2025
@@ -101,6 +99,12 @@ def jawab(pertanyaan: str):
     # 🎯 Sinonim
     if "irit" in q or "hemat" in q:
         hasil = hasil[hasil["bahan bakar"].str.contains("bensin|hybrid", case=False, na=False)]
+
+    # 🔥 Tambahan: Exclude mobil sudah direkomendasikan (dari param `exclude`)
+    exclude_list = [x.strip().lower() for x in exclude.split(",") if x.strip()]
+    if exclude_list:
+        # Hilangkan baris yang Nama Mobil-nya ada di daftar exclude (tanpa peduli huruf besar kecil)
+        hasil = hasil[~hasil["nama mobil"].str.lower().isin(exclude_list)]
 
     # ❗️ Fallback ke LLM
     if hasil.empty:

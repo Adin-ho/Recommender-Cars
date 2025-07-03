@@ -2,7 +2,7 @@ import chromadb
 from chromadb.config import Settings
 
 # Path ke folder database ChromaDB (default: './app/chroma_db')
-CHROMA_DB_PATH = "./chroma"
+CHROMA_DB_PATH = "/app/chroma"
 
 def main():
     # Inisialisasi client persistent

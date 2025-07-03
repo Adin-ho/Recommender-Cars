@@ -6,12 +6,12 @@ from langchain_ollama import OllamaLLM
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langdetect import detect
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 router = APIRouter()
 
 # === LOAD DATA SEKALI SAJA ===
-df_mobil = pd.read_csv('app/data/data_mobil.csv', encoding="utf-8-sig")
+df_mobil = pd.read_csv('app/data/data_mobil_final.csv', encoding="utf-8-sig")
 df_mobil.columns = [c.strip().lower() for c in df_mobil.columns]
 
 def clean_number(x):
@@ -41,7 +41,7 @@ def extract_exclude_list(pertanyaan):
                     exclude.append(nama)
     return [x for x in set([e.strip() for e in exclude if e])]
 
-async def stream_mobil(pertanyaan: str, streaming=True):
+async def stream_mobil(pertanyaan: str, streaming=True, exclude_param: str = ""):
     bahasa = detect(pertanyaan)
     instruksi = {
         "id": "Jawab hanya berdasarkan data mobil berikut. Jangan buat asumsi atau menyebut info yang tidak ada. Jika tidak cocok, beri alternatif dari data.",
@@ -85,7 +85,12 @@ async def stream_mobil(pertanyaan: str, streaming=True):
         max_harga = int(budget_harga * 1.10)
         harga_rentang = (min_harga, max_harga)
 
+    # Ambil dari pertanyaan (selain/kecuali) + ambil dari parameter exclude
     exclude_list = extract_exclude_list(pertanyaan_lc)
+    if exclude_param:
+        exclude_list += [x.strip().lower() for x in exclude_param.split(",") if x.strip()]
+
+    exclude_list = list(set([e for e in exclude_list if e]))  # pastikan unik
 
     df = df_mobil.copy()
     try:
@@ -100,7 +105,7 @@ async def stream_mobil(pertanyaan: str, streaming=True):
     except Exception:
         pass
 
-    # Exclude logic
+    # Exclude logic: filter semua nama mobil yang sudah ada di exclude_list
     for excl in exclude_list:
         df = df[~df['nama mobil'].str.lower().str.contains(excl)]
 
@@ -108,15 +113,11 @@ async def stream_mobil(pertanyaan: str, streaming=True):
     df = df.sort_values(['tahun', 'usia', 'harga_angka'], ascending=[False, True, True])
 
     info_alt = ""
-    # ==== Prioritas harga jika ada pertanyaan harga ====
     if harga_rentang:
-        # 1. Ambil data dalam rentang ±10%
         df_final = df[(df["harga_angka"] >= harga_rentang[0]) & (df["harga_angka"] <= harga_rentang[1])]
-        # 2. Jika kurang dari 5, tambah dari harga di bawah budget (urutan harga menurun)
         if len(df_final) < 5:
             df_bawah = df[df["harga_angka"] < harga_rentang[0]].sort_values("harga_angka", ascending=False)
             df_final = pd.concat([df_final, df_bawah.head(5 - len(df_final))])
-        # 3. Jika tetap kurang, tambah dari harga di atas range maksimal (naik)
         if len(df_final) < 5:
             df_atas = df[df["harga_angka"] > harga_rentang[1]].sort_values("harga_angka", ascending=True)
             df_final = pd.concat([df_final, df_atas.head(5 - len(df_final))])
@@ -125,7 +126,6 @@ async def stream_mobil(pertanyaan: str, streaming=True):
             info_alt = f"Tidak ditemukan mobil di kisaran {budget_harga:,} (±10%). Berikut alternatif terdekat:\n"
             df_final = df.sort_values("harga_angka").head(5)
     else:
-        # ==== Logika prioritas tahun dan usia ====
         tahun_query = None
         match_tahun = re.search(r"(tahun|th|thn)[\s:]*([0-9]{4})", pertanyaan_lc)
         if match_tahun:
@@ -234,10 +234,10 @@ Jawaban:
     return StreamingResponse(event_gen(), media_type="text/event-stream")
 
 @router.get("/jawab")
-async def jawab_mobil(pertanyaan: str):
-    hasil = await stream_mobil(pertanyaan, streaming=False)
+async def jawab_mobil(pertanyaan: str, exclude: str = Query("", description="Nama mobil yang sudah direkomendasikan, dipisahkan koma.")):
+    hasil = await stream_mobil(pertanyaan, streaming=False, exclude_param=exclude)
     return JSONResponse(content={"jawaban": hasil})
 
 @router.get("/stream")
-async def stream_mobil_stream(pertanyaan: str):
-    return await stream_mobil(pertanyaan, streaming=True)
+async def stream_mobil_stream(pertanyaan: str, exclude: str = Query("", description="Nama mobil yang sudah direkomendasikan, dipisahkan koma.")):
+    return await stream_mobil(pertanyaan, streaming=True, exclude_param=exclude)

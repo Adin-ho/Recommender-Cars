@@ -8,7 +8,7 @@ import json
 
 def simpan_vektor_mobil():
     print("[INFO] Membaca dataset...")
-    df = pd.read_csv("app/data/data_mobil.csv")
+    df = pd.read_csv("data/data_mobil_final.csv")
 
     required_cols = ['Nama Mobil', 'Harga', 'Tahun', 'Usia', 'Bahan Bakar', 'Transmisi', 'Kapasitas Mesin']
     for col in required_cols:
@@ -43,10 +43,11 @@ def simpan_vektor_mobil():
                 "nama_mobil": str(row['Nama Mobil']).strip(),
                 "tahun": int(row['Tahun']),
                 "harga": str(row['Harga']).strip(),
-                "harga_angka": harga_angka,
+                "harga_angka": int(row['harga_angka']) if 'harga_angka' in row and pd.notna(row['harga_angka']) else harga_angka,
                 "usia": usia,
                 "bahan_bakar": str(row['Bahan Bakar']).strip().lower(),
                 "transmisi": str(row['Transmisi']).strip().lower(),
+                "kapasitas_mesin": str(row['Kapasitas Mesin']).strip() if 'Kapasitas Mesin' in row else None,
             })
 
         except Exception as e:
