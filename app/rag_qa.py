@@ -1,243 +1,172 @@
-import json
+import random
 import re
-import pandas as pd
-from fastapi.responses import StreamingResponse, JSONResponse
-from langchain_ollama import OllamaLLM
-from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langdetect import detect
 from fastapi import APIRouter, Query
+from langchain_ollama import OllamaEmbeddings
+from langchain_chroma import Chroma
 
 router = APIRouter()
 
-# === LOAD DATA SEKALI SAJA ===
-df_mobil = pd.read_csv('app/data/data_mobil_final.csv', encoding="utf-8-sig")
-df_mobil.columns = [c.strip().lower() for c in df_mobil.columns]
+def valid_int(x, default=0):
+    try:
+        return int(float(x))
+    except:
+        return default
 
-def clean_number(x):
-    if pd.isna(x): return 0
-    s = re.sub(r"\D", "", str(x))
-    if not s: return 0
-    return int(s)
+def is_kapasitas_mesin_valid(kapasitas, bahan_bakar):
+    # Listrik/hybrid tidak dicek CC, yang penting stringnya ada (kWh, dsb)
+    if "listrik" in str(bahan_bakar).lower() or "hybrid" in str(bahan_bakar).lower():
+        return kapasitas is not None and len(str(kapasitas).strip()) > 0
+    try:
+        num = int(re.sub(r'\D', '', str(kapasitas)))
+        return 600 <= num <= 6000
+    except:
+        return False
 
-for col in ["usia", "tahun"]:
-    if col in df_mobil.columns:
-        df_mobil[col] = df_mobil[col].apply(clean_number)
-df_mobil["harga_angka"] = df_mobil["harga"].apply(clean_number)
+@router.get("/cosine_rekomendasi")
+async def cosine_rekomendasi(
+    query: str = Query(..., description="Pertanyaan/kebutuhan mobil, misal 'rekomendasi mobil 500 juta'"),
+    k: int = Query(5, description="Jumlah hasil yang ingin ditampilkan"),
+    exclude: str = Query("", description="Nama mobil yang sudah direkomendasikan, pisahkan koma")
+):
+    embeddings = OllamaEmbeddings(model="mistral")
+    vector_store = Chroma(
+        persist_directory="chroma",
+        embedding_function=embeddings,
+    )
+    # Ambil banyak, supaya random benar-benar dinamis (jika exclude dipakai)
+    result_list = vector_store.similarity_search_with_score(query, k=150)
 
-def extract_exclude_list(pertanyaan):
-    pertanyaan = pertanyaan.lower()
-    exclude = []
-    patterns = [
-        r"(?:selain|kecuali|bukan)\s*([^\?\.]+)"
-    ]
-    for pat in patterns:
-        match = re.search(pat, pertanyaan)
-        if match:
-            kandidat = re.split(r',| dan | atau ', match.group(1))
-            for k in kandidat:
-                nama = k.strip()
-                if nama and len(nama) > 2:
-                    exclude.append(nama)
-    return [x for x in set([e.strip() for e in exclude if e])]
+    q_lc = query.lower()
+    harga_target = None
+    match_harga = re.search(r"(\d{2,4})\s*juta", q_lc)
+    if match_harga:
+        harga_target = int(match_harga.group(1)) * 1_000_000
+    else:
+        match_angka = re.search(r"(\d{9,12})", q_lc.replace(".", ""))
+        if match_angka:
+            harga_target = int(match_angka.group(1))
+    tolerance = 0.18  # ±18%
+    harga_min, harga_max = 0, 10**10
+    if harga_target:
+        harga_min = int(harga_target * (1 - tolerance))
+        harga_max = int(harga_target * (1 + tolerance))
+    usia_max = 5
+    match_usia = re.search(r"(?:<|di ?bawah|kurang dari|maks(?:imal)?|max(?:imum)?)\s*(\d{1,2})\s*tahun", q_lc)
+    if match_usia:
+        usia_max = int(match_usia.group(1))
 
-async def stream_mobil(pertanyaan: str, streaming=True, exclude_param: str = ""):
-    bahasa = detect(pertanyaan)
-    instruksi = {
-        "id": "Jawab hanya berdasarkan data mobil berikut. Jangan buat asumsi atau menyebut info yang tidak ada. Jika tidak cocok, beri alternatif dari data.",
-        "en": "Answer strictly based on the data below. Do not fabricate or assume unknown values. If there's no exact match, suggest alternatives from data.",
-    }.get(bahasa, "Answer using the same language as the question and only based on the data below.")
-
-    filters = {}
-    pertanyaan_lc = pertanyaan.lower()
-    if "manual" in pertanyaan_lc:
-        filters["transmisi"] = "manual"
-    if "matic" in pertanyaan_lc:
-        filters["transmisi"] = "matic"
-    for bahan in ["diesel", "bensin", "hybrid", "listrik"]:
-        if bahan in pertanyaan_lc:
-            filters["bahan bakar"] = bahan
-
-    merk_list = [
-        "bmw", "toyota", "honda", "mitsubishi", "suzuki", "nissan", "daihatsu",
-        "mercedes", "wuling", "hyundai", "mazda", "kijang", "innova",
-        "volkswagen", "vw", "alphard"
-    ]
-    selected_merk = None
-    for merk in merk_list:
-        if merk in pertanyaan_lc:
-            filters["nama mobil"] = merk
-            selected_merk = merk
+    # Deteksi bahan bakar secara cerdas
+    filter_bahan_bakar = None
+    for bb in ["listrik", "electric", "diesel", "bensin", "hybrid"]:
+        if bb in q_lc:
+            filter_bahan_bakar = bb
             break
 
-    match_usia = re.search(r"(di ?bawah|kurang dari) (\d{1,2}) tahun", pertanyaan_lc)
-    if match_usia:
-        filters["usia"] = int(match_usia.group(2))
+    exclude_list = [x.strip().lower() for x in exclude.split(",") if x.strip()]
+    hasil_utama, hasil_tua, hasil_lain = [], [], []
 
-    # ===== DETEKSI HARGA =====
-    match_harga = re.search(r"(\d+)[\s\.,]*juta", pertanyaan_lc)
-    budget_harga = None
-    harga_rentang = None
-    if match_harga:
-        budget_harga = int(match_harga.group(1).replace(".", "")) * 1_000_000
-        filters["harga"] = budget_harga
-        min_harga = int(budget_harga * 0.90)
-        max_harga = int(budget_harga * 1.10)
-        harga_rentang = (min_harga, max_harga)
+    # Track mobil yang sudah diambil, agar tidak dobel
+    seen = set()
 
-    # Ambil dari pertanyaan (selain/kecuali) + ambil dari parameter exclude
-    exclude_list = extract_exclude_list(pertanyaan_lc)
-    if exclude_param:
-        exclude_list += [x.strip().lower() for x in exclude_param.split(",") if x.strip()]
+    for doc, score in result_list:
+        meta = doc.metadata
+        nama = str(meta.get("nama_mobil", "-"))
+        harga = valid_int(meta.get("harga_angka", 0))
+        harga_display = meta.get("harga", "-")
+        usia = valid_int(meta.get("usia", 0))
+        kapasitas = meta.get("kapasitas_mesin", "-")
+        bb = str(meta.get("bahan_bakar", "-")).lower()
+        trans = str(meta.get("transmisi", "-"))
+        tahun = meta.get("tahun", "-")
 
-    exclude_list = list(set([e for e in exclude_list if e]))  # pastikan unik
+        # Exclude & deduplicate
+        key_nama = f"{nama.lower().strip()}__{tahun}"
+        if nama.lower() in exclude_list or key_nama in seen:
+            continue
+        seen.add(key_nama)
 
-    df = df_mobil.copy()
-    try:
-        if "transmisi" in filters:
-            df = df[df['transmisi'].str.lower() == filters["transmisi"]]
-        if "bahan bakar" in filters:
-            df = df[df['bahan bakar'].str.lower() == filters["bahan bakar"]]
-        if "nama mobil" in filters:
-            df = df[df['nama mobil'].str.lower().str.contains(filters["nama mobil"])]
-        if "usia" in filters:
-            df = df[df['usia'] <= filters["usia"]]
-    except Exception:
-        pass
+        # Bahan bakar filter
+        if filter_bahan_bakar and filter_bahan_bakar not in bb:
+            continue
 
-    # Exclude logic: filter semua nama mobil yang sudah ada di exclude_list
-    for excl in exclude_list:
-        df = df[~df['nama mobil'].str.lower().str.contains(excl)]
+        # Validasi kapasitas mesin (khusus hybrid/listrik true jika ada apapun)
+        if not is_kapasitas_mesin_valid(kapasitas, bb):
+            kapasitas = "-"
 
-    df = df[df["nama mobil"].notnull() & (df["nama mobil"].str.strip() != "")]
-    df = df.sort_values(['tahun', 'usia', 'harga_angka'], ascending=[False, True, True])
+        data_obj = {
+            "nama_mobil": nama,
+            "tahun": tahun,
+            "harga": harga_display,
+            "harga_angka": harga,
+            "usia": usia,
+            "bahan_bakar": bb,
+            "transmisi": trans,
+            "kapasitas_mesin": kapasitas,
+            "cosine_score": float(round(float(score), 4))
+        }
 
-    info_alt = ""
-    if harga_rentang:
-        df_final = df[(df["harga_angka"] >= harga_rentang[0]) & (df["harga_angka"] <= harga_rentang[1])]
-        if len(df_final) < 5:
-            df_bawah = df[df["harga_angka"] < harga_rentang[0]].sort_values("harga_angka", ascending=False)
-            df_final = pd.concat([df_final, df_bawah.head(5 - len(df_final))])
-        if len(df_final) < 5:
-            df_atas = df[df["harga_angka"] > harga_rentang[1]].sort_values("harga_angka", ascending=True)
-            df_final = pd.concat([df_final, df_atas.head(5 - len(df_final))])
-        df_final = df_final.head(5)
-        if df_final.empty:
-            info_alt = f"Tidak ditemukan mobil di kisaran {budget_harga:,} (±10%). Berikut alternatif terdekat:\n"
-            df_final = df.sort_values("harga_angka").head(5)
-    else:
-        tahun_query = None
-        match_tahun = re.search(r"(tahun|th|thn)[\s:]*([0-9]{4})", pertanyaan_lc)
-        if match_tahun:
-            tahun_query = int(match_tahun.group(2))
+        # Prioritas: harga sesuai ±18%, usia < 5 tahun
+        if harga_target and (harga_min <= harga <= harga_max):
+            if 0 < usia <= usia_max:
+                hasil_utama.append(data_obj)
+            elif usia > usia_max:
+                hasil_tua.append(data_obj)
+        elif not harga_target and 0 < usia <= usia_max:
+            hasil_utama.append(data_obj)
         else:
-            for thn in range(2024, 2031):
-                if str(thn) in pertanyaan_lc:
-                    tahun_query = thn
-                    break
+            hasil_lain.append(data_obj)
 
-        df_final = pd.DataFrame()
-        if tahun_query:
-            df_utama = df[df['tahun'] == tahun_query]
-            if not df_utama.empty:
-                df_final = df_utama
-        if df_final.empty or len(df_final) < 5:
-            df_5th = df[df['usia'] <= 5]
-            if not df_5th.empty:
-                df_5th = df_5th[~df_5th.index.isin(df_final.index)]
-                df_final = pd.concat([df_final, df_5th])
-        if len(df_final) < 5:
-            df_lain = df[~df.index.isin(df_final.index)]
-            df_final = pd.concat([df_final, df_lain.head(5 - len(df_final))])
-        df_final = df_final.head(5)
+    # Sorting hasil utama (dekat harga & usia muda), hasil_tua (usia tua tapi harga dekat)
+    hasil_utama = sorted(hasil_utama, key=lambda x: (abs(x['harga_angka']-harga_target) if harga_target else x['usia'], x['usia']))
+    hasil_tua = sorted(hasil_tua, key=lambda x: (x['usia'], abs(x['harga_angka']-harga_target) if harga_target else 0))
+    random.shuffle(hasil_lain)
 
-    if df_final.empty:
-        exclude_info = ""
-        if exclude_list:
-            exclude_info = f"selain {', '.join(exclude_list)}"
-        fallback = f"❌ Maaf, {('' if not exclude_info else exclude_info+', ')}tidak ada mobil lain yang sesuai di database."
-        return fallback if not streaming else StreamingResponse(
-            (f"data: {json.dumps({'type': 'stream', 'token': c})}\n\n" for c in fallback),
-            media_type="text/event-stream"
+    hasil_final = hasil_utama + hasil_tua + hasil_lain
+    hasil_final = hasil_final[:k]
+
+    # Jika kosong, tetap tampilkan hasil random tanpa filter (alternatif)
+    if not hasil_final and result_list:
+        alt = []
+        seen_alt = set()
+        for doc, score in result_list:
+            meta = doc.metadata
+            nama = str(meta.get("nama_mobil", "-"))
+            tahun = meta.get("tahun", "-")
+            key_nama = f"{nama.lower().strip()}__{tahun}"
+            if nama.lower() in exclude_list or key_nama in seen_alt:
+                continue
+            seen_alt.add(key_nama)
+            alt.append({
+                "nama_mobil": nama,
+                "tahun": tahun,
+                "harga": meta.get("harga", "-"),
+                "harga_angka": valid_int(meta.get("harga_angka", 0)),
+                "usia": valid_int(meta.get("usia", 0)),
+                "bahan_bakar": str(meta.get("bahan_bakar", "-")).lower(),
+                "transmisi": str(meta.get("transmisi", "-")),
+                "kapasitas_mesin": meta.get("kapasitas_mesin", "-"),
+                "cosine_score": float(round(float(score), 4))
+            })
+            if len(alt) >= k:
+                break
+        hasil_final = alt
+
+    if not hasil_final:
+        return {
+            "jawaban": "Maaf, tidak ditemukan mobil yang sesuai dengan kriteria pencarian Anda.",
+            "rekomendasi": []
+        }
+
+    # Output Format
+    output = "Rekomendasi berdasarkan Cosine Similarity:\n\n"
+    for idx, m in enumerate(hasil_final, 1):
+        output += (
+            f"{idx}. {m['nama_mobil']} ({m['tahun']})\n"
+            f"    Skor: {m['cosine_score']}\n"
+            f"    Harga: {m['harga']}\n"
+            f"    Usia: {m['usia']} tahun\n"
+            f"    Bahan Bakar: {m['bahan_bakar'].capitalize()}\n"
+            f"    Transmisi: {m['transmisi'].capitalize()}\n"
+            f"    Kapasitas Mesin: {m['kapasitas_mesin']}\n\n"
         )
-
-    def safe_get(row, key):
-        value = row.get(key, '-')
-        if pd.isna(value) or str(value).strip() == '':
-            return '-'
-        return value
-
-    context = ""
-    for idx, row in enumerate(df_final.to_dict(orient="records"), 1):
-        context += (
-            f"{idx}. Nama Mobil: {safe_get(row, 'nama mobil')}\n"
-            f"   - Tahun: {safe_get(row, 'tahun')}\n"
-            f"   - Harga: {safe_get(row, 'harga')}\n"
-            f"   - Usia: {safe_get(row, 'usia')} tahun\n"
-            f"   - Bahan Bakar: {safe_get(row, 'bahan bakar')}\n"
-            f"   - Transmisi: {safe_get(row, 'transmisi')}\n"
-            f"   - Kapasitas Mesin: {safe_get(row, 'kapasitas mesin')}\n"
-        )
-
-    if not context.strip():
-        fallback = "❌ Maaf, saya tidak menemukan mobil yang cocok. Silakan periksa ulang kriteria Anda."
-        return fallback if not streaming else StreamingResponse(
-            (f"data: {json.dumps({'type': 'stream', 'token': c})}\n\n" for c in fallback),
-            media_type="text/event-stream"
-        )
-
-    prompt = PromptTemplate.from_template(f"""
-{info_alt}Berikut adalah data mobil bekas yang tersedia dari database. Jawablah HANYA dari data berikut, **TIDAK BOLEH menambah, menghitung, atau mengubah nilai apapun**.
-
-{{context}}
-
-Instruksi penting:
-- Semua field (Nama, Tahun, Harga, Usia, Bahan Bakar, Transmisi, Kapasitas Mesin) HARUS DIKUTIP APA ADANYA dari context, tanpa dihitung atau diubah!
-- Field **Usia** WAJIB diambil dari baris 'Usia' di atas (tidak boleh dihitung ulang).
-- Jika Nama mobil sudah ada tahun, tetap ambil field Tahun dari baris 'Tahun', bukan dari Nama.
-- Urutkan jawaban sesuai urutan nomor pada context.
-- Jika semua mobil sudah tua, tetap tampilkan maksimal 5 mobil yang paling muda.
-- Setelah list, tutup jawaban dengan:
-"Jika Anda punya preferensi khusus (tahun, fitur, merk, atau budget tertentu), silakan tanyakan agar saya bisa merekomendasikan yang lebih sesuai."
-
-Format jawaban WAJIB seperti ini:
-1. Nama Mobil: <Nama Mobil>
-   - Tahun: <Tahun>
-   - Harga: <Harga>
-   - Usia: <Usia>
-   - Bahan Bakar: <Bahan Bakar>
-   - Transmisi: <Transmisi>
-   - Alasan: Mobil ini layak dipertimbangkan karena ... (isi bebas, tidak boleh ngarang field!)
-
-Pertanyaan: {{pertanyaan}}
-Jawaban:
-""")
-
-    llm = OllamaLLM(model="mistral", system=instruksi, stream=streaming)
-    chain = prompt | llm | StrOutputParser()
-
-    if not streaming:
-        return await chain.ainvoke({
-            "context": context,
-            "pertanyaan": pertanyaan,
-        })
-
-    async def event_gen():
-        yield f"data: {json.dumps({'type': 'start'})}\n\n"
-        async for t in chain.astream({
-            "context": context,
-            "pertanyaan": pertanyaan,
-        }):
-            yield f"data: {json.dumps({'type': 'stream', 'token': t})}\n\n"
-        yield f"data: {json.dumps({'type': 'end'})}\n\n"
-
-    return StreamingResponse(event_gen(), media_type="text/event-stream")
-
-@router.get("/jawab")
-async def jawab_mobil(pertanyaan: str, exclude: str = Query("", description="Nama mobil yang sudah direkomendasikan, dipisahkan koma.")):
-    hasil = await stream_mobil(pertanyaan, streaming=False, exclude_param=exclude)
-    return JSONResponse(content={"jawaban": hasil})
-
-@router.get("/stream")
-async def stream_mobil_stream(pertanyaan: str, exclude: str = Query("", description="Nama mobil yang sudah direkomendasikan, dipisahkan koma.")):
-    return await stream_mobil(pertanyaan, streaming=True, exclude_param=exclude)
+    return {"jawaban": output, "rekomendasi": hasil_final}
