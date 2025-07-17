@@ -5,6 +5,41 @@ import re
 data_mobil = pd.read_csv('app/data/data_mobil_final.csv')
 data_mobil.columns = data_mobil.columns.str.strip().str.lower()
 
+kunci_transmisi = ['matic', 'manual']
+kunci_bahan_bakar = ['diesel', 'bensin', 'hybrid', 'listrik']
+kunci_tanya = ['ada', 'apa', 'cari', 'butuh', 'ingin', 'saran', 'pilihan', 'mobil', 'mau', 'rekomendasi', 'tersedia']
+
+def deteksi_kriteria(pertanyaan):
+    # Normalisasi ke lower
+    q = pertanyaan.lower()
+    kriteria = {}
+
+    # Transmisi
+    for t in kunci_transmisi:
+        if re.search(r'\b' + re.escape(t) + r'\b', q):
+            kriteria['transmisi'] = t
+    # Bahan bakar
+    for b in kunci_bahan_bakar:
+        if re.search(r'\b' + re.escape(b) + r'\b', q):
+            kriteria['bahan_bakar'] = b
+    # Tahun/harga/kapasitas (pattern angka)
+    tahun = re.findall(r'(\d{4})', q)
+    if tahun:
+        kriteria['tahun'] = tahun
+    harga = re.findall(r'(\d+\s?(juta|miliar|ribu)?)', q)
+    if harga:
+        kriteria['harga'] = harga
+    # Deteksi kata tanya/aksi (agar tetap dilayani meski tanpa kata 'rekomendasi')
+    for kt in kunci_tanya:
+        if kt in q:
+            kriteria['intent'] = kt
+    # Merek umum (misal BMW, Toyota, Honda dst)
+    merek_umum = ['bmw', 'toyota', 'honda', 'hyundai', 'chevrolet', 'ford', 'daihatsu', 'wuling', 'mercedes', 'nissan']
+    for m in merek_umum:
+        if m in q:
+            kriteria['merek'] = m
+    return kriteria
+
 if 'harga_angka' not in data_mobil.columns:
     def bersihkan_harga(h):
         if pd.isna(h): return 0
