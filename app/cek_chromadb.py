@@ -1,32 +1,16 @@
-import chromadb
+from langchain_chroma import Chroma
+from langchain_ollama import OllamaEmbeddings
 
-CHROMA_DB_PATH = "./chroma"
+# Load vector database dari folder
+vector_store = Chroma(persist_directory="chroma")
 
-def main():
-    client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
-    collections = client.list_collections()
-    if not collections:
-        print("Tidak ada koleksi ditemukan di database ChromaDB.")
-        return
+# Jumlah vektor (record/data mobil)
+jumlah_vektor = vector_store._collection.count()
+print(f"Jumlah record mobil dalam ChromaDB: {jumlah_vektor}")
 
-    print(f"Daftar koleksi di database:")
-    for idx, col in enumerate(collections):
-        print(f"{idx+1}. {col}")
+# Cek dimensi vektor (misal dengan embedding model)
+embeddings = OllamaEmbeddings(model="mistral")  # atau model yang kamu pakai
+vektor_sample = embeddings.embed_query("Contoh mobil Avanza 2022 matic")
+print(f"Dimensi setiap vektor: {len(vektor_sample)}")
 
-    collection_name = collections[0]  # Sekarang col adalah string nama koleksi
-    print(f"\nMengambil data dari koleksi: {collection_name}")
-
-    collection = client.get_collection(collection_name)
-    results = collection.get(limit=10)
-
-    print(f"\nMenampilkan maksimal 10 data pertama:")
-    for i in range(len(results['ids'])):
-        print("="*30)
-        print(f"ID: {results['ids'][i]}")
-        print(f"Document: {results['documents'][i]}")
-        print(f"Metadata: {results['metadatas'][i]}")
-    print("="*30)
-    print(f"\nTotal data di koleksi ini (approx): {len(results['ids'])}")
-
-if __name__ == "__main__":
-    main()
+# Info: untuk cek ukuran file, lihat folder 'chroma/' di file explorer atau terminal
