@@ -110,18 +110,18 @@ plt.hist(df['f1'], bins=20, color='salmon', edgecolor='black')
 plt.title('Distribusi F1 Score')
 plt.xlabel('F1 Score')
 
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+# from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
-labels = ['Negative', 'Neutral', 'Positive']
-y_true = df['label_true']
-y_pred = df['label_pred']
-cm = confusion_matrix(y_true, y_pred, labels=labels)
-plt.subplot(1, 4, 4)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
-disp.plot(ax=plt.gca(), cmap='Blues', colorbar=False)
-plt.title('Confusion Matrix')
-plt.xlabel('Predicted')
-plt.ylabel('True')
-plt.tight_layout()
+# labels = ['Negative', 'Neutral', 'Positive']
+# y_true = df['label_true']
+# y_pred = df['label_pred']
+# cm = confusion_matrix(y_true, y_pred, labels=labels)
+# plt.subplot(1, 4, 4)
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
+# disp.plot(ax=plt.gca(), cmap='Blues', colorbar=False)
+# plt.title('Confusion Matrix')
+# plt.xlabel('Predicted')
+# plt.ylabel('True')
+# plt.tight_layout()
 
-plt.show()
+# plt.show()
