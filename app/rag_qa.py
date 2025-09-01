@@ -1,7 +1,17 @@
-import random
+import os
 import re
+import random
 from fastapi import APIRouter, Query
-from langchain_ollama import OllamaEmbeddings
+
+# ===== Pilih embedding: Ollama (kalau ada) atau CPU (default) =====
+if os.getenv("USE_OLLAMA", "0") == "1":
+    from langchain_ollama import OllamaEmbeddings as _Emb
+    EMBEDDINGS = _Emb(model="mistral")
+else:
+    # CPU: ringan & cocok free hosting
+    from langchain_community.embeddings import HuggingFaceEmbeddings as _Emb
+    EMBEDDINGS = _Emb(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
 from langchain_chroma import Chroma
 
 router = APIRouter()
@@ -9,133 +19,126 @@ router = APIRouter()
 def valid_int(x, default=0):
     try:
         return int(float(x))
-    except:
+    except Exception:
         return default
 
 def is_kapasitas_mesin_valid(kapasitas, bahan_bakar):
-    # Listrik/hybrid tidak dicek CC, yang penting stringnya ada (kWh, dsb)
-    if "listrik" in str(bahan_bakar).lower() or "hybrid" in str(bahan_bakar).lower():
-        return kapasitas is not None and len(str(kapasitas).strip()) > 0
+    j = str(bahan_bakar).lower()
+    if "listrik" in j or "hybrid" in j:
+        return kapasitas is not None and str(kapasitas).strip() != ""
     try:
-        num = int(re.sub(r'\D', '', str(kapasitas)))
+        num = int(re.sub(r"\D", "", str(kapasitas)))
         return 600 <= num <= 6000
-    except:
+    except Exception:
         return False
 
 @router.get("/cosine_rekomendasi")
 async def cosine_rekomendasi(
-    query: str = Query(..., description="Pertanyaan/kebutuhan mobil, misal 'rekomendasi mobil 500 juta'"),
-    k: int = Query(5, description="Jumlah hasil yang ingin ditampilkan"),
+    query: str = Query(..., description="Pertanyaan kebutuhan mobil (mis. 'mpv 200 juta')"),
+    k: int = Query(5, description="Jumlah hasil"),
     exclude: str = Query("", description="Nama mobil yang sudah direkomendasikan, pisahkan koma")
 ):
-    embeddings = OllamaEmbeddings(model="mistral")
     vector_store = Chroma(
         persist_directory="chroma",
-        embedding_function=embeddings,
+        embedding_function=EMBEDDINGS,
     )
-    # Ambil banyak, supaya random benar-benar dinamis (jika exclude dipakai)
     result_list = vector_store.similarity_search_with_score(query, k=150)
 
     q_lc = query.lower()
+
+    # Target harga (boleh '200 juta' atau angka utuh)
     harga_target = None
-    match_harga = re.search(r"(\d{2,4})\s*juta", q_lc)
-    if match_harga:
-        harga_target = int(match_harga.group(1)) * 1_000_000
+    m = re.search(r"(\d{2,4})\s*juta", q_lc)
+    if m:
+        harga_target = int(m.group(1)) * 1_000_000
     else:
-        match_angka = re.search(r"(\d{9,12})", q_lc.replace(".", ""))
-        if match_angka:
-            harga_target = int(match_angka.group(1))
-    tolerance = 0.18  # ±18%
+        m2 = re.search(r"(\d{9,12})", q_lc.replace(".", ""))
+        if m2:
+            harga_target = int(m2.group(1))
+
+    tolerance = 0.18
     harga_min, harga_max = 0, 10**10
     if harga_target:
         harga_min = int(harga_target * (1 - tolerance))
         harga_max = int(harga_target * (1 + tolerance))
-    usia_max = 5
-    match_usia = re.search(r"(?:<|di ?bawah|kurang dari|maks(?:imal)?|max(?:imum)?)\s*(\d{1,2})\s*tahun", q_lc)
-    if match_usia:
-        usia_max = int(match_usia.group(1))
 
-    # Deteksi bahan bakar secara cerdas
-    filter_bahan_bakar = None
+    # Usia maks (default 5 thn)
+    usia_max = 5
+    m_usia = re.search(r"(?:<|di ?bawah|kurang dari|max(?:imal)?)\s*(\d{1,2})\s*tahun", q_lc)
+    if m_usia:
+        usia_max = int(m_usia.group(1))
+
+    # Filter bahan bakar (opsional)
+    filter_bb = None
     for bb in ["listrik", "electric", "diesel", "bensin", "hybrid"]:
         if bb in q_lc:
-            filter_bahan_bakar = bb
+            filter_bb = bb
             break
 
     exclude_list = [x.strip().lower() for x in exclude.split(",") if x.strip()]
     hasil_utama, hasil_tua, hasil_lain = [], [], []
-
-    # Track mobil yang sudah diambil, agar tidak dobel
     seen = set()
 
     for doc, score in result_list:
         meta = doc.metadata
         nama = str(meta.get("nama_mobil", "-"))
+        tahun = meta.get("tahun", "-")
         harga = valid_int(meta.get("harga_angka", 0))
-        harga_display = meta.get("harga", "-")
+        harga_disp = meta.get("harga", "-")
         usia = valid_int(meta.get("usia", 0))
-        kapasitas = meta.get("kapasitas_mesin", "-")
         bb = str(meta.get("bahan_bakar", "-")).lower()
         trans = str(meta.get("transmisi", "-"))
-        tahun = meta.get("tahun", "-")
+        kapasitas = meta.get("kapasitas_mesin", "-")
 
-        # Exclude & deduplicate
-        key_nama = f"{nama.lower().strip()}__{tahun}"
-        if nama.lower() in exclude_list or key_nama in seen:
+        key = f"{nama.lower().strip()}__{tahun}"
+        if nama.lower() in exclude_list or key in seen:
             continue
-        seen.add(key_nama)
+        seen.add(key)
 
-        # Bahan bakar filter
-        if filter_bahan_bakar and filter_bahan_bakar not in bb:
+        if filter_bb and filter_bb not in bb:
             continue
 
-        # Validasi kapasitas mesin (khusus hybrid/listrik true jika ada apapun)
         if not is_kapasitas_mesin_valid(kapasitas, bb):
             kapasitas = "-"
 
-        data_obj = {
+        obj = {
             "nama_mobil": nama,
             "tahun": tahun,
-            "harga": harga_display,
+            "harga": harga_disp,
             "harga_angka": harga,
             "usia": usia,
             "bahan_bakar": bb,
             "transmisi": trans,
             "kapasitas_mesin": kapasitas,
-            "cosine_score": float(round(float(score), 4))
+            "cosine_score": float(round(float(score), 4)),
         }
 
-        # Prioritas: harga sesuai ±18%, usia < 5 tahun
         if harga_target and (harga_min <= harga <= harga_max):
             if 0 < usia <= usia_max:
-                hasil_utama.append(data_obj)
+                hasil_utama.append(obj)
             elif usia > usia_max:
-                hasil_tua.append(data_obj)
+                hasil_tua.append(obj)
         elif not harga_target and 0 < usia <= usia_max:
-            hasil_utama.append(data_obj)
+            hasil_utama.append(obj)
         else:
-            hasil_lain.append(data_obj)
+            hasil_lain.append(obj)
 
-    # Sorting hasil utama (dekat harga & usia muda), hasil_tua (usia tua tapi harga dekat)
-    hasil_utama = sorted(hasil_utama, key=lambda x: (abs(x['harga_angka']-harga_target) if harga_target else x['usia'], x['usia']))
-    hasil_tua = sorted(hasil_tua, key=lambda x: (x['usia'], abs(x['harga_angka']-harga_target) if harga_target else 0))
+    hasil_utama = sorted(hasil_utama, key=lambda x: (abs(x['harga_angka']-(harga_target or 0)), x['usia']))
+    hasil_tua   = sorted(hasil_tua,   key=lambda x: (x['usia'], abs(x['harga_angka']-(harga_target or 0))))
     random.shuffle(hasil_lain)
 
-    hasil_final = hasil_utama + hasil_tua + hasil_lain
-    hasil_final = hasil_final[:k]
+    hasil_final = (hasil_utama + hasil_tua + hasil_lain)[:k]
 
-    # Jika kosong, tetap tampilkan hasil random tanpa filter (alternatif)
     if not hasil_final and result_list:
-        alt = []
-        seen_alt = set()
+        alt, seen_alt = [], set()
         for doc, score in result_list:
             meta = doc.metadata
             nama = str(meta.get("nama_mobil", "-"))
             tahun = meta.get("tahun", "-")
-            key_nama = f"{nama.lower().strip()}__{tahun}"
-            if nama.lower() in exclude_list or key_nama in seen_alt:
+            key = f"{nama.lower().strip()}__{tahun}"
+            if nama.lower() in exclude_list or key in seen_alt:
                 continue
-            seen_alt.add(key_nama)
+            seen_alt.add(key)
             alt.append({
                 "nama_mobil": nama,
                 "tahun": tahun,
@@ -145,23 +148,19 @@ async def cosine_rekomendasi(
                 "bahan_bakar": str(meta.get("bahan_bakar", "-")).lower(),
                 "transmisi": str(meta.get("transmisi", "-")),
                 "kapasitas_mesin": meta.get("kapasitas_mesin", "-"),
-                "cosine_score": float(round(float(score), 4))
+                "cosine_score": float(round(float(score), 4)),
             })
             if len(alt) >= k:
                 break
         hasil_final = alt
 
     if not hasil_final:
-        return {
-            "jawaban": "Maaf, tidak ditemukan mobil yang sesuai dengan kriteria pencarian Anda.",
-            "rekomendasi": []
-        }
+        return {"jawaban": "Maaf, tidak ditemukan mobil yang sesuai.", "rekomendasi": []}
 
-    # Output Format
-    output = "Rekomendasi berdasarkan Cosine Similarity:\n\n"
-    for idx, m in enumerate(hasil_final, 1):
-        output += (
-            f"{idx}. {m['nama_mobil']} ({m['tahun']})\n"
+    out = "Rekomendasi berdasarkan Cosine Similarity:\n\n"
+    for i, m in enumerate(hasil_final, 1):
+        out += (
+            f"{i}. {m['nama_mobil']} ({m['tahun']})\n"
             f"    Skor: {m['cosine_score']}\n"
             f"    Harga: {m['harga']}\n"
             f"    Usia: {m['usia']} tahun\n"
@@ -169,4 +168,4 @@ async def cosine_rekomendasi(
             f"    Transmisi: {m['transmisi'].capitalize()}\n"
             f"    Kapasitas Mesin: {m['kapasitas_mesin']}\n\n"
         )
-    return {"jawaban": output, "rekomendasi": hasil_final}
+    return {"jawaban": out, "rekomendasi": hasil_final}

@@ -21,6 +21,6 @@ env/
 
 # Abaikan cache Python
 __pycache__/
-backup
+backup/
 evaluation/
 chroma/

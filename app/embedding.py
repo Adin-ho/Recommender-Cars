@@ -1,43 +1,43 @@
+from pathlib import Path
 from tqdm import tqdm
 import pandas as pd
 import json
-from langchain_ollama import OllamaEmbeddings
+
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 
-def simpan_vektor_mobil():
-    print("[INFO] Membaca dataset...")
-    df = pd.read_csv("app/data/data_mobil_final.csv")
-    required_cols = ['Nama Mobil', 'Harga', 'Tahun', 'Usia', 'Bahan Bakar', 'Transmisi', 'Kapasitas Mesin']
+ROOT_DIR = Path(__file__).resolve().parents[1]
+DATA_CSV = ROOT_DIR / "app" / "data" / "data_mobil_final.csv"
+CHROMA_DIR = ROOT_DIR / "chroma"
 
+def simpan_vektor_mobil():
+    print("[INFO] Membaca dataset:", DATA_CSV)
+    df = pd.read_csv(DATA_CSV)
+
+    required_cols = ['Nama Mobil', 'Harga', 'Tahun', 'Usia', 'Bahan Bakar', 'Transmisi', 'Kapasitas Mesin']
     for col in required_cols:
         if col not in df.columns:
             raise ValueError(f"Kolom '{col}' tidak ditemukan di CSV.")
 
-    texts = []
-    metadatas = []
-
-    print("[INFO] Memproses baris data...")
+    texts, metadatas = [], []
     for _, row in tqdm(df.iterrows(), total=len(df)):
-        # Tidak ada continue, semua baris tetap diproses!
-        usia = 0
         try:
             usia = int(str(row['Usia']).strip())
         except Exception:
-            pass
+            usia = 0
 
-        harga_angka = 0
         try:
             harga_str = str(row['Harga']).replace("Rp", "").replace(".", "").replace(",", "").strip()
             harga_angka = int(harga_str)
         except Exception:
-            pass
+            harga_angka = 0
 
-        kapasitas_mesin = str(row['Kapasitas Mesin']).strip() if 'Kapasitas Mesin' in row else "-"
+        kapasitas = str(row.get('Kapasitas Mesin', '-') or '-').strip()
 
         deskripsi = (
             f"{row['Nama Mobil']} ({row['Tahun']}), tahun {row['Tahun']}, harga {row['Harga']}, "
             f"usia {row['Usia']} tahun, bahan bakar {row['Bahan Bakar']}, "
-            f"transmisi {row['Transmisi']}, kapasitas mesin {kapasitas_mesin}"
+            f"transmisi {row['Transmisi']}, kapasitas mesin {kapasitas}"
         )
         texts.append(deskripsi)
         metadatas.append({
@@ -48,22 +48,20 @@ def simpan_vektor_mobil():
             "usia": usia,
             "bahan_bakar": str(row['Bahan Bakar']).strip().lower(),
             "transmisi": str(row['Transmisi']).strip().lower(),
-            "kapasitas_mesin": kapasitas_mesin,
+            "kapasitas_mesin": kapasitas,
         })
 
-    print("\n[INFO] Contoh metadata:", json.dumps(metadatas[0], indent=2))
-    print("[INFO] Contoh teks:", texts[0])
-    embeddings = OllamaEmbeddings(model="mistral")
+    print("[INFO] Contoh metadata:", json.dumps(metadatas[0], indent=2))
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
-    print("[INFO] Menyimpan ke ChromaDB...")
+    print("[INFO] Menyimpan ke ChromaDB:", CHROMA_DIR)
     Chroma.from_texts(
         texts=texts,
         embedding=embeddings,
         metadatas=metadatas,
-        persist_directory="chroma"
+        persist_directory=str(CHROMA_DIR)
     )
-
-    print("[✅ SELESAI] Semua data valid disimpan ke ChromaDB.")
+    print("[✅ SELESAI] Embedding tersimpan.")
 
 if __name__ == "__main__":
     simpan_vektor_mobil()
