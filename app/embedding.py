@@ -2,7 +2,6 @@ from pathlib import Path
 from tqdm import tqdm
 import pandas as pd
 import json
-
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 
