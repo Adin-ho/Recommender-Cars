@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+pandas
+requests
+aiofiles
+python-multipart
+chromadb
+langchain-chroma
+langchain-community
+sentence-transformers

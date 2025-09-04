@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ChatCars</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+</head>
+<body class="bg-gray-100 flex flex-col items-center h-screen p-4">
+  <div class="flex flex-col w-full max-w-2xl bg-white shadow-lg rounded-lg p-6 h-full gap-2">
+    <h1 class="text-2xl font-bold text-center text-blue-600 mb-4">🚗 ChatCars: Rekomendasi Mobil</h1>
+    <div id="chatBox" class="flex-1 min-h-0 overflow-y-auto p-4 border rounded bg-gray-50 text-sm"></div>
+    <div class="flex space-x-2">
+      <input id="pertanyaan" type="text" placeholder="Tanyakan sesuatu tentang mobil..."
+        class="flex-grow px-4 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"/>
+      <button onclick="kirimPertanyaan()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Kirim</button>
+    </div>
+  </div>
+  <script>
+    async function kirimPertanyaan() {
+      const input = document.getElementById("pertanyaan");
+      const chatBox = document.getElementById("chatBox");
+      const pesan = input.value.trim();
+      if (!pesan) return;
+
+      // User message
+      const userMsg = document.createElement("div");
+      userMsg.className = "text-right text-blue-600 font-medium";
+      userMsg.textContent = "👤 " + pesan;
+      chatBox.appendChild(userMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      input.value = "";
+      input.disabled = true;
+
+      // Bot message container
+      const botMsg = document.createElement("div");
+      botMsg.className = "text-left text-gray-800 whitespace-pre-wrap";
+      chatBox.appendChild(botMsg);
+
+      // Loading animation
+      let loading = setInterval(() => {
+        botMsg.textContent += ".";
+        if (botMsg.textContent.length > 8) botMsg.textContent = "🤖";
+      }, 200);
+
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/cosine_rekomendasi?query=${encodeURIComponent(pesan)}`);
+        const data = await response.json();
+        clearInterval(loading);
+
+        if (data && data.rekomendasi && data.rekomendasi.length > 0) {
+          let hasil = "";
+          data.rekomendasi.forEach((row, i) => {
+            hasil += `<div class="mb-3 p-2 rounded bg-gray-50 border">
+              <b>${i+1}. ${row.nama_mobil} (${row.tahun})</b><br>
+              <span class="text-xs">Skor: <b>${row.cosine_score}</b></span><br>
+              Harga: <b>${row.harga}</b><br>
+              Usia: <b>${row.usia} tahun</b><br>
+              Bahan Bakar: ${row.bahan_bakar}<br>
+              Transmisi: ${row.transmisi}<br>
+              Kapasitas Mesin: ${row.kapasitas_mesin}<br>
+            </div>`;
+          });
+          botMsg.innerHTML = "🤖<b> Rekomendasi berdasarkan Cosine Similarity:</b><br><br>" + hasil;
+        } else {
+          botMsg.innerHTML = "🤖 Maaf, tidak ditemukan mobil yang sesuai dari pencarian cosine similarity.";
+        }
+      } catch (err) {
+        clearInterval(loading);
+        botMsg.textContent += "\n❌ Gagal mengambil jawaban.";
+      } finally {
+        input.disabled = false;
+        input.focus();
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    }
+
+    document.getElementById("pertanyaan").addEventListener("keypress", function (e) {
+      if (e.key === "Enter") kirimPertanyaan();
+    });
+  </script>
+</body>
+</html>
