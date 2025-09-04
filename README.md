@@ -1,6 +1,9 @@
-﻿# Recommender Cars
-
-This Space runs FastAPI (uvicorn) + static frontend.
-
-- SDK: Docker
-- Start: uvicorn app.main:app --host 0.0.0.0 --port 
+﻿---
+title: Chatbot Cars
+emoji: 🚗
+colorFrom: indigo
+colorTo: emerald
+sdk: docker
+pinned: false
+license: mit
+---
