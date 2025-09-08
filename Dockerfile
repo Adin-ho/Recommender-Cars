@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Pastikan folder cache ada & writable
 RUN mkdir -p $HF_HOME && chmod -R 777 /data
 
-# Prefetch model (hindari heredoc supaya tidak kena CRLF)
+# Prefetch model (hindari heredoc agar aman di Windows)
 RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
 
 COPY app ./app
