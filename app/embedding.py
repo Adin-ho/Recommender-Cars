@@ -4,10 +4,11 @@ import pandas as pd
 import json
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
+import os
 
-CHROMA_DIR = Path(os.getenv("CHROMA_DIR", ROOT_DIR / "chroma"))
 ROOT_DIR = Path(__file__).resolve().parents[1]
 DATA_CSV = ROOT_DIR / "app" / "data" / "data_mobil_final.csv"
+CHROMA_DIR = Path(os.getenv("CHROMA_DIR", ROOT_DIR / "chroma"))
 
 def simpan_vektor_mobil():
     print("[INFO] Membaca dataset:", DATA_CSV)
@@ -55,11 +56,11 @@ def simpan_vektor_mobil():
 
     print("[INFO] Menyimpan ke ChromaDB:", CHROMA_DIR)
     Chroma.from_texts(
-        texts=texts,
-        embedding=embeddings,
-        metadatas=metadatas,
-        persist_directory=str(CHROMA_DIR)
-    )
+    texts=texts,
+    embedding=embeddings,
+    metadatas=metadatas,
+    persist_directory=str(CHROMA_DIR)
+)
     print("[✅ SELESAI] Embedding tersimpan.")
 
 if __name__ == "__main__":

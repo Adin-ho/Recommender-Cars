@@ -13,7 +13,21 @@ APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
 DATA_CSV = APP_DIR / "data" / "data_mobil_final.csv"
 FRONTEND_DIR = ROOT_DIR / "frontend"
+CHROMA_DIR = Path(os.getenv("CHROMA_DIR", ROOT_DIR / "chroma"))
 
+if os.getenv("ENABLE_RAG", "0") == "1":
+    try:
+        from app.rag_qa import router as rag_qa_router
+        app.include_router(rag_qa_router)
+
+        if not CHROMA_DIR.exists():
+            print("[INIT] chroma belum ada → generate embedding ke:", CHROMA_DIR)
+            from app.embedding import simpan_vektor_mobil
+            simpan_vektor_mobil()
+        else:
+            print("[INIT] chroma sudah ada di:", CHROMA_DIR)
+    except Exception as e:
+        print("[INIT] ENABLE_RAG=1 tapi gagal load RAG:", e)
 app = FastAPI()
 
 # ===== CORS bebas untuk demo =====

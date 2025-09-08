@@ -2,10 +2,11 @@ import os
 import re
 import random
 from fastapi import APIRouter, Query
+from pathlib import Path
 
 os.environ["CUDA_VISIBLE_DEVICES"] = ""   # pastikan tidak pakai GPU/CUDA
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-PERSIST_DIR = os.getenv("CHROMA_DIR", "chroma")
+PERSIST_DIR = os.getenv("CHROMA_DIR", str(Path(__file__).resolve().parents[1] / "chroma"))
 # ===== Pilih embedding: Ollama (kalau ada) atau CPU (default) =====
 if os.getenv("USE_OLLAMA", "0") == "1":
     from langchain_ollama import OllamaEmbeddings as _Emb
