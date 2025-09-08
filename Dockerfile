@@ -2,7 +2,7 @@ FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends git curl && rm -rf /var/lib/apt/lists/*
 
-# === cache model di folder yang bisa ditulis ===
+# Cache model di lokasi yang bisa ditulis oleh Space
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     HF_HOME=/data/.cache/huggingface \
@@ -13,11 +13,11 @@ WORKDIR /code
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# siapkan folder cache yang writable
+# Pastikan folder cache ada & writable
 RUN mkdir -p $HF_HOME && chmod -R 777 /data
 
-# (opsional) prefetch model agar startup cepat
-RUN python - <<'PY'\nfrom sentence_transformers import SentenceTransformer\nSentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')\nPY
+# Prefetch model (hindari heredoc supaya tidak kena CRLF)
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
 
 COPY app ./app
 COPY frontend ./frontend
