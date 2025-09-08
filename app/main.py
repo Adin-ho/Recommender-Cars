@@ -10,14 +10,12 @@ APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
 DATA_CSV = APP_DIR / "data" / "data_mobil_final.csv"
 
-# >>> PENTING: simpan index ke folder yang writable di HF
+# Simpan Chroma di folder yang writable di HF
 CHROMA_DIR = Path(os.getenv("CHROMA_DIR", "/data/chroma"))
-
 FRONTEND_DIR = ROOT_DIR / "frontend"
 
 app = FastAPI(title="ChatCars API")
 
-# CORS longgar untuk demo
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -29,7 +27,6 @@ RAG_READY = False
 
 @app.on_event("startup")
 async def _startup():
-    """Bangun index Chroma otomatis (sekali saja)."""
     global RAG_READY
     try:
         from .embedding import ensure_chroma
@@ -45,31 +42,27 @@ async def _startup():
 def healthz():
     return {"ok": True, "rag_ready": RAG_READY, "chroma_dir": str(CHROMA_DIR)}
 
-# --------- Endpoint utama ----------
 @app.get("/cosine_rekomendasi")
 def cosine_rekomendasi(query: str = Query(..., min_length=1), top_k: int = 5):
-    """
-    Coba pakai RAG; kalau gagal → fallback ke rule-based
-    Output diseragamkan: {source: "...", items: [...]}
-    """
-    # 1) RAG
+    # 1) Coba RAG
     if RAG_READY:
         try:
             from .rag_qa import cosine_rekomendasi_rag
             items = cosine_rekomendasi_rag(
                 query=query, top_k=top_k, csv_path=DATA_CSV, persist_dir=CHROMA_DIR
             )
-            return {"source": "rag", "items": items}
+            # <-- sesuai ekspektasi frontend
+            return {"source": "rag", "rekomendasi": items}
         except Exception as e:
-            print(f"[RAG] error: {e}")  # lanjut ke fallback
+            print(f"[RAG] error: {e}")
 
-    # 2) Fallback rule-based (selalu ada jawaban)
+    # 2) Fallback rule-based (tetap kasih jawaban)
     try:
         from .rule_based import rekomendasi_rule_based
         items = rekomendasi_rule_based(query=query, csv_path=DATA_CSV, top_k=top_k)
-        return {"source": "rule_based", "items": items}
+        return {"source": "rule_based", "rekomendasi": items}
     except Exception as e:
         return JSONResponse({"error": f"Gagal memproses query: {e}"}, status_code=400)
 
-# ---- Terakhir: mount frontend (supaya API tidak ketutup) ----
+# Mount static TERAKHIR supaya route API tidak ketutup oleh file statis
 app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
