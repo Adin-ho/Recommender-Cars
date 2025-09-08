@@ -45,7 +45,12 @@
       }, 200);
 
       try {
-        const response = await fetch(`/cosine_rekomendasi?query=${encodeURIComponent(q)}`)
+        const res = await fetch(`/cosine_rekomendasi?query=${encodeURIComponent(text)}`);
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(err);
+        }
+
         const data = await response.json();
         clearInterval(loading);
 
