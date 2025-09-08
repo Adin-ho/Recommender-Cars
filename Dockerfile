@@ -1,27 +1,27 @@
 FROM python:3.11-slim
 
-# Paket sistem minimum agar pip build lancar
-RUN apt-get update && apt-get install -y build-essential git && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends git curl && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+# === cache model di folder yang bisa ditulis ===
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    HF_HOME=/data/.cache/huggingface \
+    TRANSFORMERS_CACHE=/data/.cache/huggingface
 
-# Install dependencies
+WORKDIR /code
+
 COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Env: RAG CPU + cache model + port Spaces
-ENV HF_HOME=/root/.cache/huggingface \
-    TRANSFORMERS_CACHE=/root/.cache/huggingface \
-    SENTENCE_TRANSFORMERS_HOME=/root/.cache/huggingface \
-    ENABLE_RAG=1 \
-    USE_OLLAMA=0 \
-    PORT=7860
+# siapkan folder cache yang writable
+RUN mkdir -p $HF_HOME && chmod -R 777 /data
 
-# Salin source code
-COPY . .
+# (opsional) prefetch model agar startup cepat
+RUN python - <<'PY'\nfrom sentence_transformers import SentenceTransformer\nSentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')\nPY
 
-# Pre-build index Chroma saat build (biar startup cepat)
-RUN python -m app.embedding
+COPY app ./app
+COPY frontend ./frontend
 
+ENV PORT=7860 ENABLE_RAG=1
 EXPOSE 7860
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD uvicorn app.main:app --host 0.0.0.0 --port $PORT
