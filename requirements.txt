@@ -1,11 +1,16 @@
-fastapi
-uvicorn[standard]
-pandas
-numpy
-tqdm
-sentence-transformers
-transformers
-torch
-chromadb
-langchain-community
-langchain-chroma
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+pandas==2.3.2
+
+# LangChain + Chroma
+langchain-community==0.3.29
+langchain-chroma==0.2.5
+chromadb==1.0.20
+
+# Embedding stack (CPU only, tanpa CUDA)
+sentence-transformers==2.7.0
+transformers==4.45.2
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.4.1+cpu
+
+tqdm==4.66.4

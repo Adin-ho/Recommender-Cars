@@ -3,6 +3,8 @@ import re
 import random
 from fastapi import APIRouter, Query
 
+os.environ["CUDA_VISIBLE_DEVICES"] = ""   # pastikan tidak pakai GPU/CUDA
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 PERSIST_DIR = os.getenv("CHROMA_DIR", "chroma")
 # ===== Pilih embedding: Ollama (kalau ada) atau CPU (default) =====
 if os.getenv("USE_OLLAMA", "0") == "1":
