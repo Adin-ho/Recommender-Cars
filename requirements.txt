@@ -1,10 +1,11 @@
 fastapi
 uvicorn[standard]
 pandas
-requests
-aiofiles
-python-multipart
-chromadb
-langchain-chroma
-langchain-community
+numpy
+tqdm
 sentence-transformers
+transformers
+torch
+chromadb
+langchain-community
+langchain-chroma
