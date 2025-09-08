@@ -1,88 +1,115 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ChatCars</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
 </head>
-<body class="bg-gray-100 flex flex-col items-center h-screen p-4">
-  <div class="flex flex-col w-full max-w-2xl bg-white shadow-lg rounded-lg p-6 h-full gap-2">
-    <h1 class="text-2xl font-bold text-center text-blue-600 mb-4">🚗 ChatCars: Rekomendasi Mobil</h1>
-    <div id="chatBox" class="flex-1 min-h-0 overflow-y-auto p-4 border rounded bg-gray-50 text-sm"></div>
-    <div class="flex space-x-2">
+<body class="bg-gray-100 flex flex-col items-center min-h-screen p-4">
+  <div class="flex flex-col w-full max-w-2xl bg-white shadow-lg rounded-lg p-6 h-full gap-3">
+    <h1 class="text-2xl font-bold text-center text-blue-600">🚗 ChatCars: Rekomendasi Mobil</h1>
+
+    <div id="chatBox" class="flex-1 min-h-0 overflow-y-auto p-4 border rounded bg-gray-50 text-sm space-y-2"></div>
+
+    <div class="flex gap-2">
       <input id="pertanyaan" type="text" placeholder="Tanyakan sesuatu tentang mobil..."
-        class="flex-grow px-4 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"/>
-      <button onclick="kirimPertanyaan()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Kirim</button>
+        class="flex-1 px-4 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"/>
+      <button id="btnKirim" type="button"
+        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Kirim</button>
     </div>
   </div>
+
   <script>
+    const input   = document.getElementById("pertanyaan");
+    const chatBox = document.getElementById("chatBox");
+    const btn     = document.getElementById("btnKirim");
+
+    function addMsg(text, side = "left", isHtml = false) {
+      const div = document.createElement("div");
+      div.className = (side === "right" ? "text-right text-blue-600" : "text-left text-gray-800") + " whitespace-pre-wrap";
+      if (isHtml) div.innerHTML = text; else div.textContent = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return div;
+    }
+
+    function formatItem(row, i) {
+      const nama   = row.nama_mobil || row.nama || "-";
+      const merek  = row.merek || "";
+      const tahun  = row.tahun || "";
+      const transm = row.transmisi || row.transmision || "-";
+      const bb     = row.bahan_bakar || row.bbm || "-";
+      const harga  = row.harga || "-";
+      const score  = row.score ?? row.cosine_score;
+
+      return `
+        <div class="mb-3 p-3 rounded bg-gray-50 border">
+          <div class="font-semibold">${i+1}. ${nama}${tahun ? ` (${tahun})` : ""}</div>
+          <div class="text-xs text-gray-600">${merek ? `Merek: <b>${merek}</b> • ` : ""}Transmisi: <b>${transm}</b> • Bahan bakar: <b>${bb}</b></div>
+          <div>Harga: <b>${harga}</b>${score != null ? ` • Skor: <b>${Number(score).toFixed(3)}</b>` : ""}</div>
+        </div>`;
+    }
+
     async function kirimPertanyaan() {
-      const input = document.getElementById("pertanyaan");
-      const chatBox = document.getElementById("chatBox");
-      const pesan = input.value.trim();
+      const pesan = (input.value || "").trim();
       if (!pesan) return;
 
-      // User message
-      const userMsg = document.createElement("div");
-      userMsg.className = "text-right text-blue-600 font-medium";
-      userMsg.textContent = "👤 " + pesan;
-      chatBox.appendChild(userMsg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-
+      // tampilkan pesan user
+      addMsg("👤 " + pesan, "right");
       input.value = "";
       input.disabled = true;
+      btn.disabled = true;
 
-      // Bot message container
-      const botMsg = document.createElement("div");
-      botMsg.className = "text-left text-gray-800 whitespace-pre-wrap";
-      chatBox.appendChild(botMsg);
-
-      // Loading animation
-      let loading = setInterval(() => {
-        botMsg.textContent += ".";
-        if (botMsg.textContent.length > 8) botMsg.textContent = "🤖";
-      }, 200);
+      // placeholder bot + animasi loading sederhana
+      const botDiv = addMsg("🤖", "left");
+      const dots = ["", ".", "..", "..."];
+      let di = 0;
+      const timer = setInterval(() => {
+        botDiv.textContent = "🤖" + dots[di++ % dots.length];
+      }, 300);
 
       try {
+        // PENTING: relative path → backend Space
         const response = await fetch(`/cosine_rekomendasi?query=${encodeURIComponent(pesan)}`);
-        if (!res.ok) {
-          const err = await res.text();
-          throw new Error(err);
+        if (!response.ok) {
+          const errText = await response.text();
+          throw new Error(errText || `HTTP ${response.status}`);
         }
 
         const data = await response.json();
-        clearInterval(loading);
+        clearInterval(timer);
 
-        if (data && data.rekomendasi && data.rekomendasi.length > 0) {
-          let hasil = "";
-          data.rekomendasi.forEach((row, i) => {
-            hasil += `<div class="mb-3 p-2 rounded bg-gray-50 border">
-              <b>${i+1}. ${row.nama_mobil} (${row.tahun})</b><br>
-              <span class="text-xs">Skor: <b>${row.cosine_score}</b></span><br>
-              Harga: <b>${row.harga}</b><br>
-              Usia: <b>${row.usia} tahun</b><br>
-              Bahan Bakar: ${row.bahan_bakar}<br>
-              Transmisi: ${row.transmisi}<br>
-              Kapasitas Mesin: ${row.kapasitas_mesin}<br>
-            </div>`;
-          });
-          botMsg.innerHTML = "🤖<b> Rekomendasi berdasarkan Cosine Similarity:</b><br><br>" + hasil;
-        } else {
-          botMsg.innerHTML = "🤖 Maaf, tidak ditemukan mobil yang sesuai dari pencarian cosine similarity.";
+        if (data && data.error) {
+          botDiv.textContent = "❌ " + String(data.error);
+          return;
         }
-      } catch (err) {
-        clearInterval(loading);
-        botMsg.textContent += "\n❌ Gagal mengambil jawaban.";
+
+        const list = data?.rekomendasi ?? data?.items ?? [];
+        if (!Array.isArray(list) || list.length === 0) {
+          botDiv.textContent = "🤖 Maaf, tidak ditemukan mobil yang sesuai.";
+          return;
+        }
+
+        // render hasil
+        let html = `<div class="mb-2"><b>🤖 Rekomendasi (${data?.source || "rule_based"})</b></div>`;
+        list.forEach((row, i) => { html += formatItem(row, i); });
+        botDiv.innerHTML = html;
+      } catch (e) {
+        clearInterval(timer);
+        botDiv.textContent = "❌ Gagal mengambil jawaban. " + (e?.message || "");
+        console.error(e);
       } finally {
         input.disabled = false;
+        btn.disabled = false;
         input.focus();
         chatBox.scrollTop = chatBox.scrollHeight;
       }
     }
 
-    document.getElementById("pertanyaan").addEventListener("keypress", function (e) {
-      if (e.key === "Enter") kirimPertanyaan();
+    btn.addEventListener("click", kirimPertanyaan);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); kirimPertanyaan(); }
     });
   </script>
 </body>

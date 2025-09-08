@@ -44,25 +44,13 @@ def healthz():
 
 @app.get("/cosine_rekomendasi")
 def cosine_rekomendasi(query: str = Query(..., min_length=1), top_k: int = 5):
-    # 1) Coba RAG
     if RAG_READY:
         try:
             from .rag_qa import cosine_rekomendasi_rag
-            items = cosine_rekomendasi_rag(
-                query=query, top_k=top_k, csv_path=DATA_CSV, persist_dir=CHROMA_DIR
-            )
-            # <-- sesuai ekspektasi frontend
+            items = cosine_rekomendasi_rag(query=query, top_k=top_k, csv_path=DATA_CSV, persist_dir=CHROMA_DIR)
             return {"source": "rag", "rekomendasi": items}
         except Exception as e:
             print(f"[RAG] error: {e}")
-
-    # 2) Fallback rule-based (tetap kasih jawaban)
-    try:
-        from .rule_based import rekomendasi_rule_based
-        items = rekomendasi_rule_based(query=query, csv_path=DATA_CSV, top_k=top_k)
-        return {"source": "rule_based", "rekomendasi": items}
-    except Exception as e:
-        return JSONResponse({"error": f"Gagal memproses query: {e}"}, status_code=400)
-
-# Mount static TERAKHIR supaya route API tidak ketutup oleh file statis
-app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
+    from .rule_based import rekomendasi_rule_based
+    items = rekomendasi_rule_based(query=query, csv_path=DATA_CSV, top_k=top_k)
+    return {"source": "rule_based", "rekomendasi": items}
