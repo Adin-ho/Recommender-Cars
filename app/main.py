@@ -44,6 +44,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.post("/admin/rebuild_chroma")
+def rebuild_chroma():
+    try:
+        CHROMA_DIR = Path(os.getenv("CHROMA_DIR", ROOT_DIR / "chroma"))
+        # bersihkan folder index lama (aman karena akan diisi ulang)
+        if CHROMA_DIR.exists():
+            for p in CHROMA_DIR.glob("*"):
+                if p.is_file(): p.unlink()
+        from app.embedding import simpan_vektor_mobil
+        simpan_vektor_mobil()
+        return JSONResponse({"ok": True, "dir": str(CHROMA_DIR)})
+    except Exception as e:
+        return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
 
 # ===== Layani frontend =====
 app.mount("/frontend", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
