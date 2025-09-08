@@ -133,7 +133,7 @@ if os.getenv("ENABLE_RAG", "0") == "1":
         app.include_router(rag_qa_router)
 
         # Auto-bangun index Chroma kalau belum ada
-        CHROMA_DIR = ROOT_DIR / "chroma"
+        CHROMA_DIR = Path(os.getenv("CHROMA_DIR", ROOT_DIR / "chroma"))
         if not CHROMA_DIR.exists():
             print("[INIT] chroma/ belum ada → generate embedding...")
             from app.embedding import simpan_vektor_mobil

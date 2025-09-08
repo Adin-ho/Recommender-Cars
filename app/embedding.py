@@ -5,9 +5,9 @@ import json
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 
+CHROMA_DIR = Path(os.getenv("CHROMA_DIR", ROOT_DIR / "chroma"))
 ROOT_DIR = Path(__file__).resolve().parents[1]
 DATA_CSV = ROOT_DIR / "app" / "data" / "data_mobil_final.csv"
-CHROMA_DIR = ROOT_DIR / "chroma"
 
 def simpan_vektor_mobil():
     print("[INFO] Membaca dataset:", DATA_CSV)

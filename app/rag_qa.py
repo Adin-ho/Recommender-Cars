@@ -3,6 +3,7 @@ import re
 import random
 from fastapi import APIRouter, Query
 
+PERSIST_DIR = os.getenv("CHROMA_DIR", "chroma")
 # ===== Pilih embedding: Ollama (kalau ada) atau CPU (default) =====
 if os.getenv("USE_OLLAMA", "0") == "1":
     from langchain_ollama import OllamaEmbeddings as _Emb
@@ -39,9 +40,9 @@ async def cosine_rekomendasi(
     exclude: str = Query("", description="Nama mobil yang sudah direkomendasikan, pisahkan koma")
 ):
     vector_store = Chroma(
-        persist_directory="chroma",
-        embedding_function=EMBEDDINGS,
-    )
+    persist_directory=PERSIST_DIR,
+    embedding_function=EMBEDDINGS,
+)
     result_list = vector_store.similarity_search_with_score(query, k=150)
 
     q_lc = query.lower()
