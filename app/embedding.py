@@ -5,15 +5,11 @@ from sentence_transformers import SentenceTransformer
 import chromadb
 
 def ensure_chroma(csv_path: Path, persist_dir: Path, collection_name: str = "cars"):
-    """
-    Buat index Chroma di persist_dir jika belum ada. Aman dipanggil berulang.
-    """
     persist_dir = Path(persist_dir)
     persist_dir.mkdir(parents=True, exist_ok=True)
 
     client = chromadb.PersistentClient(path=str(persist_dir))
     coll = client.get_or_create_collection(name=collection_name, metadata={"hnsw:space": "cosine"})
-
     if coll.count() > 0:
         return coll
 

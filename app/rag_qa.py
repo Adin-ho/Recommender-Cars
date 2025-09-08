@@ -5,10 +5,6 @@ import chromadb
 from sentence_transformers import SentenceTransformer
 
 def cosine_rekomendasi_rag(query: str, top_k: int, csv_path: Path, persist_dir: Path) -> List[Dict[str, Any]]:
-    """
-    Query ke koleksi Chroma 'cars' pakai embedding MiniLM.
-    Return list of metadata dokumen (mobil) dengan skor.
-    """
     client = chromadb.PersistentClient(path=str(Path(persist_dir)))
     coll = client.get_or_create_collection(name="cars", metadata={"hnsw:space": "cosine"})
     model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
@@ -20,6 +16,6 @@ def cosine_rekomendasi_rag(query: str, top_k: int, csv_path: Path, persist_dir: 
     results = []
     for m, d in zip(metas, dists):
         item = dict(m) if isinstance(m, dict) else {}
-        item["score"] = 1 - float(d)  # cosine similarity approx
+        item["score"] = 1 - float(d)  # approx cosine similarity
         results.append(item)
     return results

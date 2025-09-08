@@ -3,18 +3,21 @@ from pathlib import Path
 import os
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
 DATA_CSV = APP_DIR / "data" / "data_mobil_final.csv"
+
+# >>> PENTING: simpan index ke folder yang writable di HF
+CHROMA_DIR = Path(os.getenv("CHROMA_DIR", "/data/chroma"))
+
 FRONTEND_DIR = ROOT_DIR / "frontend"
-CHROMA_DIR = ROOT_DIR / "chroma"   # di-ignore dari git
 
 app = FastAPI(title="ChatCars API")
 
-# CORS (aman utk demo / Space)
+# CORS longgar untuk demo
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,51 +25,51 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve frontend statis di root "/"
-app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
-
 RAG_READY = False
 
 @app.on_event("startup")
-async def build_index_if_needed():
-    """Bangun index Chroma otomatis saat start (sekali saja)."""
+async def _startup():
+    """Bangun index Chroma otomatis (sekali saja)."""
     global RAG_READY
     try:
         from .embedding import ensure_chroma
+        CHROMA_DIR.mkdir(parents=True, exist_ok=True)
         ensure_chroma(csv_path=DATA_CSV, persist_dir=CHROMA_DIR)
         RAG_READY = True
-        print("[INIT] RAG index ready")
+        print(f"[INIT] RAG index ready at {CHROMA_DIR}")
     except Exception as e:
         RAG_READY = False
-        print(f"[INIT] ENABLE_RAG=1 tapi gagal init RAG: {e}")
+        print(f"[INIT] RAG disabled: {e}")
 
 @app.get("/healthz")
 def healthz():
-    return {"ok": True, "rag_ready": RAG_READY}
+    return {"ok": True, "rag_ready": RAG_READY, "chroma_dir": str(CHROMA_DIR)}
 
-# ---- Endpoint rekomendasi ----
-
+# --------- Endpoint utama ----------
 @app.get("/cosine_rekomendasi")
-def api_cosine_rekomendasi(query: str = Query(..., min_length=1), top_k: int = 5):
+def cosine_rekomendasi(query: str = Query(..., min_length=1), top_k: int = 5):
     """
-    Coba pakai RAG (Chroma). Jika tidak siap / error → fallback ke rule-based.
-    Response diseragamkan: {source: "rag"|"rule_based", items: [...]}
+    Coba pakai RAG; kalau gagal → fallback ke rule-based
+    Output diseragamkan: {source: "...", items: [...]}
     """
-    # 1) Coba RAG
+    # 1) RAG
     if RAG_READY:
         try:
             from .rag_qa import cosine_rekomendasi_rag
-            items = cosine_rekomendasi_rag(query, top_k=top_k, csv_path=DATA_CSV, persist_dir=CHROMA_DIR)
+            items = cosine_rekomendasi_rag(
+                query=query, top_k=top_k, csv_path=DATA_CSV, persist_dir=CHROMA_DIR
+            )
             return {"source": "rag", "items": items}
         except Exception as e:
-            # catat & teruskan ke fallback
-            print(f"[RAG] error: {e}")
+            print(f"[RAG] error: {e}")  # lanjut ke fallback
 
-    # 2) Fallback rule-based (SELALU ada jawaban)
+    # 2) Fallback rule-based (selalu ada jawaban)
     try:
         from .rule_based import rekomendasi_rule_based
-        items = rekomendasi_rule_based(query, csv_path=DATA_CSV, top_k=top_k)
+        items = rekomendasi_rule_based(query=query, csv_path=DATA_CSV, top_k=top_k)
         return {"source": "rule_based", "items": items}
     except Exception as e:
-        # supaya frontend tidak hanya "gagal mengambil jawaban" tanpa info
         return JSONResponse({"error": f"Gagal memproses query: {e}"}, status_code=400)
+
+# ---- Terakhir: mount frontend (supaya API tidak ketutup) ----
+app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
