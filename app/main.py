@@ -17,13 +17,19 @@ FRONTEND_DIR = ROOT_DIR / "frontend"
 app = FastAPI()
 
 # ===== CORS bebas untuk demo =====
+@app.get("/health")
+def health():
+    return {"ok": True}
+
+# batasi asal CORS (ganti dengan domain kamu)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://recommender-cars.up.railway.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # ===== Layani frontend =====
 app.mount("/frontend", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
