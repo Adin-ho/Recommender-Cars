@@ -4,10 +4,40 @@ import pandas as pd
 import json
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
+from sentence_transformers import SentenceTransformer
+import chromadb
+
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 DATA_CSV = ROOT_DIR / "app" / "data" / "data_mobil_final.csv"
 CHROMA_DIR = ROOT_DIR / "chroma"
+
+def ensure_chroma(csv_path: Path, persist_dir: Path, collection_name: str = "cars"):
+    persist_dir = Path(persist_dir)
+    persist_dir.mkdir(parents=True, exist_ok=True)
+
+    client = chromadb.PersistentClient(path=str(persist_dir))
+    coll = client.get_or_create_collection(name=collection_name, metadata={"hnsw:space": "cosine"})
+    if coll.count() > 0:
+        return coll
+
+    df = pd.read_csv(csv_path)
+    texts = [
+        " | ".join(map(str, [
+            row.get("nama_mobil",""),
+            row.get("merek",""),
+            row.get("tahun",""),
+            row.get("transmisi",""),
+            row.get("bahan_bakar",""),
+            row.get("harga",""),
+        ]))
+        for _, row in df.iterrows()
+    ]
+    ids = [f"id-{i}" for i in range(len(texts))]
+    model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+    embs = model.encode(texts, show_progress_bar=True, batch_size=64).tolist()
+    coll.add(documents=texts, embeddings=embs, ids=ids, metadatas=df.to_dict(orient="records"))
+    return coll
 
 def simpan_vektor_mobil():
     print("[INFO] Membaca dataset:", DATA_CSV)

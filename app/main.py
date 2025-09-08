@@ -13,17 +13,41 @@ APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
 DATA_CSV = APP_DIR / "data" / "data_mobil_final.csv"
 FRONTEND_DIR = ROOT_DIR / "frontend"
+CHROMA_DIR = ROOT_DIR / "chroma"   # ini di-IGNORE
 
 app = FastAPI()
+app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
 
-# ===== CORS bebas untuk demo =====
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+RAG_READY = False
+
+@app.on_event("startup")
+async def _startup():
+    global RAG_READY
+    try:
+        from .embedding import ensure_chroma
+        ensure_chroma(DATA_CSV, CHROMA_DIR)
+        RAG_READY = True
+        print("[INIT] RAG index ready")
+    except Exception as e:
+        RAG_READY = False
+        print(f"[INIT] RAG disabled: {e}")
+
+@app.get("/healthz")
+def healthz():
+    return {"ok": True, "rag_ready": RAG_READY}
+
+# Contoh endpoint rekomendasi (sesuaikan dengan punyamu)
+from app.rule_based import rekomendasi_rule_based  # kalau ada
+
+@app.get("/cosine_rekomendasi")
+def cosine_rekomendasi(query: str = Query(..., min_length=1)):
+    try:
+        # TODO: panggil fungsi pencarian RAG kamu di sini.
+        # Kalau belum ada, fallback ke rule-based supaya ada jawaban:
+        return {"jawaban": rekomendasi_rule_based(query)}
+    except Exception as e:
+        # jangan 500 ke frontend; kirim error jelas
+        return JSONResponse({"error": str(e)}, status_code=400)
 
 # ===== Layani frontend =====
 app.mount("/frontend", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
