@@ -1,7 +1,7 @@
 import os, re, json
 from pathlib import Path
-from tqdm import tqdm
 import pandas as pd
+from tqdm import tqdm
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 
@@ -18,9 +18,8 @@ def _harga_int(s):
     return int(m) if m else 0
 
 def simpan_vektor_mobil():
-    print("[INFO] Membaca dataset:", DATA_CSV)
+    print("[INFO] Membaca:", DATA_CSV)
     df = pd.read_csv(DATA_CSV)
-
     wajib = ['Nama Mobil','Harga','Tahun','Usia','Bahan Bakar','Transmisi','Kapasitas Mesin']
     for c in wajib:
         if c not in df.columns:
@@ -39,10 +38,9 @@ def simpan_vektor_mobil():
 
         texts.append(f"{nama} ({tahun}), {bb}, {trans}, harga {harga}, usia {usia} tahun, kapasitas {cc}")
         metas.append({
-            "nama_mobil": nama, "tahun": tahun,
-            "harga": harga, "harga_angka": harga_angka,
-            "usia": usia, "bahan_bakar": bb,
-            "transmisi": trans, "kapasitas_mesin": cc,
+            "nama_mobil": nama, "tahun": tahun, "harga": harga,
+            "harga_angka": harga_angka, "usia": usia,
+            "bahan_bakar": bb, "transmisi": trans, "kapasitas_mesin": cc,
             "merek": (nama.split()[0] if nama else "").lower(),
         })
 

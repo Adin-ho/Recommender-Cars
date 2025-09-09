@@ -25,7 +25,6 @@ def _i(x, d=0):
 
 def _parse_query(q:str):
     ql = q.lower()
-    # harga: "300 juta" atau angka panjang
     harga_target = None
     if m := re.search(r"(\d{2,4})\s*juta", ql): harga_target = int(m.group(1))*1_000_000
     elif m := re.search(r"(\d{9,12})", ql.replace(".","")): harga_target = int(m.group(1))
@@ -76,7 +75,7 @@ async def cosine_rekomendasi(
             "cosine_score": round(float(score), 4),
         }
 
-        # filter longgar: hanya terapkan kalau metadata-nya ada
+        # filter longgar (hanya kalau metadata ada)
         if fuel and row["bahan_bakar"] and fuel not in row["bahan_bakar"]: continue
         if trans and row["transmisi"] and trans != row["transmisi"]: continue
         if brand and row["merek"] and brand not in row["merek"]: continue
@@ -100,7 +99,7 @@ async def cosine_rekomendasi(
     random.shuffle(cad2)
 
     hasil = (utama + cad1 + cad2)[:k]
-    if not hasil and raw:
+    if not hasil and raw:  # Fallback: jangan pernah kosong
         hasil = [{
             "nama_mobil": (d.metadata or {}).get("nama_mobil","-"),
             "tahun": _i((d.metadata or {}).get("tahun",0)),

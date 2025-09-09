@@ -14,20 +14,17 @@ CHROMA_DIR   = Path(os.getenv("CHROMA_DIR", ROOT_DIR / "chroma"))
 
 app = FastAPI()
 
-# CORS longgar biar gampang tes
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["*"], allow_credentials=True,
+    allow_methods=["*"], allow_headers=["*"],
 )
 
-# ==== ROUTER RAG (selalu di-mount)
+# Mount router RAG SELALU
 from app.rag_qa import router as rag_router
 app.include_router(rag_router)
 
-# Auto-bangun index kalau kosong
+# Auto-build index jika kosong
 if not CHROMA_DIR.exists() or not any(CHROMA_DIR.glob("*")):
     print("[INIT] Chroma kosong → generate embedding…")
     from app.embedding import simpan_vektor_mobil
@@ -35,7 +32,7 @@ if not CHROMA_DIR.exists() or not any(CHROMA_DIR.glob("*")):
 else:
     print(f"[INIT] Chroma sudah ada di: {CHROMA_DIR}")
 
-# ==== Frontend
+# Frontend
 app.mount("/frontend", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
 
 @app.get("/")
@@ -46,7 +43,7 @@ def root():
 def health():
     return {"ok": True}
 
-# ==== Admin: rebuild index bersih
+# Admin rebuild
 @app.post("/admin/rebuild_chroma")
 def rebuild_chroma():
     try:
@@ -58,7 +55,7 @@ def rebuild_chroma():
     except Exception as e:
         return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
 
-# ==== Endpoint debug kecil
+# Debug
 @app.get("/debug/chroma")
 def debug_chroma():
     CHROMA_DIR.mkdir(parents=True, exist_ok=True)
@@ -83,69 +80,44 @@ def dataset_stats():
     brands = df["Nama Mobil"].astype(str).str.split().str[0].str.lower().value_counts().head(15).to_dict() if "Nama Mobil" in df.columns else {}
     return {"rows": len(df), "fuels": fuels, "top_brands": brands}
 
-# ==== (opsional) Rule-based bawaan untuk endpoint /jawab
+# (opsional) rule-based ringan untuk /jawab
 data_mobil = pd.read_csv(DATA_CSV)
 data_mobil.columns = data_mobil.columns.str.strip().str.lower()
 if "harga_angka" not in data_mobil.columns:
     def _harga(h):
         if pd.isna(h): return 0
-        s = str(h)
-        m = re.sub(r"\D", "", s)
-        return int(m) if m else 0
+        s = re.sub(r"\D", "", str(h))
+        return int(s) if s else 0
     data_mobil["harga_angka"] = data_mobil["harga"].apply(_harga)
 
-def _bersih_nama(nama: str, tahun: int) -> str:
-    nama = re.sub(r"\s*\(\d{4}\)$", "", str(nama).strip().lower())
-    return f"{nama} ({tahun})"
-
-def _unique(output: str) -> str:
-    found = re.findall(r"([a-z0-9 .\-]+)\s*\((\d{4})\)", output.lower())
-    seen, cars = set(), []
-    for n,t in found:
-        key = f"{n.strip()} ({t})"
-        if key not in seen:
-            seen.add(key); cars.append(key)
-    return "; ".join(cars)
+def _bersih_nama(n, t): 
+    import re
+    n = re.sub(r"\s*\(\d{4}\)$", "", str(n).strip().lower()); 
+    return f"{n} ({t})"
 
 @app.get("/jawab", response_class=PlainTextResponse)
 def jawab(pertanyaan: str, exclude: str = ""):
-    q = pertanyaan.lower()
-    hasil = data_mobil.copy()
-    thn_now = 2025
-
+    import re
+    q = pertanyaan.lower(); thn_now = 2025
+    df = data_mobil.copy()
     if m := re.search(r"usia (?:di bawah|kurang dari) (\d+)\s*tahun", q):
-        hasil = hasil[hasil["tahun"] >= thn_now - int(m.group(1))]
-    if "matic" in q and "manual" not in q:
-        hasil = hasil[hasil["transmisi"].str.contains("matic", case=False, na=False)]
-    if "manual" in q and "matic" not in q:
-        hasil = hasil[hasil["transmisi"].str.contains("manual", case=False, na=False)]
+        df = df[df["tahun"] >= thn_now - int(m.group(1))]
+    if "matic" in q and "manual" not in q:   df = df[df["transmisi"].str.contains("matic", case=False, na=False)]
+    if "manual" in q and "matic" not in q:   df = df[df["transmisi"].str.contains("manual", case=False, na=False)]
     for bb in ["diesel","bensin","hybrid","listrik"]:
-        if bb in q:
-            hasil = hasil[hasil["bahan bakar"].str.contains(bb, case=False, na=False)]
+        if bb in q: df = df[df["bahan bakar"].str.contains(bb, case=False, na=False)]
     if m := re.search(r"(?:di bawah|max(?:imal)?|<=?) ?rp? ?(\d[\d\.]*)", q):
-        hasil = hasil[hasil["harga_angka"] <= int(m.group(1).replace(".",""))]
-    if m := re.search(r"tahun (\d{4}) ke atas", q):
-        hasil = hasil[hasil["tahun"] >= int(m.group(1))]
-    if m := re.search(r"tahun (?:di bawah|kurang dari) (\d{4})", q):
-        hasil = hasil[hasil["tahun"] < int(m.group(1))]
-    if "irit" in q or "hemat" in q:
-        hasil = hasil[hasil["bahan bakar"].str.contains("bensin|hybrid", case=False, na=False)]
+        df = df[df["harga_angka"] <= int(m.group(1).replace(".",""))]
+    if m := re.search(r"tahun (\d{4}) ke atas", q): df = df[df["tahun"] >= int(m.group(1))]
+    if m := re.search(r"tahun (?:di bawah|kurang dari) (\d{4})", q): df = df[df["tahun"] < int(m.group(1))]
+    if df.empty: return "tidak ditemukan"
+    return "; ".join(_bersih_nama(r["nama mobil"], r["tahun"]) for _, r in df.head(5).iterrows())
 
-    ex = [x.strip().lower() for x in exclude.split(",") if x.strip()]
-    if ex:
-        hasil = hasil[~hasil["nama mobil"].str.lower().isin(ex)]
-
-    if hasil.empty:
-        return "tidak ditemukan"
-    out = "; ".join(_bersih_nama(r["nama mobil"], r["tahun"]) for _,r in hasil.head(5).iterrows())
-    return _unique(out)
-
-# ==== SSE demo (opsional)
 @app.get("/stream")
 async def stream(pertanyaan: str, exclude: str = ""):
     text = jawab(pertanyaan, exclude)
     async def _gen():
         for w in text.split():
-            yield f"data: {w}\n\n"
+            yield f"data: {w}\n\n"; 
             await asyncio.sleep(0.06)
     return StreamingResponse(_gen(), media_type="text/event-stream")
