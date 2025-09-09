@@ -1,33 +1,47 @@
+# app/main.py
 import os
 import re
 import asyncio
 from pathlib import Path
+from typing import List
+
 import pandas as pd
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import PlainTextResponse, FileResponse, JSONResponse, StreamingResponse
+from fastapi.responses import (
+    PlainTextResponse,
+    FileResponse,
+    StreamingResponse,
+    JSONResponse,
+)
 from fastapi.staticfiles import StaticFiles
 
-# ---------- PATH ----------
+# ===================== Paths & Config =====================
 APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
-DATA_CSV = APP_DIR / "data" / "data_mobil_final.csv"
 FRONTEND_DIR = ROOT_DIR / "frontend"
-CHROMA_DIR = Path(os.getenv("CHROMA_DIR", ROOT_DIR / "chroma"))
+DATA_CSV = APP_DIR / "data" / "data_mobil_final.csv"
+
+# Chroma path: pakai ENV kalau ada, fallback ke ./chroma
+CHROMA_DIR = Path(os.getenv("CHROMA_DIR", ROOT_DIR / "chroma")).resolve()
 COLLECTION_NAME = os.getenv("CHROMA_COLLECTION", "cars")
 
-app = FastAPI()
+# Domain asal front-end (kalau domainmu beda, tambah di sini—atau biarkan '*' saja)
+ALLOWED_ORIGINS: List[str] = ["*"]
 
-# ---------- CORS ----------
+# ===================== FastAPI App =====================
+app = FastAPI(title="ChatCars")
+
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # sesuaikan jika mau dikunci
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ---------- STATIC ----------
+# Layani folder frontend dan jadikan "/" = index.html
 app.mount("/frontend", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
 
 @app.get("/")
@@ -38,23 +52,28 @@ def root():
 def health():
     return {"ok": True}
 
-# ---------- DATASET ----------
+# ===================== Dataset & Rule-based =====================
+if not DATA_CSV.exists():
+    raise FileNotFoundError(f"CSV data tidak ditemukan: {DATA_CSV}")
+
 data_mobil = pd.read_csv(DATA_CSV)
+# normalisasi nama kolom
 data_mobil.columns = data_mobil.columns.str.strip().str.lower()
 
+# kolom bantu: harga_angka
 if "harga_angka" not in data_mobil.columns:
-    def _clean_harga(h):
-        if pd.isna(h): return 0
+    def _bersihkan_harga(h):
+        if pd.isna(h):
+            return 0
         s = str(h)
-        return int(re.sub(r"\D", "", s)) if re.search(r"\d", s) else 0
-    data_mobil["harga_angka"] = data_mobil["harga"].apply(_clean_harga)
+        digits = re.sub(r"\D", "", s)
+        return int(digits) if digits else 0
+    if "harga" in data_mobil.columns:
+        data_mobil["harga_angka"] = data_mobil["harga"].apply(_bersihkan_harga)
+    else:
+        data_mobil["harga_angka"] = 0
 
-# ---------- RULE-BASED ----------
-def _bersih_nama(nama: str, tahun: int) -> str:
-    nama = re.sub(r"\s*\(\d{4}\)$", "", str(nama).strip().lower())
-    return f"{nama} ({tahun})"
-
-def unique_cars(output: str) -> str:
+def _unique_cars(output: str) -> str:
     found = re.findall(r"([a-z0-9 .\-]+)\s*\((\d{4})\)", output.lower())
     seen, cars = set(), []
     for n, t in found:
@@ -64,6 +83,10 @@ def unique_cars(output: str) -> str:
             cars.append(key)
     return "; ".join(cars)
 
+def _bersih_nama(nama: str, tahun: int) -> str:
+    nama = re.sub(r"\s*\(\d{4}\)$", "", str(nama).strip().lower())
+    return f"{nama} ({tahun})"
+
 @app.get("/jawab", response_class=PlainTextResponse)
 def jawab(pertanyaan: str, exclude: str = ""):
     hasil = data_mobil.copy()
@@ -72,82 +95,98 @@ def jawab(pertanyaan: str, exclude: str = ""):
 
     # usia
     m_usia = re.search(r"usia (?:di bawah|kurang dari) (\d+)\s*tahun", q)
-    if m_usia:
+    if m_usia and "tahun" in hasil.columns:
         batas_tahun = tahun_sekarang - int(m_usia.group(1))
         hasil = hasil[hasil["tahun"] >= batas_tahun]
 
     # transmisi
-    if "matic" in q and "manual" not in q:
-        hasil = hasil[hasil["transmisi"].str.contains("matic", case=False, na=False)]
-    if "manual" in q and "matic" not in q:
-        hasil = hasil[hasil["transmisi"].str.contains("manual", case=False, na=False)]
+    if "transmisi" in hasil.columns:
+        if "matic" in q and "manual" not in q:
+            hasil = hasil[hasil["transmisi"].str.contains("matic", case=False, na=False)]
+        if "manual" in q and "matic" not in q:
+            hasil = hasil[hasil["transmisi"].str.contains("manual", case=False, na=False)]
 
     # bahan bakar
-    for bb in ["diesel", "bensin", "hybrid", "listrik"]:
-        if bb in q and "bahan bakar" in data_mobil.columns:
-            hasil = hasil[hasil["bahan bakar"].str.contains(bb, case=False, na=False)]
+    if "bahan bakar" in hasil.columns:
+        for bb in ["diesel", "bensin", "hybrid", "listrik"]:
+            if bb in q:
+                hasil = hasil[hasil["bahan bakar"].str.contains(bb, case=False, na=False)]
 
     # harga (contoh: "di bawah 150.000.000", "max 200000000")
     m_harga = re.search(r"(?:di bawah|max(?:imal)?|<=?) ?rp? ?(\d[\d\.]*)", q)
-    if m_harga:
+    if m_harga and "harga_angka" in hasil.columns:
         batas = int(m_harga.group(1).replace(".", ""))
         hasil = hasil[hasil["harga_angka"] <= batas]
 
     # tahun ke atas
     m_tahun_atas = re.search(r"tahun (\d{4}) ke atas", q)
-    if m_tahun_atas:
+    if m_tahun_atas and "tahun" in hasil.columns:
         hasil = hasil[hasil["tahun"] >= int(m_tahun_atas.group(1))]
 
     # tahun di bawah
     m_tahun_bawah = re.search(r"tahun (?:di bawah|kurang dari) (\d{4})", q)
-    if m_tahun_bawah:
+    if m_tahun_bawah and "tahun" in hasil.columns:
         hasil = hasil[hasil["tahun"] < int(m_tahun_bawah.group(1))]
 
     # sinonim irit/hemat -> bensin/hybrid
-    if "irit" in q or "hemat" in q:
-        if "bahan bakar" in data_mobil.columns:
-            hasil = hasil[hasil["bahan bakar"].str.contains("bensin|hybrid", case=False, na=False)]
+    if ("irit" in q or "hemat" in q) and "bahan bakar" in hasil.columns:
+        hasil = hasil[hasil["bahan bakar"].str.contains("bensin|hybrid", case=False, na=False)]
 
     # exclude list
-    exclude_list = [x.strip().lower() for x in exclude.split(",") if x.strip()]
-    if exclude_list and "nama mobil" in data_mobil.columns:
-        hasil = hasil[~hasil["nama mobil"].str.lower().isin(exclude_list)]
+    if "nama mobil" in hasil.columns:
+        exclude_list = [x.strip().lower() for x in exclude.split(",") if x.strip()]
+        if exclude_list:
+            hasil = hasil[~hasil["nama mobil"].str.lower().isin(exclude_list)]
 
     if hasil.empty:
         return "tidak ditemukan"
 
     output = "; ".join(
-        _bersih_nama(row["nama mobil"], row["tahun"])
+        _bersih_nama(row.get("nama mobil", ""), int(row.get("tahun", 0)))
         for _, row in hasil.head(5).iterrows()
     )
-    return unique_cars(output)
+    return _unique_cars(output)
 
-# ---------- RAG (Chroma) ----------
+# Streaming contoh (SSE)
+@app.get("/stream")
+async def stream(pertanyaan: str, exclude: str = ""):
+    jawaban_text = jawab(pertanyaan, exclude)
+    async def event_stream():
+        for word in jawaban_text.split():
+            yield f"data: {word}\n\n"
+            await asyncio.sleep(0.06)
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
+
+# ===================== RAG + Chroma =====================
 USE_RAG = os.getenv("ENABLE_RAG", "0") == "1"
 if USE_RAG:
+    # router untuk endpoint cosine_rekomendasi
     from app.rag_qa import router as rag_router
     app.include_router(rag_router)
 
-    # cek isi koleksi secara nyata (bukan hanya cek folder)
+    # Cek jumlah dokumen di koleksi (bukan sekadar cek folder kosong)
     def _chroma_doc_count() -> int:
         try:
             from langchain_chroma import Chroma
             vs = Chroma(collection_name=COLLECTION_NAME, persist_directory=str(CHROMA_DIR))
-            # `count()` tersedia di client baru; fallback ke len(get()) untuk amannya
             try:
-                return vs._collection.count()  # type: ignore
+                return vs._collection.count()  # chroma>=0.5
             except Exception:
                 return len(vs.get()["ids"])
         except Exception:
             return 0
 
-    # bangun embedding kalau kosong
+    # Auto build embedding kalau kosong
     try:
+        CHROMA_DIR.mkdir(parents=True, exist_ok=True)
         count = _chroma_doc_count()
         if count <= 0:
-            print(f"[INIT] Koleksi kosong -> build embedding ke: {CHROMA_DIR}")
+            print(f"[INIT] Koleksi kosong → build embedding ke: {CHROMA_DIR}")
             from app.embedding import simpan_vektor_mobil
-            simpan_vektor_mobil(collection_name=COLLECTION_NAME, persist_dir=str(CHROMA_DIR))
+            simpan_vektor_mobil(
+                collection_name=COLLECTION_NAME,
+                persist_dir=str(CHROMA_DIR)
+            )
         else:
             print(f"[INIT] Chroma OK. Dokumen: {count} di {CHROMA_DIR}")
     except Exception as e:
@@ -157,33 +196,37 @@ if USE_RAG:
     @app.get("/debug/chroma_count")
     def chroma_count():
         try:
-            return {"dir": str(CHROMA_DIR), "collection": COLLECTION_NAME, "count": _chroma_doc_count()}
-        except Exception as e:
-            return JSONResponse({"error": str(e)}, status_code=500)
-
-    # admin: rebuild manual
-    @app.post("/admin/rebuild_chroma")
-    def rebuild():
-        try:
-            from app.embedding import simpan_vektor_mobil
-            # bersihkan isi lama
-            if CHROMA_DIR.exists():
-                for p in CHROMA_DIR.glob("*"):
-                    try:
-                        p.unlink()
-                    except Exception:
-                        pass
-            simpan_vektor_mobil(collection_name=COLLECTION_NAME, persist_dir=str(CHROMA_DIR))
-            return {"ok": True, "dir": str(CHROMA_DIR), "count": _chroma_doc_count()}
+            return {
+                "dir": str(CHROMA_DIR),
+                "collection": COLLECTION_NAME,
+                "ok": True,
+                "count": _chroma_doc_count(),
+            }
         except Exception as e:
             return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
 
-# ---------- SSE contoh (opsional) ----------
-@app.get("/stream")
-async def stream(pertanyaan: str, exclude: str = ""):
-    text = jawab(pertanyaan, exclude)
-    async def gen():
-        for w in str(text).split():
-            yield f"data: {w}\n\n"
-            await asyncio.sleep(0.05)
-    return StreamingResponse(gen(), media_type="text/event-stream")
+# ===================== Admin & Debug Helpers =====================
+@app.post("/admin/rebuild_chroma")
+def rebuild_chroma():
+    """Bangun ulang index vektor dari CSV."""
+    try:
+        CHROMA_DIR.mkdir(parents=True, exist_ok=True)
+        # bersihkan isi lama (file-file di folder)
+        for p in CHROMA_DIR.glob("*"):
+            try:
+                p.unlink()
+            except Exception:
+                pass
+        from app.embedding import simpan_vektor_mobil
+        simpan_vektor_mobil(
+            collection_name=COLLECTION_NAME,
+            persist_dir=str(CHROMA_DIR)
+        )
+        return JSONResponse({"ok": True, "dir": str(CHROMA_DIR)})
+    except Exception as e:
+        return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
+
+@app.get("/debug/chroma")
+def debug_chroma():
+    files = [p.name for p in CHROMA_DIR.glob("*")]
+    return {"dir": str(CHROMA_DIR), "files": files}
