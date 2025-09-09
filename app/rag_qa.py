@@ -21,8 +21,7 @@ _BRANDS = ["bmw","toyota","honda","suzuki","daihatsu","nissan","mitsubishi",
            "mazda","hyundai","kia","wuling","renault","vw","volkswagen","mercedes","audi"]
 
 def _parse_filters(q: str):
-    ql = q.lower()
-    f = {}
+    ql = q.lower(); f = {}
     if any(k in ql for k in ["listrik","ev","electric"]): f["bahan_bakar"]="listrik"
     elif "diesel" in ql:  f["bahan_bakar"]="diesel"
     elif "bensin" in ql:  f["bahan_bakar"]="bensin"
@@ -30,24 +29,26 @@ def _parse_filters(q: str):
     if "matic" in ql: f["transmisi"]="matic"
     elif "manual" in ql: f["transmisi"]="manual"
     for b in _BRANDS:
-        if b in ql: f["merek"] = "volkswagen" if b=="vw" else b
+        if b in ql:
+            f["merek"] = "volkswagen" if b=="vw" else b
+            break
     return f
 
 def _parse_numeric(q: str):
-    ql = q.lower(); out = {}
-    if m := re.search(r"(?:di bawah|max(?:imal)?|<=?)\s*rp?\s*([\d\.]+)", ql):
-        out["harga_max"] = int(m.group(1).replace(".",""))
-    if m := re.search(r"tahun\s*(\d{4})\s*ke atas", ql):
-        out["tahun_min"] = int(m.group(1))
-    if m := re.search(r"(?:<|di ?bawah|kurang dari|max)?\s*(\d{1,2})\s*tahun", ql):
-        out["usia_max"] = int(m.group(1))
+    ql=q.lower(); out={}
+    if m:=re.search(r"(?:di bawah|max(?:imal)?|<=?)\s*rp?\s*([\d\.]+)", ql):
+        out["harga_max"]=int(m.group(1).replace(".",""))
+    if m:=re.search(r"tahun\s*(\d{4})\s*ke atas", ql):
+        out["tahun_min"]=int(m.group(1))
+    if m:=re.search(r"(?:<|di ?bawah|kurang dari|max)?\s*(\d{1,2})\s*tahun", ql):
+        out["usia_max"]=int(m.group(1))
     return out
 
 def _as_int(x, default=0):
     try: return int(float(x))
     except: return default
 
-def _format(doc, score):
+def _fmt(doc, score):
     m = doc.metadata or {}
     return {
         "nama_mobil": m.get("nama_mobil","-"),
@@ -58,27 +59,28 @@ def _format(doc, score):
         "bahan_bakar": str(m.get("bahan_bakar","")),
         "transmisi": str(m.get("transmisi","")),
         "kapasitas_mesin": m.get("kapasitas_mesin","-"),
-        "cosine_score": round(float(score),4),
-        "merek": str(m.get("merek",""))
+        "merek": str(m.get("merek","")),
+        "cosine_score": round(float(score), 4),
     }
 
 @router.get("/cosine_rekomendasi")
 async def cosine_rekomendasi(query: str = Query(...), k: int = 5, exclude: str = ""):
-    docs_scores = VECTOR.similarity_search_with_score(query, k=max(80,8*k))
     filters = _parse_filters(query)
-    numeric = _parse_numeric(query)
+    numeric  = _parse_numeric(query)
 
-    seen = set()
-    picked = []
+    raw = VECTOR.similarity_search_with_score(query, k=max(80, 8*k))
 
-    for doc, score in docs_scores:
-        row = _format(doc, score)
+    ex = {x.strip().lower() for x in exclude.split(",") if x.strip()}
+    seen, picked = set(), []
+
+    for doc, score in raw:
+        row = _fmt(doc, score)
         key = f"{row['nama_mobil'].lower()}__{row['tahun']}"
-        if key in seen: 
+        if row["nama_mobil"].lower() in ex or key in seen:
             continue
         seen.add(key)
 
-        # Filter kategorikal → longgar (jangan buang jika metadata kosong)
+        # Kategorikal → longgar (jangan buang kalau metadata kosong)
         if "bahan_bakar" in filters and row["bahan_bakar"] and filters["bahan_bakar"] not in row["bahan_bakar"]:
             continue
         if "transmisi" in filters and row["transmisi"] and filters["transmisi"] != row["transmisi"]:
@@ -86,7 +88,7 @@ async def cosine_rekomendasi(query: str = Query(...), k: int = 5, exclude: str =
         if "merek" in filters and row["merek"] and filters["merek"] not in row["merek"]:
             continue
 
-        # Filter numerik (hanya kalau datanya ada)
+        # Numerik (hanya jika nilai ada)
         if "harga_max" in numeric and row["harga_angka"] and row["harga_angka"] > numeric["harga_max"]:
             continue
         if "tahun_min" in numeric and row["tahun"] and row["tahun"] < numeric["tahun_min"]:
@@ -96,13 +98,13 @@ async def cosine_rekomendasi(query: str = Query(...), k: int = 5, exclude: str =
 
         picked.append(row)
 
-    # Fallback: kalau setelah filter kosong, gunakan top-K tanpa filter
+    # Fallback: kalau kosong, tampilkan top-K apa adanya (biar UI tak kosong)
     if not picked:
-        picked = [_format(doc, s) for doc, s in docs_scores[:k]]
+        picked = [_fmt(doc, s) for doc, s in raw[:k]]
 
     return {"rekomendasi": picked[:k]}
 
-# ===== Debug kecil: hitung dokumen di koleksi
+# Debug: hitung dokumen
 @router.get("/debug/chroma_count")
 def chroma_count():
     try:

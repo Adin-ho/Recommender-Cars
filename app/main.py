@@ -1,5 +1,4 @@
-import os
-import shutil
+import os, shutil
 from pathlib import Path
 import pandas as pd
 from fastapi import FastAPI
@@ -9,21 +8,32 @@ from fastapi.staticfiles import StaticFiles
 
 APP_DIR  = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
-DATA_CSV = APP_DIR / "data" / "data_mobil_final.csv"
 FRONTEND_DIR = ROOT_DIR / "frontend"
 CHROMA_DIR   = Path(os.getenv("CHROMA_DIR", ROOT_DIR / "chroma"))
 
 app = FastAPI()
 
+# CORS longgar dulu biar mudah tes
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # longgarkan dulu agar mudah tes dari mana saja
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ===== Serve frontend
+# ===== RAG router + auto build jika kosong =====
+from app.rag_qa import router as rag_router
+app.include_router(rag_router)
+
+if not CHROMA_DIR.exists() or not any(CHROMA_DIR.glob("*")):
+    print("[INIT] Chroma kosong → generate embedding…")
+    from app.embedding import simpan_vektor_mobil
+    simpan_vektor_mobil()
+else:
+    print(f"[INIT] Chroma sudah ada di: {CHROMA_DIR}")
+
+# ===== Frontend
 app.mount("/frontend", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
 
 @app.get("/")
@@ -33,30 +43,28 @@ def root():
 @app.get("/health")
 def health(): return {"ok": True}
 
-# ===== Admin: rebuild chroma (hapus folder lama, bangun ulang)
+# ===== Admin rebuild (hapus folder lama → build ulang)
 @app.post("/admin/rebuild_chroma")
 def rebuild_chroma():
     try:
         if CHROMA_DIR.exists():
-            shutil.rmtree(CHROMA_DIR)  # bersih total
+            shutil.rmtree(CHROMA_DIR)
         from app.embedding import simpan_vektor_mobil
         simpan_vektor_mobil()
         return JSONResponse({"ok": True, "dir": str(CHROMA_DIR)})
     except Exception as e:
         return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
 
-# ===== Debug: lihat isi folder chroma
+# ===== Debug kecil
 @app.get("/debug/chroma")
 def debug_chroma():
     CHROMA_DIR.mkdir(parents=True, exist_ok=True)
-    files = sorted([p.name for p in CHROMA_DIR.glob("*")])
-    return {"dir": str(CHROMA_DIR), "files": files}
+    return {"dir": str(CHROMA_DIR), "files": sorted([p.name for p in CHROMA_DIR.glob("*")])}
 
-# ===== (opsional) Statistik dataset
 @app.get("/debug/dataset_stats")
 def dataset_stats():
-    df = pd.read_csv(DATA_CSV)
-    cols = list(df.columns)
+    csv = APP_DIR / "data" / "data_mobil_final.csv"
+    df = pd.read_csv(csv)
     fuels = df["Bahan Bakar"].astype(str).str.lower().value_counts().to_dict() if "Bahan Bakar" in df.columns else {}
     brands = df["Nama Mobil"].astype(str).str.split().str[0].str.lower().value_counts().head(15).to_dict() if "Nama Mobil" in df.columns else {}
-    return {"columns": cols, "fuels": fuels, "top_brands": brands}
+    return {"fuels": fuels, "top_brands": brands, "rows": len(df)}
