@@ -3,8 +3,9 @@ uvicorn[standard]==0.30.6
 pandas==2.2.2
 numpy<2.0
 
-# LangChain + Chroma (kompatibel)
+# LangChain + Chroma (kompatibel dgn Python 3.11 & chromadb 0.5.x)
 langchain-community==0.3.7
-langchain-chroma==0.1.5
+langchain-chroma==0.2.5
 chromadb==0.5.12
+
 tqdm==4.66.5
