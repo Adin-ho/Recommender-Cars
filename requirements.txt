@@ -4,7 +4,7 @@ pandas==2.2.2
 tqdm==4.66.5
 langchain-community==0.3.6
 langchain-chroma==0.1.4
-chromadb==0.5.5
+chromadb==0.5.10        # <— ganti dari 0.5.5
 sentence-transformers==2.5.1
 torch==2.3.1
 numpy<2.0
