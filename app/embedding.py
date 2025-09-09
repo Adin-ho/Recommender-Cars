@@ -17,9 +17,10 @@ def _harga_int(s):
     m = re.sub(r"\D", "", str(s))
     return int(m) if m else 0
 
-def simpan_vektor_mobil():
+def simpan_vektor_mobil(collection_name: str = "cars", persist_dir: str = "chroma"):
     print("[INFO] Membaca:", DATA_CSV)
     df = pd.read_csv(DATA_CSV)
+    vectordb = Chroma(collection_name=collection_name, persist_directory=persist_dir, embedding_function=emb)
     wajib = ['Nama Mobil','Harga','Tahun','Usia','Bahan Bakar','Transmisi','Kapasitas Mesin']
     for c in wajib:
         if c not in df.columns:

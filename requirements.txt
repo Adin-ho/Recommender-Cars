@@ -1,10 +1,20 @@
+# inti API
 fastapi==0.110.0
 uvicorn[standard]==0.30.6
+
+# data utils
 pandas==2.2.2
 tqdm==4.66.5
+numpy<2.0
+
+# langchain + chroma (versi saling cocok)
 langchain-community==0.3.6
 langchain-chroma==0.1.4
-chromadb==0.5.10        # <— ganti dari 0.5.5
+chromadb==0.5.10   # <- jangan 0.5.5 (bikin konflik)
+
+# embedding (kecil & CPU)
 sentence-transformers==2.5.1
+
+# PyTorch CPU only (pakai index resmi CPU agar wheel lebih kecil)
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.3.1
-numpy<2.0

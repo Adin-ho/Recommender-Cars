@@ -1,0 +1,12 @@
+[phases.setup]
+aptPkgs = ["python3-dev"]
+
+[phases.install]
+cmds = [
+  "python -m venv /app/.venv",
+  ". /app/.venv/bin/activate",
+  "pip install --no-cache-dir -r requirements.txt"
+]
+
+[start]
+cmd = "uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"
