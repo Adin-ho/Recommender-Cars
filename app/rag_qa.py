@@ -1,138 +1,79 @@
-# app/rag_qa.py
-import os, re
 from pathlib import Path
-from fastapi import APIRouter, Query
+from typing import Optional
+
+import pandas as pd
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_chroma import Chroma
+from langchain_community.vectorstores import Chroma
 
-# Non-GPU
-os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")
-os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+# Model ringan CPU
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
-PERSIST_DIR = Path(os.getenv("CHROMA_DIR", Path(__file__).resolve().parents[1] / "chroma"))
-COLLECTION_NAME = os.getenv("CHROMA_COLLECTION", "cars")
+def _load_df(data_csv: Path) -> pd.DataFrame:
+    df = pd.read_csv(data_csv)
+    df.columns = df.columns.str.strip().str.lower()
+    # normalisasi usia jika belum ada
+    if "usia" not in df.columns and "tahun" in df.columns:
+        df["usia"] = df["tahun"].apply(lambda t: "" if pd.isna(t) else max(0, 2025 - int(t)))
+    return df
 
-EMB = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    encode_kwargs={"normalize_embeddings": True},
-)
+def rebuild_chroma(chroma_dir: Path, data_csv: Path) -> None:
+    chroma_dir.mkdir(parents=True, exist_ok=True)
 
-# 1 global vector store (hemat memori)
-VS = Chroma(
-    collection_name=COLLECTION_NAME,
-    persist_directory=str(PERSIST_DIR),
-    embedding_function=EMB,
-)
+    df = _load_df(data_csv)
 
-router = APIRouter()
+    # gabung atribut jadi satu “dokumen”
+    def as_doc(row) -> str:
+        parts = [
+            str(row.get("nama mobil", "")),
+            f"tahun {row.get('tahun', '')}",
+            f"harga {row.get('harga', '')}",
+            f"usia {row.get('usia', '')} tahun",
+            f"bahan bakar {row.get('bahan bakar', '')}",
+            f"transmisi {row.get('transmisi', '')}",
+            f"kapasitas mesin {row.get('kapasitas mesin', '')}",
+        ]
+        return " | ".join([p for p in parts if p])
 
-_BRANDS = [
-    "bmw","toyota","honda","suzuki","daihatsu","nissan","mitsubishi",
-    "mazda","hyundai","kia","wuling","renault","vw","volkswagen","mercedes","audi"
-]
+    docs = [as_doc(r) for _, r in df.iterrows()]
+    metadatas = [r.to_dict() for _, r in df.iterrows()]
+    ids = [f"car-{i}" for i in range(len(docs))]
 
-def _i(x, d=0):
+    embeddings = HuggingFaceEmbeddings(model_name=MODEL_NAME)
+    # hapus koleksi lama kalau ada
     try:
-        return int(float(x))
+        Chroma(
+            collection_name="cars",
+            embedding_function=embeddings,
+            persist_directory=str(chroma_dir),
+        ).delete_collection()
     except Exception:
-        return d
+        pass
 
-def _parse_query(q: str):
-    ql = q.lower()
-    # harga target (200 juta) atau angka penuh
-    harga_target = None
-    if m := re.search(r"(\d{2,4})\s*juta", ql):
-        harga_target = int(m.group(1)) * 1_000_000
-    elif m := re.search(r"(\d{9,12})", ql.replace(".","")):
-        harga_target = int(m.group(1))
+    vs = Chroma.from_texts(
+        texts=docs,
+        embedding=embeddings,
+        metadatas=metadatas,
+        ids=ids,
+        collection_name="cars",
+        persist_directory=str(chroma_dir),
+    )
+    vs.persist()
 
-    usia_max = None
-    if m := re.search(r"(?:<|di ?bawah|kurang dari|max(?:imal)?)\s*(\d{1,2})\s*tahun", ql):
-        usia_max = int(m.group(1))
+def build_retriever(chroma_dir: Path, data_csv: Path):
+    chroma_dir.mkdir(parents=True, exist_ok=True)
+    embeddings = HuggingFaceEmbeddings(model_name=MODEL_NAME)
 
-    fuel = None
-    for bb in ["listrik","electric","diesel","bensin","hybrid"]:
-        if bb in ql:
-            fuel = "listrik" if bb == "electric" else bb
-            break
+    # Kalau index belum ada, bikin dulu
+    need_build = True
+    for p in chroma_dir.glob("*"):
+        need_build = False
+        break
+    if need_build:
+        rebuild_chroma(chroma_dir, data_csv)
 
-    trans = None
-    if "matic" in ql and "manual" not in ql:
-        trans = "matic"
-    elif "manual" in ql and "matic" not in ql:
-        trans = "manual"
-
-    brand = None
-    for b in _BRANDS:
-        if b in ql:
-            brand = "volkswagen" if b == "vw" else b
-            break
-
-    return harga_target, usia_max, fuel, trans, brand
-
-def _fmt(doc, s):
-    m = doc.metadata or {}
-    return {
-        "nama_mobil": m.get("nama_mobil", "-"),
-        "tahun": _i(m.get("tahun", 0)),
-        "harga": m.get("harga", "-"),
-        "harga_angka": _i(m.get("harga_angka", 0)),
-        "usia": _i(m.get("usia", 0)),
-        "bahan_bakar": str(m.get("bahan_bakar", "")),
-        "transmisi": str(m.get("transmisi", "")),
-        "kapasitas_mesin": m.get("kapasitas_mesin", "-"),
-        "merek": str(m.get("merek", "")),
-        "cosine_score": round(float(s), 4),
-    }
-
-@router.get("/cosine_rekomendasi")
-async def cosine_rekomendasi(
-    query: str = Query(..., description="Contoh: 'rekomendasi mobil diesel 300 juta'"),
-    k: int = Query(5, ge=1, le=50),
-    exclude: str = ""
-):
-    harga_target, usia_max, fuel, trans, brand = _parse_query(query)
-
-    # Makin besar k internal → peluang match relevan lebih besar
-    raw = VS.similarity_search_with_score(query, k=max(80, 8*k))
-
-    ex = {x.strip().lower() for x in exclude.split(",") if x.strip()}
-    seen, utama, cad1, cad2 = set(), [], [], []
-    tol = 0.18
-    hmin = int(harga_target*(1-tol)) if harga_target else 0
-    hmax = int(harga_target*(1+tol)) if harga_target else 10**12
-
-    for doc, score in raw:
-        m = doc.metadata or {}
-        nama = str(m.get("nama_mobil", "-"))
-        key  = f"{nama.lower().strip()}__{m.get('tahun','-')}"
-        if nama.lower() in ex or key in seen:
-            continue
-        seen.add(key)
-
-        harga = _i(m.get("harga_angka", 0))
-        usia  = _i(m.get("usia", 0))
-        ok = True
-
-        # filter numerik
-        if harga_target is not None and not (hmin <= harga <= hmax): ok = False
-        if usia_max is not None and usia > usia_max: ok = False
-
-        # filter kategori
-        if fuel and str(m.get("bahan_bakar","")) != fuel: ok = False
-        if trans and str(m.get("transmisi","")) != trans: ok = False
-        if brand and str(m.get("merek","")) != brand: ok = False
-
-        item = _fmt(doc, score)
-        if ok:
-            utama.append(item)
-        elif harga_target is not None:
-            cad1.append(item)
-        else:
-            cad2.append(item)
-
-        if len(utama) >= k:
-            break
-
-    hasil = utama or cad1[:k] or cad2[:k]
-    return {"rekomendasi": hasil}
+    vs = Chroma(
+        collection_name="cars",
+        embedding_function=embeddings,
+        persist_directory=str(chroma_dir),
+    )
+    return vs.as_retriever(search_kwargs={"k": 5})
