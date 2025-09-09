@@ -20,6 +20,22 @@ from langchain_chroma import Chroma
 
 router = APIRouter()
 
+def _parse_filter(q: str):
+    ql = q.lower()
+    where = {}
+    if any(k in ql for k in ["listrik", "ev", "electric"]):
+        where["bahan_bakar"] = "listrik"
+    elif "diesel" in ql:
+        where["bahan_bakar"] = "diesel"
+    elif "bensin" in ql:
+        where["bahan_bakar"] = "bensin"
+    # merek umum
+    for brand in ["bmw","toyota","honda","suzuki","renault","wuling","mitsubishi","daihatsu","nissan","mazda","hyundai","kia","vw","volkswagen"]:
+        if brand in ql:
+            where["merek"] = brand
+            break
+    return where
+
 def valid_int(x, default=0):
     try:
         return int(float(x))

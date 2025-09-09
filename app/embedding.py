@@ -10,6 +10,25 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 DATA_CSV = ROOT_DIR / "app" / "data" / "data_mobil_final.csv"
 CHROMA_DIR = Path(os.getenv("CHROMA_DIR", ROOT_DIR / "chroma"))
 
+def _merek(nama: str) -> str:
+    return str(nama).strip().split()[0].lower() if nama else ""
+
+metadatas = []
+texts = []
+for _, r in df.iterrows():
+    meta = {
+        "nama_mobil": r["nama mobil"],
+        "tahun": int(r["tahun"]),
+        "harga": str(r["harga"]),
+        "bahan_bakar": str(r["bahan bakar"]).lower(),
+        "transmisi": str(r["transmisi"]).lower(),
+        "kapasitas_mesin": str(r["kapasitas mesin"]),
+        "merek": _merek(r["nama mobil"]),
+    }
+    metadatas.append(meta)
+    # text bebas untuk embedding
+    texts.append(f"{r['nama mobil']} tahun {r['tahun']}, {r['bahan bakar']}, {r['transmisi']}, {r['kapasitas mesin']}, harga {r['harga']}")
+    
 def simpan_vektor_mobil():
     print("[INFO] Membaca dataset:", DATA_CSV)
     df = pd.read_csv(DATA_CSV)
