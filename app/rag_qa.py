@@ -1,191 +1,174 @@
 import os
 import re
 import random
-from fastapi import APIRouter, Query
 from pathlib import Path
+from typing import Dict, List, Tuple
 
-os.environ["CUDA_VISIBLE_DEVICES"] = ""   # pastikan tidak pakai GPU/CUDA
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
-PERSIST_DIR = os.getenv("CHROMA_DIR", str(Path(__file__).resolve().parents[1] / "chroma"))
-# ===== Pilih embedding: Ollama (kalau ada) atau CPU (default) =====
-if os.getenv("USE_OLLAMA", "0") == "1":
-    from langchain_ollama import OllamaEmbeddings as _Emb
-    EMBEDDINGS = _Emb(model="mistral")
-else:
-    # CPU: ringan & cocok free hosting
-    from langchain_community.embeddings import HuggingFaceEmbeddings as _Emb
-    EMBEDDINGS = _Emb(model_name="sentence-transformers/all-MiniLM-L6-v2")
-
+from fastapi import APIRouter, Query
+from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain_chroma import Chroma
+
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+
+APP_DIR = Path(__file__).resolve().parent
+ROOT_DIR = APP_DIR.parent
+PERSIST_DIR = os.getenv("CHROMA_DIR", str(ROOT_DIR / "chroma"))
 
 router = APIRouter()
 
-def _parse_filter(q: str):
+# Reuse sekali saja
+EMBEDDINGS = SentenceTransformerEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2",
+    encode_kwargs={"normalize_embeddings": True}
+)
+VECTOR = Chroma(persist_directory=PERSIST_DIR, embedding_function=EMBEDDINGS)
+
+_BRANDS = [
+    "bmw","toyota","honda","suzuki","daihatsu","nissan","mitsubishi",
+    "mazda","hyundai","kia","wuling","renault","vw","volkswagen","mercedes","mercedes-benz","audi"
+]
+
+def _parse_filters(q: str) -> Dict:
     ql = q.lower()
-    where = {}
-    if any(k in ql for k in ["listrik", "ev", "electric"]):
-        where["bahan_bakar"] = "listrik"
-    elif "diesel" in ql:
-        where["bahan_bakar"] = "diesel"
-    elif "bensin" in ql:
-        where["bahan_bakar"] = "bensin"
-    # merek umum
-    for brand in ["bmw","toyota","honda","suzuki","renault","wuling","mitsubishi","daihatsu","nissan","mazda","hyundai","kia","vw","volkswagen"]:
-        if brand in ql:
-            where["merek"] = brand
+    f = {}
+    # bahan bakar
+    if any(k in ql for k in ["listrik","ev","electric"]): f["bahan_bakar"] = "listrik"
+    elif "diesel" in ql:  f["bahan_bakar"] = "diesel"
+    elif "bensin" in ql:  f["bahan_bakar"] = "bensin"
+    elif "hybrid" in ql:  f["bahan_bakar"] = "hybrid"
+    # transmisi
+    if "matic" in ql:  f["transmisi"] = "matic"
+    elif "manual" in ql: f["transmisi"] = "manual"
+    # merek
+    for b in _BRANDS:
+        if b in ql:
+            f["merek"] = "volkswagen" if b == "vw" else b
             break
-    return where
+    return f
 
-def valid_int(x, default=0):
-    try:
-        return int(float(x))
-    except Exception:
-        return default
+def _parse_numeric(q: str) -> Dict:
+    ql = q.lower()
+    out = {}
+    # harga (di bawah/max 200 juta / angka penuh)
+    if m := re.search(r"(?:di bawah|max(?:imal)?|<=?)\s*rp?\s*([\d\.]+)", ql):
+        out["harga_max"] = int(m.group(1).replace(".", ""))
+    # tahun ke atas
+    if m := re.search(r"tahun\s*(\d{4})\s*ke atas", ql):
+        out["tahun_min"] = int(m.group(1))
+    # usia max (hanya jika disebut)
+    if m := re.search(r"(?:<|di ?bawah|kurang dari|max(?:imal)?)\s*(\d{1,2})\s*tahun", ql):
+        out["usia_max"] = int(m.group(1))
+    return out
 
-def is_kapasitas_mesin_valid(kapasitas, bahan_bakar):
-    j = str(bahan_bakar).lower()
-    if "listrik" in j or "hybrid" in j:
-        return kapasitas is not None and str(kapasitas).strip() != ""
-    try:
-        num = int(re.sub(r"\D", "", str(kapasitas)))
-        return 600 <= num <= 6000
-    except Exception:
-        return False
+def _valid_int(x, default=0):
+    try: return int(float(x))
+    except Exception: return default
+
+def _keyword_boost(q: str, meta: Dict) -> float:
+    ql = q.lower()
+    s = 0.0
+    if meta.get("merek") and meta["merek"] in ql: s += 0.6
+    if meta.get("bahan_bakar") and meta["bahan_bakar"] in ql: s += 0.4
+    if "matic" in ql and meta.get("transmisi") == "matic": s += 0.2
+    if "manual" in ql and meta.get("transmisi") == "manual": s += 0.2
+    if m := re.search(r"(\d{4})", ql):
+        th = int(m.group(1))
+        try:
+            if int(meta.get("tahun", 0)) >= th: s += 0.2
+        except: pass
+    return min(s, 1.0)
 
 @router.get("/cosine_rekomendasi")
 async def cosine_rekomendasi(
-    query: str = Query(..., description="Pertanyaan kebutuhan mobil (mis. 'mpv 200 juta')"),
-    k: int = Query(5, description="Jumlah hasil"),
-    exclude: str = Query("", description="Nama mobil yang sudah direkomendasikan, pisahkan koma")
+    query: str = Query(..., description="Pertanyaan kebutuhan mobil"),
+    k: int = Query(5, ge=1, le=50),
+    exclude: str = Query("", description="Nama mobil yang sudah tampil, pisahkan koma")
 ):
-    vector_store = Chroma(
-    persist_directory=PERSIST_DIR,
-    embedding_function=EMBEDDINGS,
-)
-    result_list = vector_store.similarity_search_with_score(query, k=150)
+    ql = query.lower()
+    filters = _parse_filters(ql)
+    numeric  = _parse_numeric(ql)
+    usia_max = numeric.get("usia_max")  # <— hanya dipakai kalau user menyebutkan
 
-    q_lc = query.lower()
+    # Ambil kandidat banyak dulu (tanpa filter metadata di Chroma untuk kompatibilitas),
+    # lalu saring manual dengan metadata.
+    docs_scores = VECTOR.similarity_search_with_score(query, k=max(8*k, 80))
 
-    # Target harga (boleh '200 juta' atau angka utuh)
-    harga_target = None
-    m = re.search(r"(\d{2,4})\s*juta", q_lc)
-    if m:
-        harga_target = int(m.group(1)) * 1_000_000
-    else:
-        m2 = re.search(r"(\d{9,12})", q_lc.replace(".", ""))
-        if m2:
-            harga_target = int(m2.group(1))
-
-    tolerance = 0.18
-    harga_min, harga_max = 0, 10**10
-    if harga_target:
-        harga_min = int(harga_target * (1 - tolerance))
-        harga_max = int(harga_target * (1 + tolerance))
-
-    # Usia maks (default 5 thn)
-    usia_max = 5
-    m_usia = re.search(r"(?:<|di ?bawah|kurang dari|max(?:imal)?)\s*(\d{1,2})\s*tahun", q_lc)
-    if m_usia:
-        usia_max = int(m_usia.group(1))
-
-    # Filter bahan bakar (opsional)
-    filter_bb = None
-    for bb in ["listrik", "electric", "diesel", "bensin", "hybrid"]:
-        if bb in q_lc:
-            filter_bb = bb
-            break
-
-    exclude_list = [x.strip().lower() for x in exclude.split(",") if x.strip()]
-    hasil_utama, hasil_tua, hasil_lain = [], [], []
+    ex = {x.strip().lower() for x in exclude.split(",") if x.strip()}
     seen = set()
+    pool: List[Tuple[dict, float]] = []
 
-    for doc, score in result_list:
-        meta = doc.metadata
-        nama = str(meta.get("nama_mobil", "-"))
-        tahun = meta.get("tahun", "-")
-        harga = valid_int(meta.get("harga_angka", 0))
-        harga_disp = meta.get("harga", "-")
-        usia = valid_int(meta.get("usia", 0))
-        bb = str(meta.get("bahan_bakar", "-")).lower()
-        trans = str(meta.get("transmisi", "-"))
-        kapasitas = meta.get("kapasitas_mesin", "-")
+    for doc, score in docs_scores:
+        m = doc.metadata or {}
+        nama = str(m.get("nama_mobil","-")).strip()
+        tahun = _valid_int(m.get("tahun",0))
+        bb = str(m.get("bahan_bakar","")).lower()
+        trans = str(m.get("transmisi","")).lower()
+        merek = str(m.get("merek","")).lower()
+        harga = _valid_int(m.get("harga_angka",0))
+        usia  = _valid_int(m.get("usia",0))
 
-        key = f"{nama.lower().strip()}__{tahun}"
-        if nama.lower() in exclude_list or key in seen:
+        key = f"{nama.lower()}__{tahun}"
+        if not nama or nama.lower() in ex or key in seen:
             continue
         seen.add(key)
 
-        if filter_bb and filter_bb not in bb:
+        # filter metadata sesuai query (bahan bakar, transmisi, merek)
+        if filters.get("bahan_bakar") and filters["bahan_bakar"] not in bb:
+            continue
+        if filters.get("transmisi") and filters["transmisi"] != trans:
+            continue
+        if filters.get("merek") and filters["merek"] not in merek:
             continue
 
-        if not is_kapasitas_mesin_valid(kapasitas, bb):
-            kapasitas = "-"
+        # filter numerik opsional
+        if "harga_max" in numeric and harga and harga > numeric["harga_max"]:
+            continue
+        if "tahun_min" in numeric and tahun and tahun < numeric["tahun_min"]:
+            continue
+        if usia_max is not None and usia and usia > usia_max:
+            continue  # usia HANYA dibatasi jika user menyebutkan
 
-        obj = {
+        pool.append(({
             "nama_mobil": nama,
             "tahun": tahun,
-            "harga": harga_disp,
+            "harga": m.get("harga","-"),
             "harga_angka": harga,
             "usia": usia,
             "bahan_bakar": bb,
             "transmisi": trans,
-            "kapasitas_mesin": kapasitas,
-            "cosine_score": float(round(float(score), 4)),
-        }
+            "kapasitas_mesin": m.get("kapasitas_mesin","-"),
+        }, float(score)))
 
-        if harga_target and (harga_min <= harga <= harga_max):
-            if 0 < usia <= usia_max:
-                hasil_utama.append(obj)
-            elif usia > usia_max:
-                hasil_tua.append(obj)
-        elif not harga_target and 0 < usia <= usia_max:
-            hasil_utama.append(obj)
-        else:
-            hasil_lain.append(obj)
-
-    hasil_utama = sorted(hasil_utama, key=lambda x: (abs(x['harga_angka']-(harga_target or 0)), x['usia']))
-    hasil_tua   = sorted(hasil_tua,   key=lambda x: (x['usia'], abs(x['harga_angka']-(harga_target or 0))))
-    random.shuffle(hasil_lain)
-
-    hasil_final = (hasil_utama + hasil_tua + hasil_lain)[:k]
-
-    if not hasil_final and result_list:
-        alt, seen_alt = [], set()
-        for doc, score in result_list:
-            meta = doc.metadata
-            nama = str(meta.get("nama_mobil", "-"))
-            tahun = meta.get("tahun", "-")
-            key = f"{nama.lower().strip()}__{tahun}"
-            if nama.lower() in exclude_list or key in seen_alt:
-                continue
-            seen_alt.add(key)
-            alt.append({
-                "nama_mobil": nama,
-                "tahun": tahun,
-                "harga": meta.get("harga", "-"),
-                "harga_angka": valid_int(meta.get("harga_angka", 0)),
-                "usia": valid_int(meta.get("usia", 0)),
-                "bahan_bakar": str(meta.get("bahan_bakar", "-")).lower(),
-                "transmisi": str(meta.get("transmisi", "-")),
-                "kapasitas_mesin": meta.get("kapasitas_mesin", "-"),
-                "cosine_score": float(round(float(score), 4)),
-            })
-            if len(alt) >= k:
-                break
-        hasil_final = alt
-
-    if not hasil_final:
+    if not pool:
         return {"jawaban": "Maaf, tidak ditemukan mobil yang sesuai.", "rekomendasi": []}
 
+    # rerank: gabung cosine + keyword boost kecil
+    ranked = []
+    for meta, cos in pool:
+        kb = _keyword_boost(query, {**meta, "merek": _parse_filters(query).get("merek", meta.get("merek",""))})
+        final = 0.85 * float(cos) + 0.15 * kb
+        ranked.append((final, meta, cos))
+    ranked.sort(key=lambda x: x[0], reverse=True)
+
+    hasil = []
+    for _, m, cos in ranked[:k]:
+        hasil.append({
+            **m,
+            "cosine_score": round(float(cos), 4)
+        })
+
+    # format jawaban text (opsional)
     out = "Rekomendasi berdasarkan Cosine Similarity:\n\n"
-    for i, m in enumerate(hasil_final, 1):
+    for i, m in enumerate(hasil, 1):
         out += (
             f"{i}. {m['nama_mobil']} ({m['tahun']})\n"
             f"    Skor: {m['cosine_score']}\n"
             f"    Harga: {m['harga']}\n"
             f"    Usia: {m['usia']} tahun\n"
-            f"    Bahan Bakar: {m['bahan_bakar'].capitalize()}\n"
-            f"    Transmisi: {m['transmisi'].capitalize()}\n"
+            f"    Bahan Bakar: {m['bahan_bakar']}\n"
+            f"    Transmisi: {m['transmisi']}\n"
             f"    Kapasitas Mesin: {m['kapasitas_mesin']}\n\n"
         )
-    return {"jawaban": out, "rekomendasi": hasil_final}
+
+    return {"jawaban": out, "rekomendasi": hasil}
