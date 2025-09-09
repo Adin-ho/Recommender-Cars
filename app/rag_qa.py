@@ -82,24 +82,19 @@ async def cosine_rekomendasi(
 
         if harga_target:
             in_range = row["harga_angka"] and hmin <= row["harga_angka"] <= hmax
-            if in_range and (0 < row["usia"] <= usia_max):
-                utama.append(row)
-            elif in_range and row["usia"] > usia_max:
-                cad1.append(row)
-            else:
-                cad2.append(row)
+            if in_range and (0 < row["usia"] <= usia_max):   utama.append(row)
+            elif in_range and row["usia"] > usia_max:         cad1.append(row)
+            else:                                             cad2.append(row)
         else:
-            if 0 < row["usia"] <= usia_max:
-                utama.append(row)
-            else:
-                cad2.append(row)
+            if 0 < row["usia"] <= usia_max: utama.append(row)
+            else:                           cad2.append(row)
 
     utama.sort(key=lambda x: (abs((harga_target or 0)-x["harga_angka"]), x["usia"]))
     cad1.sort(key=lambda x: (x["usia"], abs((harga_target or 0)-x["harga_angka"])))
     random.shuffle(cad2)
 
     hasil = (utama + cad1 + cad2)[:k]
-    if not hasil and raw:  # Fallback: jangan pernah kosong
+    if not hasil and raw:   # Fallback: jangan pernah kosong
         hasil = [{
             "nama_mobil": (d.metadata or {}).get("nama_mobil","-"),
             "tahun": _i((d.metadata or {}).get("tahun",0)),
