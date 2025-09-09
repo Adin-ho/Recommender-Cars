@@ -21,7 +21,7 @@ def simpan_vektor_mobil():
     if not DATA_CSV.exists():
         raise FileNotFoundError(f"CSV tidak ditemukan: {DATA_CSV}")
 
-    df = pd.read_csv(DATA_CSV)  # biarkan header apa adanya
+    df = pd.read_csv(DATA_CSV)
     wajib = ["Nama Mobil","Harga","Tahun","Usia","Bahan Bakar","Transmisi","Kapasitas Mesin"]
     for c in wajib:
         if c not in df.columns:
@@ -29,7 +29,7 @@ def simpan_vektor_mobil():
 
     texts, metas = [], []
     for _, r in tqdm(df.iterrows(), total=len(df)):
-        nama = str(r["Nama Mobil"]).strip()
+        nama  = str(r["Nama Mobil"]).strip()
         tahun = int(str(r["Tahun"]).split(".")[0]) if pd.notna(r["Tahun"]) else 0
         usia  = int(str(r["Usia"]).split(".")[0])  if pd.notna(r["Usia"])  else 0
         harga = str(r["Harga"]).strip()
@@ -52,21 +52,14 @@ def simpan_vektor_mobil():
         })
 
     CHROMA_DIR.mkdir(parents=True, exist_ok=True)
-    embeddings = HuggingFaceEmbeddings(
+    emb = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2",
         encode_kwargs={"normalize_embeddings": True}
     )
-    vs = Chroma.from_texts(
-        texts=texts,
-        embedding=embeddings,
-        metadatas=metas,
-        persist_directory=str(CHROMA_DIR),
-    )
+    vs = Chroma.from_texts(texts=texts, embedding=emb, metadatas=metas, persist_directory=str(CHROMA_DIR))
     vs.persist()
-    try:
-        count = vs._collection.count()
-    except Exception:
-        count = "unknown"
+    try: count = vs._collection.count()
+    except: count = "unknown"
     print(f"[✅ SELESAI] Embedding tersimpan di {CHROMA_DIR} (count={count})")
 
 if __name__ == "__main__":
