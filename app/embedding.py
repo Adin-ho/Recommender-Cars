@@ -1,61 +1,55 @@
-import os, re
+import os, re, json
 from pathlib import Path
-import pandas as pd
 from tqdm import tqdm
+import pandas as pd
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 
-APP_DIR   = Path(__file__).resolve().parent
-ROOT_DIR  = APP_DIR.parent
-DATA_CSV  = APP_DIR / "data" / "data_mobil_final.csv"
+ROOT_DIR   = Path(__file__).resolve().parents[1]
+DATA_CSV   = ROOT_DIR / "app" / "data" / "data_mobil_final.csv"
 CHROMA_DIR = Path(os.getenv("CHROMA_DIR", ROOT_DIR / "chroma"))
 
 os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
-def _harga_to_int(s):
+def _harga_int(s):
     if pd.isna(s): return 0
-    return int(re.sub(r"\D", "", str(s)) or 0)
+    m = re.sub(r"\D", "", str(s))
+    return int(m) if m else 0
 
 def simpan_vektor_mobil():
-    if not DATA_CSV.exists():
-        raise FileNotFoundError(f"CSV tidak ditemukan: {DATA_CSV}")
-
+    print("[INFO] Membaca dataset:", DATA_CSV)
     df = pd.read_csv(DATA_CSV)
-    wajib = ["Nama Mobil","Harga","Tahun","Usia","Bahan Bakar","Transmisi","Kapasitas Mesin"]
+
+    wajib = ['Nama Mobil','Harga','Tahun','Usia','Bahan Bakar','Transmisi','Kapasitas Mesin']
     for c in wajib:
         if c not in df.columns:
-            raise ValueError(f"Kolom '{c}' tidak ada di CSV.")
+            raise ValueError(f"Kolom '{c}' tidak ditemukan di CSV.")
 
     texts, metas = [], []
-    for _, r in tqdm(df.iterrows(), total=len(df)):
-        nama  = str(r["Nama Mobil"]).strip()
-        tahun = int(str(r["Tahun"]).split(".")[0]) if pd.notna(r["Tahun"]) else 0
-        usia  = int(str(r["Usia"]).split(".")[0])  if pd.notna(r["Usia"])  else 0
-        harga = str(r["Harga"]).strip()
-        harga_angka = _harga_to_int(harga)
-        bb    = str(r["Bahan Bakar"]).strip().lower()
-        trans = str(r["Transmisi"]).strip().lower()
-        cc    = str(r["Kapasitas Mesin"]).strip()
+    for _, row in tqdm(df.iterrows(), total=len(df)):
+        nama  = str(row['Nama Mobil']).strip()
+        tahun = int(row['Tahun'])
+        harga = str(row['Harga']).strip()
+        harga_angka = _harga_int(harga)
+        usia  = int(str(row['Usia']).split(".")[0]) if pd.notna(row['Usia']) else 0
+        bb    = str(row['Bahan Bakar']).strip().lower()
+        trans = str(row['Transmisi']).strip().lower()
+        cc    = str(row.get('Kapasitas Mesin','-') or '-').strip()
 
         texts.append(f"{nama} ({tahun}), {bb}, {trans}, harga {harga}, usia {usia} tahun, kapasitas {cc}")
         metas.append({
-            "nama_mobil": nama,
-            "tahun": tahun,
-            "harga": harga,
-            "harga_angka": harga_angka,
-            "usia": usia,
-            "bahan_bakar": bb,
-            "transmisi": trans,
-            "kapasitas_mesin": cc,
+            "nama_mobil": nama, "tahun": tahun,
+            "harga": harga, "harga_angka": harga_angka,
+            "usia": usia, "bahan_bakar": bb,
+            "transmisi": trans, "kapasitas_mesin": cc,
             "merek": (nama.split()[0] if nama else "").lower(),
         })
 
+    print("[INFO] Contoh metadata:", json.dumps(metas[0], indent=2))
     CHROMA_DIR.mkdir(parents=True, exist_ok=True)
-    emb = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2",
-        encode_kwargs={"normalize_embeddings": True}
-    )
+    emb = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2",
+                                encode_kwargs={"normalize_embeddings": True})
     vs = Chroma.from_texts(texts=texts, embedding=emb, metadatas=metas, persist_directory=str(CHROMA_DIR))
     vs.persist()
     try: count = vs._collection.count()
