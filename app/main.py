@@ -3,171 +3,209 @@ import re
 from pathlib import Path
 from typing import List, Dict, Any
 
+import numpy as np
 import pandas as pd
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
-# ====== Path dasar ======
+# ========= PATHS =========
 APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
 DATA_CSV = APP_DIR / "data" / "data_mobil_final.csv"
 FRONTEND_DIR = ROOT_DIR / "frontend"
-CHROMA_DIR = Path(os.getenv("CHROMA_DIR", ROOT_DIR / "chroma"))
-ENABLE_RAG = os.getenv("ENABLE_RAG", "0") == "1"
 
-# ====== Aplikasi ======
-app = FastAPI(title="ChatCars")
-
-# CORS (boleh disesuaikan)
+# ========= APP =========
+app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # ganti ke domain kamu kalau mau lebih ketat
-    allow_credentials=True,
+    allow_origins=["*"],  # longgar dulu biar mudah tes; ganti domain Anda kalau mau
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ====== Serve frontend ======
+# ========= DATA LOADING =========
+if not DATA_CSV.exists():
+    raise FileNotFoundError(f"Tidak ketemu dataset: {DATA_CSV}")
+
+df = pd.read_csv(DATA_CSV)
+# Normalisasi kolom
+df.columns = df.columns.str.strip().str.lower()
+df.columns = df.columns.str.replace(r"\s+", "_", regex=True)
+
+# Pastikan nama kolom utama ada:
+# nama_mobil, tahun, harga, usia, bahan_bakar, transmisi, kapasitas_mesin
+def _ensure(col_name: str) -> None:
+    if col_name not in df.columns:
+        raise KeyError(f"Kolom '{col_name}' tidak ada di CSV")
+for col in ["nama_mobil", "tahun", "harga", "bahan_bakar", "transmisi", "kapasitas_mesin"]:
+    _ensure(col)
+
+# harga -> angka
+def to_int_price(x) -> int:
+    if pd.isna(x):
+        return 0
+    s = str(x).lower().replace("rp", "").replace(" ", "")
+    s = s.replace(",", ".")
+    # format "150juta"
+    m = re.search(r"(\d+)\s*juta", s)
+    if m:
+        return int(m.group(1)) * 1_000_000
+    # ambil digit
+    digits = re.sub(r"[^\d]", "", s)
+    return int(digits) if digits else 0
+
+df["harga_angka"] = df["harga"].apply(to_int_price)
+
+# Buat field teks untuk TF-IDF (gabung beberapa atribut biar “kaya”)
+def row_text(r: pd.Series) -> str:
+    parts = [
+        str(r.get("nama_mobil", "")),
+        str(r.get("bahan_bakar", "")),
+        str(r.get("transmisi", "")),
+        f"{str(r.get('kapasitas_mesin', ''))}cc",
+        str(r.get("tahun", "")),
+    ]
+    return " ".join([p for p in parts if p])
+
+df["_text"] = df.apply(row_text, axis=1)
+
+# ========= TF-IDF FIT =========
+# N-gram sampai bigram cukup, stop_words biarkan None (karena banyak istilah Indo)
+VECTORIZER = TfidfVectorizer(ngram_range=(1, 2), min_df=1)
+DOC_MATRIX = VECTORIZER.fit_transform(df["_text"].fillna(""))
+
+# ========= UTIL PARSER =========
+def parse_budget(q: str) -> int | None:
+    """Cari 'di bawah 300 juta' atau angka langsung"""
+    q = q.lower()
+    # X juta
+    m = re.search(r"(\d+)\s*juta", q)
+    if m:
+        return int(m.group(1)) * 1_000_000
+    # angka penuh
+    m2 = re.search(r"(\d[\d\.]{5,})", q)
+    if m2:
+        return int(m2.group(1).replace(".", ""))
+    return None
+
+def parse_tahun_min(q: str) -> int | None:
+    m = re.search(r"tahun\s*(\d{4})\s*(ke\s*atas|keatas|>=)?", q.lower())
+    if m:
+        return int(m.group(1))
+    return None
+
+def parse_tahun_max(q: str) -> int | None:
+    m = re.search(r"tahun\s*(?:di\s*bawah|<)\s*(\d{4})", q.lower())
+    if m:
+        return int(m.group(1))
+    return None
+
+def parse_usia_max(q: str) -> int | None:
+    m = re.search(r"usia\s*(?:di\s*bawah|<)\s*(\d+)", q.lower())
+    if m:
+        return int(m.group(1))
+    return None
+
+def apply_rule_filters(base: pd.DataFrame, q: str) -> pd.DataFrame:
+    ql = q.lower()
+    d = base
+
+    # bahan bakar
+    fuels = ["diesel", "bensin", "hybrid", "listrik"]
+    picked = [f for f in fuels if f in ql]
+    if picked:
+        regex = "|".join(picked)
+        d = d[d["bahan_bakar"].astype(str).str.contains(regex, case=False, na=False)]
+
+    # transmisi
+    if "matic" in ql and "manual" not in ql:
+        d = d[d["transmisi"].astype(str).str.contains("matic", case=False, na=False)]
+    if "manual" in ql and "matic" not in ql:
+        d = d[d["transmisi"].astype(str).str.contains("manual", case=False, na=False)]
+
+    # budget
+    budget = parse_budget(ql)
+    if budget is not None:
+        d = d[d["harga_angka"] <= budget]
+
+    # tahun
+    tmin = parse_tahun_min(ql)
+    if tmin is not None:
+        d = d[d["tahun"].astype(int) >= tmin]
+
+    tmax = parse_tahun_max(ql)
+    if tmax is not None:
+        d = d[d["tahun"].astype(int) < tmax]
+
+    # usia
+    umax = parse_usia_max(ql)
+    if umax is not None:
+        tahun_sekarang = 2025  # boleh diset dinamis
+        batas = tahun_sekarang - umax
+        d = d[d["tahun"].astype(int) >= batas]
+
+    return d
+
+def rank_by_cosine(query: str, candidates_idx: np.ndarray, topk: int = 5) -> List[int]:
+    """Hitung cosine similarity antara query dan semua dokumen, tapi hanya ambil indeks kandidat."""
+    qvec = VECTORIZER.transform([query])
+    scores = cosine_similarity(DOC_MATRIX[candidates_idx], qvec).ravel()
+    ord_idx = np.argsort(scores)[::-1]  # descending
+    take = ord_idx[:topk]
+    return candidates_idx[take].tolist(), scores[take].tolist()
+
+def to_payload(rows: pd.DataFrame, idxs: List[int], scores: List[float]) -> List[Dict[str, Any]]:
+    out = []
+    for i, s in zip(idxs, scores):
+        r = rows.iloc[i]
+        out.append({
+            "nama_mobil": str(r.get("nama_mobil", "")),
+            "tahun": int(r.get("tahun", 0)) if pd.notna(r.get("tahun")) else None,
+            "harga": str(r.get("harga", "")),
+            "usia": int(r.get("usia", 0)) if "usia" in rows.columns and pd.notna(r.get("usia")) else None,
+            "bahan_bakar": str(r.get("bahan_bakar", "")),
+            "transmisi": str(r.get("transmisi", "")),
+            "kapasitas_mesin": str(r.get("kapasitas_mesin", "")),
+            "cosine_score": float(round(s, 4)),
+        })
+    return out
+
+# ========= ROUTES =========
+@app.get("/health")
+def health():
+    return {"ok": True}
+
+# Layani frontend
 app.mount("/frontend", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
 
 @app.get("/")
 def root():
     return FileResponse(str(FRONTEND_DIR / "index.html"))
 
-@app.get("/health")
-def health():
-    return {"ok": True}
-
-# ====== Dataset mobil ======
-def _load_dataset() -> pd.DataFrame:
-    df = pd.read_csv(DATA_CSV)
-    df.columns = df.columns.str.strip().str.lower()
-    # normalisasi kolom harga -> angka
-    if "harga_angka" not in df.columns:
-        def _to_int(x):
-            s = str(x)
-            digits = re.sub(r"\D", "", s)
-            return int(digits) if digits else 0
-        if "harga" in df.columns:
-            df["harga_angka"] = df["harga"].apply(_to_int)
-        else:
-            df["harga_angka"] = 0
-    return df
-
-data_mobil = _load_dataset()
-
-# ====== Rule-based filter sederhana (backup kalau RAG kosong) ======
-def filter_rule_based(q: str, limit: int = 5) -> pd.DataFrame:
-    qlow = q.lower()
-    df = data_mobil.copy()
-
-    # Bahan bakar
-    fuels = ["diesel", "bensin", "hybrid", "listrik"]
-    for bb in fuels:
-        if bb in qlow and f"non {bb}" not in qlow:
-            if "bahan bakar" in df.columns:
-                df = df[df["bahan bakar"].str.contains(bb, case=False, na=False)]
-
-    # Transmisi
-    if "matic" in qlow and "manual" not in qlow and "transmisi" in df.columns:
-        df = df[df["transmisi"].str.contains("matic", case=False, na=False)]
-    if "manual" in qlow and "matic" not in qlow and "transmisi" in df.columns:
-        df = df[df["transmisi"].str.contains("manual", case=False, na=False)]
-
-    # Harga
-    m_max = re.search(r"(?:di\s*bawah|max(?:imal)?|<=?)\s*rp?\s*([\d\.]+)", qlow)
-    if m_max:
-        batas = int(m_max.group(1).replace(".", ""))
-        df = df[df["harga_angka"] <= batas]
-    m_range = re.search(r"rp?\s*([\d\.]+)\s*-\s*rp?\s*([\d\.]+)", qlow)
-    if m_range:
-        lo = int(m_range.group(1).replace(".", ""))
-        hi = int(m_range.group(2).replace(".", ""))
-        df = df[(df["harga_angka"] >= lo) & (df["harga_angka"] <= hi)]
-
-    # Tahun ke atas
-    m_tahun_min = re.search(r"tahun\s*(\d{4})\s*(?:ke\s*atas|\+)", qlow)
-    if m_tahun_min and "tahun" in df.columns:
-        df = df[df["tahun"] >= int(m_tahun_min.group(1))]
-
-    if df.empty:
-        return df
-    return df.head(limit)
-
-# ====== (Opsional) RAG: pakai Chroma + Sentence Transformers ======
-if ENABLE_RAG:
-    try:
-        from app.rag_qa import build_retriever, rebuild_chroma as _rebuild
-        retriever = build_retriever(CHROMA_DIR, DATA_CSV)
-
-        @app.post("/admin/rebuild_chroma")
-        def rebuild_chroma():
-            _rebuild(CHROMA_DIR, DATA_CSV)
-            return JSONResponse({"ok": True, "dir": str(CHROMA_DIR)})
-
-        @app.get("/debug/chroma")
-        def debug_chroma():
-            files = []
-            if CHROMA_DIR.exists():
-                files = [p.name for p in CHROMA_DIR.glob("*")]
-            return {"dir": str(CHROMA_DIR), "files": files}
-
-        @app.get("/debug/chroma_count")
-        def debug_chroma_count():
-            try:
-                results = retriever.vectorstore._collection.count()  # type: ignore
-            except Exception:
-                results = None
-            return {"count": results}
-
-    except Exception as e:
-        # Jangan biarkan startup mati hanya karena RAG error
-        print("[INIT] ENABLE_RAG=1 tapi gagal inisialisasi RAG:", e)
-        ENABLE_RAG = False
-
-# ====== Endpoint yang dipakai front-end ======
 @app.get("/cosine_rekomendasi")
-def cosine_rekomendasi(query: str, k: int = 5) -> Dict[str, Any]:
-    """
-    1) Coba cari via RAG (semantic search)
-    2) Jika kosong, fallback rule-based filter
-    """
-    results: List[Dict[str, Any]] = []
+def cosine_rekomendasi(
+    query: str = Query(..., description="Pertanyaan pengguna, mis. 'rekomendasi mobil listrik di bawah 300 juta'"),
+    k: int = Query(5, ge=1, le=20),
+):
+    # 1) Filter rule-based lebih dulu
+    filtered = apply_rule_filters(df, query)
 
-    # 1) RAG
-    if ENABLE_RAG:
-        try:
-            docs = retriever.get_relevant_documents(query)[:k]  # type: ignore
-            for d in docs:
-                meta = d.metadata or {}
-                results.append({
-                    "nama_mobil": meta.get("nama mobil") or meta.get("nama") or "",
-                    "tahun": meta.get("tahun") or "",
-                    "harga": meta.get("harga") or "",
-                    "usia": meta.get("usia") or "",
-                    "bahan_bakar": meta.get("bahan bakar") or meta.get("bahan_bakar") or "",
-                    "transmisi": meta.get("transmisi") or "",
-                    "kapasitas_mesin": meta.get("kapasitas mesin") or meta.get("kapasitas_mesin") or "",
-                    "cosine_score": getattr(d, "score", None)
-                })
-        except Exception as e:
-            print("[RAG] gagal search:", e)
+    # Jika filter terlalu ketat, longgarkan (fallback ke semua data)
+    if filtered.empty:
+        filtered = df.copy()
 
-    # 2) Fallback rule-based
-    if not results:
-        df = filter_rule_based(query, k)
-        for _, r in df.iterrows():
-            results.append({
-                "nama_mobil": r.get("nama mobil", ""),
-                "tahun": r.get("tahun", ""),
-                "harga": r.get("harga", ""),
-                "usia": r.get("usia", ""),
-                "bahan_bakar": r.get("bahan bakar", ""),
-                "transmisi": r.get("transmisi", ""),
-                "kapasitas_mesin": r.get("kapasitas mesin", ""),
-                "cosine_score": None
-            })
+    # 2) Siapkan kandidat index (index relatif terhadap df asli)
+    candidates_idx = filtered.index.to_numpy()
 
-    return {"rekomendasi": results}
+    # 3) Rank dengan cosine TF-IDF
+    top_idxs, scores = rank_by_cosine(query, candidates_idx, topk=k)
+
+    if not top_idxs:
+        return {"rekomendasi": []}
+
+    payload = to_payload(df, top_idxs, scores)
+    return {"rekomendasi": payload}
