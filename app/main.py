@@ -21,7 +21,7 @@ FRONTEND_DIR = ROOT_DIR / "frontend"
 app = FastAPI(title="ChatCars")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # longgar biar mudah tes; ganti ke domain produksi kalau mau
+    allow_origins=["*"],  # ganti ke domain kamu jika mau lebih ketat
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -40,6 +40,7 @@ def _need(col: str):
 for c in ["nama_mobil", "tahun", "harga", "bahan_bakar", "transmisi", "kapasitas_mesin"]:
     _need(c)
 
+# konversi harga → int (rupiah)
 def to_int_price(x) -> int:
     if pd.isna(x):
         return 0
@@ -53,12 +54,15 @@ def to_int_price(x) -> int:
 
 df["harga_angka"] = df["harga"].apply(to_int_price)
 
-# brand katalog (first token dari nama_mobil)
+# usia (thn sekarang 2025)
+TAHUN_SEKARANG = 2025
+df["_usia"] = (TAHUN_SEKARANG - df["tahun"].astype(int)).clip(lower=0)
+
+# brand (token pertama)
 def extract_brand(name: str) -> str:
     if not isinstance(name, str) or not name.strip():
         return ""
     return name.strip().split()[0].lower()
-
 df["_brand"] = df["nama_mobil"].astype(str).apply(extract_brand)
 KNOWN_BRANDS = set(sorted(df["_brand"].unique()))
 
@@ -104,13 +108,12 @@ def parse_usia_max(q: str) -> int | None:
 
 def find_brand_tokens(q: str) -> List[str]:
     tokens = re.findall(r"[a-z0-9]+", q.lower())
-    # buang kata-kata umum
     stop = {"rekomendasi", "mobil", "tahun", "harga", "bawah", "di", "ke", "atas", "max", "maksimal", "rp", "jt", "juta"}
     cand = [t for t in tokens if t not in stop and len(t) >= 2]
     brands = [t for t in cand if t in KNOWN_BRANDS]
     return brands
 
-# ========= FILTER & RANK =========
+# ========= FILTER =========
 def apply_rule_filters(base: pd.DataFrame, q: str) -> pd.DataFrame:
     ql = q.lower()
     d = base
@@ -121,7 +124,7 @@ def apply_rule_filters(base: pd.DataFrame, q: str) -> pd.DataFrame:
     for f in fuels:
         if re.search(fr"\b{re.escape(f)}\b", ql):
             picked.append("listrik" if f in {"ev", "electric"} else f)
-    picked = list(dict.fromkeys(picked))  # unique preserve order
+    picked = list(dict.fromkeys(picked))
     if picked:
         regex = "|".join(picked)
         d = d[d["bahan_bakar"].astype(str).str.contains(regex, case=False, na=False)]
@@ -140,7 +143,7 @@ def apply_rule_filters(base: pd.DataFrame, q: str) -> pd.DataFrame:
     # budget / tahun / usia
     budget = parse_budget(ql)
     if budget is not None:
-        d = d[d["harga_angka"] > 0]  # punya harga
+        d = d[d["harga_angka"] > 0]
         d = d[d["harga_angka"] <= budget]
 
     tmin = parse_tahun_min(ql)
@@ -153,40 +156,30 @@ def apply_rule_filters(base: pd.DataFrame, q: str) -> pd.DataFrame:
 
     umax = parse_usia_max(ql)
     if umax is not None:
-        tahun_sekarang = 2025
-        batas = tahun_sekarang - umax
+        batas = TAHUN_SEKARANG - umax
         d = d[d["tahun"].astype(int) >= batas]
 
     return d
 
+# ========= RANKING =========
 def rank_candidates(query: str, candidates_idx: np.ndarray, k: int, budget: int | None) -> tuple[list[int], list[float]]:
-    """
-    Skor gabungan:
-      - cosine TF-IDF (w_text)
-      - kedekatan ke budget (w_price) → kalau melewati budget, dipenalti
-    """
     if len(candidates_idx) == 0:
         return [], []
 
     qvec = VECTORIZER.transform([query])
     cos = cosine_similarity(DOC_MATRIX[candidates_idx], qvec).ravel()
 
-    # price proximity (0..1). Jika tidak ada budget → nol.
     price_prox = np.zeros_like(cos, dtype=float)
     if budget and budget > 0:
         prices = df.loc[candidates_idx, "harga_angka"].fillna(0).to_numpy(dtype=float)
-        # kedekatan (boleh lebih kecil dari budget, yang melebihi dipenalti)
         prox = 1.0 - np.abs(prices - budget) / budget
         prox = np.clip(prox, 0.0, 1.0)
-        # penalti jika > budget (turunkan 30%)
         over = prices > budget
-        prox[over] *= 0.7
+        prox[over] *= 0.7  # penalti kalau lewat budget
         price_prox = prox
 
-    # bobot (bisa disetel)
     w_text = 0.45
     w_price = 0.55 if budget else 0.0
-
     final = w_text * cos + w_price * price_prox
 
     order = np.argsort(final)[::-1]
@@ -197,15 +190,15 @@ def to_payload(rows: pd.DataFrame, idxs: List[int], scores: List[float]) -> List
     out: List[Dict[str, Any]] = []
     for i, s in zip(idxs, scores):
         r = rows.iloc[i]
+        usia_val = int((TAHUN_SEKARANG - int(r.get("tahun", 0))) if pd.notna(r.get("tahun")) else 0)
         out.append({
             "nama_mobil": str(r.get("nama_mobil", "")),
             "tahun": int(r.get("tahun", 0)) if pd.notna(r.get("tahun")) else None,
             "harga": str(r.get("harga", "")),
-            "usia": int(r.get("usia", 0)) if "usia" in rows.columns and pd.notna(r.get("usia")) else None,
+            "usia": usia_val,
             "bahan_bakar": str(r.get("bahan_bakar", "")),
             "transmisi": str(r.get("transmisi", "")),
             "kapasitas_mesin": str(r.get("kapasitas_mesin", "")),
-            # frontend kamu membaca "cosine_score" → isi skor gabungan di sini
             "cosine_score": float(round(s, 4)),
         })
     return out
@@ -230,21 +223,36 @@ def cosine_rekomendasi(
     if not q:
         return {"rekomendasi": []}
 
-    # 1) filter rule-based (strict)
+    # 1) filter aturan
     filtered = apply_rule_filters(df, q)
-
-    # 2) fallback kalau terlalu ketat
     if filtered.empty:
         filtered = df.copy()
 
     candidates_idx = filtered.index.to_numpy()
     budget = parse_budget(q)
 
-    # 3) ranking gabungan
-    top_idxs, scores = rank_candidates(q, candidates_idx, k, budget)
+    # 2) PRIORITAS USIA MUDA (≤ 5 tahun)
+    usia_maks_muda = 5
+    muda_mask = filtered["_usia"] <= usia_maks_muda
+    idx_muda = filtered.index[muda_mask].to_numpy()
+    idx_tua = filtered.index[~muda_mask].to_numpy()
 
-    if not top_idxs:
+    final_ids: List[int] = []
+    final_scores: List[float] = []
+
+    # 2a) ambil dari yang muda dulu
+    ids_y, scores_y = rank_candidates(q, idx_muda, k, budget)
+    final_ids.extend(ids_y)
+    final_scores.extend(scores_y)
+
+    # 2b) kalau belum cukup, isi dari yang >5 tahun
+    if len(final_ids) < k and len(idx_tua) > 0:
+        ids_o, scores_o = rank_candidates(q, idx_tua, k - len(final_ids), budget)
+        final_ids.extend(ids_o)
+        final_scores.extend(scores_o)
+
+    if not final_ids:
         return {"rekomendasi": []}
 
-    payload = to_payload(df, top_idxs, scores)
+    payload = to_payload(df, final_ids, final_scores)
     return {"rekomendasi": payload}
