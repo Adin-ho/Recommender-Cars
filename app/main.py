@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
+from app.rule_based import jawab_rule
 
 APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
@@ -69,3 +70,21 @@ def rebuild(secret: str):
     from app.embedding import simpan_vektor_mobil
     simpan_vektor_mobil(persist_dir=str(CHROMA_PERSIST_DIR))
     return {"ok": True, "persist_dir": str(CHROMA_PERSIST_DIR)}
+
+@app.get("/cosine_rekomendasi")
+def cosine_alias(query: str):
+    recs = jawab_rule(query, topk=10)
+    # samakan field yang diharapkan frontend lama
+    mapped = []
+    for r in recs:
+        mapped.append({
+            "nama_mobil": r["nama_mobil"],
+            "tahun": r["tahun"],
+            "harga": r["harga"],
+            "usia": r["usia"],
+            "bahan_bakar": r["bahan_bakar"],
+            "transmisi": r["transmisi"],
+            "kapasitas_mesin": r["kapasitas_mesin"],
+            "cosine_score": r.get("skor") if r.get("skor") is not None else 0.0
+        })
+    return {"rekomendasi": mapped}
