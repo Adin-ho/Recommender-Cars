@@ -1,15 +1,15 @@
-fastapi
-uvicorn[standard]
-pandas
-numpy
-requests
-aiofiles
-python-multipart
-tqdm
+fastapi==0.112.2
+uvicorn[standard]==0.30.6
+pandas==2.2.2
+numpy==1.26.4
+requests==2.32.3
+aiofiles==24.1.0
+python-multipart==0.0.9
+tqdm==4.66.4
 
 chromadb==0.5.3
-langchain
-langchain-community
-langchain-chroma
+langchain==0.2.14
+langchain-community==0.2.11
+langchain-chroma==0.1.2
 
-sentence-transformers
+sentence-transformers==2.7.0
