@@ -1,12 +1,13 @@
+# backend
 fastapi==0.110.0
 uvicorn[standard]==0.30.6
+
+# data/utils
 pandas==2.2.2
-numpy<2.0
+numpy==1.26.4
 tqdm==4.66.5
 
-# RAG stack (kompatibel Python 3.11)
-langchain-community==0.3.7
-langchain-chroma==0.1.4
-chromadb==0.5.8
-
+# vector store + embeddings (CPU only)
+chromadb==0.5.12
 sentence-transformers==2.5.1
+torch==2.2.2          # CPU wheel, py3.11 compatible
