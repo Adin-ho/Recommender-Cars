@@ -23,10 +23,10 @@ def _parse_query(q: str):
         "brand": None,
         "bahan_bakar": None,
         "transmisi": None,
-        "harga_max": None
+        "harga_max": None,
+        "harga_min": None
     }
 
-    # brand
     brands = ["toyota", "daihatsu", "wuling", "bmw", "hyundai", "renault", "innova", "ayla", "fortuner", "mobilio"]
     for b in brands:
         if b in ql:
@@ -43,34 +43,54 @@ def _parse_query(q: str):
     elif "manual" in ql:
         parsed["transmisi"] = "manual"
 
-    m = re.search(r"(?:di bawah|<=|maks(?:imal)?)\s*rp?\s*([\d\.]+)", ql)
-    if m:
-        parsed["harga_max"] = int(m.group(1).replace(".", ""))
+    if "di bawah" in ql or "<=" in ql or "maksimal" in ql:
+        m = re.search(r"(?:di bawah|<=|maks(?:imal)?)\s*rp?\s*([\d\.]+)", ql)
+        if m:
+            parsed["harga_max"] = int(m.group(1).replace(".", ""))
+    elif "lebih dari" in ql or "di atas" in ql or ">=" in ql:
+        m = re.search(r"(?:lebih dari|di atas|>=)\s*rp?\s*([\d\.]+)", ql)
+        if m:
+            parsed["harga_min"] = int(m.group(1).replace(".", ""))
+    else:
+        # fallback angka besar
+        m = re.search(r"(rp\s*)?([\d\.]{6,})", ql)
+        if m:
+            angka = int(m.group(2).replace(".", ""))
+            parsed["harga_max"] = angka
+
     return parsed
 
 def jawab_rule(pertanyaan: str, topk: int = 10):
-    parsed = _parse_query(pertanyaan)
-    out = df.copy()
+    p = _parse_query(pertanyaan)
+    df_filtered = df.copy()
 
-    if parsed["brand"]:
-        out = out[out["nama mobil"].str.contains(parsed["brand"], case=False, na=False)]
+    if p["brand"]:
+        df_filtered = df_filtered[df_filtered["nama mobil"].str.contains(p["brand"], case=False, na=False)]
 
-    if parsed["bahan_bakar"]:
-        out = out[out["bahan bakar"].str.contains(parsed["bahan_bakar"], case=False, na=False)]
+    if p["bahan_bakar"]:
+        df_filtered = df_filtered[df_filtered["bahan bakar"].str.contains(p["bahan_bakar"], case=False, na=False)]
 
-    if parsed["transmisi"]:
-        out = out[out["transmisi"].str.contains(parsed["transmisi"], case=False, na=False)]
+    if p["transmisi"]:
+        df_filtered = df_filtered[df_filtered["transmisi"].str.contains(p["transmisi"], case=False, na=False)]
 
-    if parsed["harga_max"]:
-        out = out[out["harga_angka"] <= parsed["harga_max"]]
+    if p["harga_max"]:
+        df_filtered = df_filtered[df_filtered["harga_angka"] <= p["harga_max"]]
 
-    if out.empty:
+    if p["harga_min"]:
+        df_filtered = df_filtered[df_filtered["harga_angka"] >= p["harga_min"]]
+
+    if df_filtered.empty:
         return []
 
-    out = out.sort_values("harga_angka").head(topk)
+    # Prioritaskan usia <= 5 tahun dulu
+    prefer = df_filtered[df_filtered["usia"] <= 5]
+    if prefer.empty:
+        prefer = df_filtered.copy()
+
+    prefer = prefer.sort_values(["harga_angka", "usia"]).head(topk)
 
     hasil = []
-    for _, r in out.iterrows():
+    for _, r in prefer.iterrows():
         hasil.append({
             "nama_mobil": _clean_name(r.get("nama mobil", "")),
             "tahun": int(r.get("tahun", 0)),
@@ -92,4 +112,4 @@ def api_rule(pertanyaan: str = Query(..., description="Contoh: 'mobil diesel mat
     lines = []
     for i, r in enumerate(hasil, 1):
         lines.append(f"{i}. {r['nama_mobil']} ({r['tahun']}) - {r['harga']} - {r['bahan_bakar']}, {r['transmisi']}, {r['kapasitas_mesin']}")
-    return {"jawaban": "Hasil rule-based:\n\n" + "\n".join(lines), "rekomendasi": hasil}
+    return {"jawaban": "Hasil rekomendasi:\n\n" + "\n".join(lines), "rekomendasi": hasil}
