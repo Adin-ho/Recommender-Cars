@@ -1,61 +1,90 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>🚗 Rekomendasi Mobil</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <style>body{font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial}</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ChatCars</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
 </head>
-<body style="background:#f5f7fb;display:flex;justify-content:center">
-  <div style="max-width:760px;width:100%;background:#fff;margin:24px;padding:20px;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.06)">
-    <h1 style="margin:0 0 10px;color:#2563eb">🚗 Rekomendasi Mobil</h1>
+<body class="bg-gray-100 flex flex-col items-center h-screen p-4">
+  <div class="flex flex-col w-full max-w-2xl bg-white shadow-lg rounded-lg p-6 h-full gap-2">
+    <h1 class="text-2xl font-bold text-center text-blue-600 mb-2">🚗 Rekomendasi Mobil</h1>
 
-    <div id="chat" style="height:60vh;overflow:auto;border:1px solid #e5e7eb;border-radius:8px;padding:12px;background:#fafafa"></div>
+    <div id="chatBox" class="flex-1 min-h-0 overflow-y-auto p-4 border rounded bg-gray-50 text-sm"></div>
 
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <input id="q" placeholder="Contoh: mobil listrik matic di bawah 500jt"
-        style="flex:1;padding:10px;border:1px solid #d1d5db;border-radius:8px" />
-      <button id="send" style="padding:10px 16px;background:#2563eb;color:#fff;border:0;border-radius:8px;cursor:pointer">Kirim</button>
+    <div class="flex space-x-2">
+      <input id="pertanyaan" type="text" placeholder="Tanyakan mobil... contoh: diesel matic di bawah 300 juta"
+        class="flex-grow px-4 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"/>
+      <button onclick="kirimPertanyaan()"
+        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Kirim</button>
     </div>
-    <div style="color:#6b7280;font-size:12px;margin-top:6px">Contoh: “BMW diesel matic lebih dari 500 juta”</div>
+
+    <div class="text-xs text-gray-500 mt-1">Contoh: “BMW diesel matic lebih dari 500 juta”</div>
   </div>
 
   <script>
-    const chat = document.getElementById('chat')
-    const input = document.getElementById('q')
-    const sendBtn = document.getElementById('send')
+    const chatBox = document.getElementById("chatBox");
+    const input = document.getElementById("pertanyaan");
 
-    function addBubble(text, right=false) {
-      const d = document.createElement('div')
-      d.style.margin = '6px 0'
-      d.style.textAlign = right ? 'right' : 'left'
-      d.innerText = text
-      chat.appendChild(d)
-      chat.scrollTop = chat.scrollHeight
-    }
+    async function kirimPertanyaan(){
+      const pesan = input.value.trim();
+      if(!pesan) return;
 
-    async function ask() {
-      const t = input.value.trim()
-      if (!t) return
-      addBubble(t, true)
-      input.value = ''
-      const wait = document.createElement('div'); wait.innerText = '🤖 …'; chat.appendChild(wait)
+      const userMsg = document.createElement("div");
+      userMsg.className = "text-right text-blue-700 mb-2";
+      userMsg.textContent = pesan;
+      chatBox.appendChild(userMsg);
+      input.value = "";
+      input.disabled = true;
+
+      const botMsg = document.createElement("div");
+      botMsg.className = "text-left text-gray-800 whitespace-pre-wrap";
+      chatBox.appendChild(botMsg);
+
+      botMsg.textContent = "🤖";
+      let dots = setInterval(() => {
+        botMsg.textContent += ".";
+        if(botMsg.textContent.length > 8) botMsg.textContent = "🤖";
+      }, 200);
 
       try {
-        const res = await fetch(`/api/rule?pertanyaan=${encodeURIComponent(t)}&topk=5`)
-        const data = await res.json()
-        wait.remove()
-        const txt = (data && data.jawaban) ? data.jawaban : 'Tidak ada jawaban.'
-        addBubble(txt, false)
+        const res = await fetch(`/api/rule?pertanyaan=${encodeURIComponent(pesan)}`);
+        clearInterval(dots);
+
+        if(!res.ok){
+          botMsg.textContent = "❌ Gagal mengambil jawaban (status " + res.status + ").";
+          return;
+        }
+
+        const data = await res.json();
+        let jawab = data.jawaban || "Berikut hasilnya:";
+        let list  = data.rekomendasi || [];
+
+        let html = `<div class="mb-2">${jawab}</div>`;
+        for(let i=0;i<list.length;i++){
+          const r = list[i];
+          html += `<div class="mb-3 p-2 rounded bg-gray-50 border">
+            <b>${i+1}. ${r.nama_mobil || ""} (${r.tahun || ""})</b><br>
+            Harga: <b>${r.harga || "-"}</b><br>
+            Usia: <b>${r.usia || "-"}</b> tahun<br>
+            Bahan Bakar: ${r.bahan_bakar || "-"}<br>
+            Transmisi: ${r.transmisi || "-"}<br>
+            Kapasitas Mesin: ${r.kapasitas_mesin || "-"}<br>
+          </div>`;
+        }
+        botMsg.innerHTML = html;
       } catch (e) {
-        wait.remove()
-        addBubble('❌ Gagal mengambil jawaban.', false)
+        clearInterval(dots);
+        botMsg.textContent = "❌ Gagal mengambil jawaban.";
+      } finally {
+        input.disabled = false;
+        input.focus();
+        chatBox.scrollTop = chatBox.scrollHeight;
       }
     }
 
-    sendBtn.onclick = ask
-    input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') ask() })
+    input.addEventListener("keypress", e => { if(e.key==="Enter") kirimPertanyaan(); });
   </script>
 </body>
+
 </html>
