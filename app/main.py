@@ -1,3 +1,4 @@
+# app/main.py
 import os
 from pathlib import Path
 from fastapi import FastAPI
@@ -5,21 +6,22 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
+# === Path dasar ===
 APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
 FRONTEND_DIR = ROOT_DIR / "frontend"
 
-# --- ENV ---
-ENABLE_RAG = os.getenv("ENABLE_RAG", "0") == "1"
-ENABLE_LLM = os.getenv("ENABLE_LLM", "0") == "1"   # <-- baru
+# === ENV flags ===
+ENABLE_RAG = os.getenv("ENABLE_RAG", "0") == "1"     # default off
+ENABLE_LLM = os.getenv("ENABLE_LLM", "0") == "1"     # default off
 BUILD_EMBED_ON_START = os.getenv("BUILD_EMBED_ON_START", "0") == "1"
 CHROMA_PERSIST_DIR = Path(os.getenv("CHROMA_PERSIST_DIR", str(ROOT_DIR / "chroma")))
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*")
 
-# --- App instance HARUS duluan ---
+# === BUAT APP DULUAN (ini kunci agar tak NameError) ===
 app = FastAPI(title="Car Recommender")
 
-# --- CORS ---
+# === CORS ===
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"] if ALLOWED_ORIGINS == "*" else [o.strip() for o in ALLOWED_ORIGINS.split(",")],
@@ -28,16 +30,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- Static (opsional) ---
+# === Static/frontend (opsional) ===
 if FRONTEND_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
 
-# --- Health ---
+# === Health ===
 @app.get("/healthz", response_class=PlainTextResponse)
 def health():
     return "ok"
 
-# --- Home -> render frontend/index.html bila ada ---
+# === Home -> render index.html bila ada ===
 @app.get("/")
 def home():
     index_html = FRONTEND_DIR / "index.html"
@@ -45,23 +47,23 @@ def home():
         return FileResponse(index_html)
     return {"message": "Car Recommender API. Buka /docs untuk Swagger."}
 
-# --- Router rule-based (selalu on) ---
+# === Router rule-based (SELALU ON) ===
 from app.rule_based import router as rule_router, jawab_rule  # noqa: E402
 app.include_router(rule_router)
 
-# --- Router LLM (opsional, untuk Ollama Mistral) ---
+# === Router LLM (OPSIONAL) ===
 if ENABLE_LLM:
     try:
+        # IMPORT & INCLUDE HANYA DI DALAM BLOK INI
         from app.llm_proxy import router as llm_router  # noqa: E402
         app.include_router(llm_router)
         print("[INIT] LLM router aktif")
     except Exception as e:
         print("[WARN] ENABLE_LLM=1 tapi gagal inisialisasi LLM router:", e)
 
-# --- Router RAG/Chroma (opsional) ---
+# === Router RAG/Chroma (OPSIONAL) ===
 if ENABLE_RAG:
     try:
-        # Bangun embedding saat start hanya bila diizinkan & index belum ada
         need_build = not CHROMA_PERSIST_DIR.exists() or not any(CHROMA_PERSIST_DIR.rglob("*"))
         if need_build and BUILD_EMBED_ON_START:
             print("[INIT] Chroma index belum ada -> generate embedding ...")
@@ -76,22 +78,12 @@ if ENABLE_RAG:
     except Exception as e:
         print("[WARN] ENABLE_RAG=1 tapi gagal inisialisasi RAG:", e)
 
-# --- Admin: rebuild embeddings manual ---
-@app.post("/admin/rebuild-embeddings")
-def rebuild(secret: str):
-    if secret != os.getenv("REBUILD_SECRET", "dev"):
-        return {"ok": False, "error": "unauthorized"}
-    from app.embedding import simpan_vektor_mobil
-    simpan_vektor_mobil(persist_dir=str(CHROMA_PERSIST_DIR))
-    return {"ok": True, "persist_dir": str(CHROMA_PERSIST_DIR)}
-
-# --- Alias lama (kompatibel UI lama) ---
+# === Alias lama untuk kompatibilitas UI lama ===
 @app.get("/cosine_rekomendasi")
 def cosine_alias(query: str):
     recs = jawab_rule(query, topk=10)
-    mapped = []
-    for r in recs:
-        mapped.append({
+    return {"rekomendasi": [
+        {
             "nama_mobil": r["nama_mobil"],
             "tahun": r["tahun"],
             "harga": r["harga"],
@@ -99,6 +91,6 @@ def cosine_alias(query: str):
             "bahan_bakar": r["bahan_bakar"],
             "transmisi": r["transmisi"],
             "kapasitas_mesin": r["kapasitas_mesin"],
-            "cosine_score": r.get("skor") if r.get("skor") is not None else 0.0
-        })
-    return {"rekomendasi": mapped}
+            "cosine_score": r.get("skor") or 0.0
+        } for r in recs
+    ]}
