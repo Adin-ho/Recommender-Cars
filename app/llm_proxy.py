@@ -21,6 +21,5 @@ async def chat(req: ChatReq):
         r = await client.post(f"{OLLAMA}/api/chat", json=payload)
         r.raise_for_status()
         data = r.json()
-    # format keluaran ringkas
-    content = data.get("message",{}).get("content","")
+    content = (data.get("message") or {}).get("content","")
     return {"model": MODEL, "output": content}
