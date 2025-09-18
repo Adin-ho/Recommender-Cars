@@ -27,9 +27,9 @@ def _clean_name(nm: str) -> str:
 
 FUEL_KEYWORDS = {
     "listrik": ["listrik", "electric", "ev"],
-    "hybrid":  ["hybrid", "hev", "phev", "plugin"],
-    "diesel":  ["diesel"],
-    "bensin":  ["bensin", "gasoline", "pertalite", "pertamax"]
+    "hybrid": ["hybrid", "hev", "phev", "plugin"],
+    "diesel": ["diesel"],
+    "bensin": ["bensin", "gasoline", "pertalite", "pertamax"]
 }
 
 BRANDS = [
@@ -75,17 +75,18 @@ def _parse_query(q: str):
     elif "manual" in ql:
         parsed["transmisi"] = "manual"
 
-    # harga di bawah / <=
+    # harga
+    # di bawah / <=
     m = re.search(r"(?:di\s*bawah|<=|maks(?:imal)?|max)\s*([^\s]+(?:\s*(?:jt|juta))?)", ql)
     if m:
         parsed["harga_max"] = _parse_int(m.group(1))
 
-    # harga di atas / >=
+    # di atas / >=
     m = re.search(r"(?:di\s*atas|lebih\s*dari|>=|min(?:imal)?)\s*([^\s]+(?:\s*(?:jt|juta))?)", ql)
     if m:
         parsed["harga_min"] = _parse_int(m.group(1))
 
-    # angka tunggal + kata "bawah" -> asumsi max
+    # angka tunggal (contoh: "500 juta") -> asumsikan max jika ada "bawah", kalau tidak biarkan
     if not parsed["harga_max"] and not parsed["harga_min"]:
         m = re.search(r"(\d[\d\.]*\s*(?:jt|juta)?)", ql)
         if m and ("bawah" in ql or "<" in ql):
@@ -98,8 +99,7 @@ def _parse_query(q: str):
 
     return parsed
 
-def _match_fuel_value(val: str, want: str) -> bool:
-    """Cek 'bahan bakar' terhadap sinonim (listrik/electric/ev, hybrid/hev/phev, dst)."""
+def _match_fuel(val: str, want: str) -> bool:
     if not want:
         return True
     s = str(val).lower()
@@ -110,29 +110,19 @@ def jawab_rule(pertanyaan: str, topk: int = 5):
     p = _parse_query(pertanyaan)
     out = df.copy()
 
-    # BRAND
+    # brand
     if p["brand"]:
         out = out[out["nama mobil"].str.contains(p["brand"], case=False, na=False)]
 
-    # FUEL (dengan fallback ke nama mobil)
+    # fuel
     if p["fuel"]:
-        # langkah-1: filter berdasarkan kolom 'bahan bakar'
-        mask_bb = out["bahan bakar"].apply(lambda x: _match_fuel_value(x, p["fuel"]))
-        out1 = out[mask_bb]
+        out = out[out["bahan bakar"].apply(lambda x: _match_fuel(x, p["fuel"]))]
 
-        # langkah-2 (fallback): jika kosong, coba deteksi di 'nama mobil'
-        if out1.empty:
-            keys = FUEL_KEYWORDS[p["fuel"]]
-            pat = "|".join([re.escape(k) for k in keys])
-            out1 = out[out["nama mobil"].str.contains(pat, case=False, na=False)]
-
-        out = out1
-
-    # TRANSMISI
+    # transmisi
     if p["transmisi"]:
         out = out[out["transmisi"].str.contains(p["transmisi"], case=False, na=False)]
 
-    # HARGA
+    # harga
     if p["harga_min"] is not None:
         out = out[out["harga_angka"] >= p["harga_min"]]
     if p["harga_max"] is not None:
@@ -141,17 +131,17 @@ def jawab_rule(pertanyaan: str, topk: int = 5):
     if out.empty:
         return []
 
-    # USIA eksplisit dari user -> filter ketat
+    # jika user minta usia eksplisit -> filter ketat
     if p["usia_max"] is not None:
         out = out[out["usia"] <= p["usia_max"]]
         if out.empty:
             return []
 
-    # PRIORITAS USIA <= PREFER_MAX_USIA, jika tidak ada pakai semua
+    # prioritas usia <= PREFER_MAX_USIA
     kandidat_muda = out[out["usia"] <= PREFER_MAX_USIA]
     prefer = kandidat_muda if not kandidat_muda.empty else out
 
-    # URUT: lebih murah & lebih muda di atas
+    # urutkan by harga lalu usia (lebih murah & muda di atas)
     prefer = prefer.sort_values(by=["harga_angka", "usia"], ascending=[True, True]).head(topk)
 
     hasil = []
@@ -171,7 +161,7 @@ def jawab_rule(pertanyaan: str, topk: int = 5):
 # ===== API =====
 @router.get("")
 def api_rule(
-    pertanyaan: str = Query(..., description="Contoh: 'mobil listrik matic di bawah 500jt'"),
+    pertanyaan: str = Query(..., description="Contoh: 'mobil listrik matic di bawah 500 jt'"),
     topk: int = Query(5, ge=1, le=50)
 ):
     hasil = jawab_rule(pertanyaan, topk)
@@ -180,8 +170,5 @@ def api_rule(
 
     lines = []
     for i, r in enumerate(hasil, 1):
-        lines.append(
-            f"{i}. {r['nama_mobil']} ({r['tahun']}) - {r['harga']} - "
-            f"{r['bahan_bakar']}, {r['transmisi']}, {r['kapasitas_mesin']}"
-        )
+        lines.append(f"{i}. {r['nama_mobil']} ({r['tahun']}) - {r['harga']} - {r['bahan_bakar']}, {r['transmisi']}, {r['kapasitas_mesin']}")
     return {"jawaban": "Hasil rekomendasi:\n\n" + "\n".join(lines), "rekomendasi": hasil}
