@@ -4,6 +4,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
+from app.llm_proxy import router as llm_router
+
+app.include_router(llm_router)
+
 
 APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
