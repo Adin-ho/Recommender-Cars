@@ -1,3 +1,4 @@
+# app/main.py
 import os
 from pathlib import Path
 from fastapi import FastAPI, Query
@@ -23,7 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ⬇️ Mount frontend hanya di /static agar /api TIDAK ketimpa
+# Mount frontend di /static (agar /api tidak ketimpa)
 if FRONTEND_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
 
@@ -32,7 +33,7 @@ if FRONTEND_DIR.exists():
 def healthz():
     return "ok"
 
-# Home: render index.html dari frontend/
+# Home: render index.html
 @app.get("/")
 def home():
     index_html = FRONTEND_DIR / "index.html"
@@ -44,7 +45,7 @@ def home():
 from app.rule_based import router as rule_router, jawab_rule  # noqa: E402
 app.include_router(rule_router)
 
-# === LLM Router (opsional, expose /api/llm/chat)
+# === LLM Router (opsional, /api/llm/chat)
 if ENABLE_LLM:
     try:
         from app.llm_proxy import router as llm_router, ollama_chat  # noqa: E402
@@ -67,8 +68,7 @@ async def api_ask(
     if not recs:
         return {
             "jawaban": "Tidak ditemukan.",
-            "rekomendasi": [],
-            "llm_model": os.getenv("OLLAMA_MODEL", "mistral") if ENABLE_LLM else None
+            "rekomendasi": []
         }
 
     plain = "Hasil rekomendasi:\n\n" + "\n".join([
@@ -77,7 +77,7 @@ async def api_ask(
         for i, r in enumerate(recs)
     ])
 
-    # Ringkas pakai Mistral (jika diaktifkan dan koneksi ada)
+    llm_text = None
     if ENABLE_LLM and callable(ollama_chat):
         items = "\n".join([
             f"{i+1}. {r['nama_mobil']} ({r['tahun']}), harga {r['harga']}, "
@@ -94,13 +94,11 @@ async def api_ask(
         )
         try:
             llm_text = await ollama_chat(prompt)
-        except Exception as e:
-            llm_text = f"(LLM tidak tersedia: {e})"
-    else:
-        llm_text = None
+        except Exception:
+            # silent fallback: jika LLM gagal, gunakan plain tanpa menampilkan pesan error
+            llm_text = None
 
     return JSONResponse({
         "jawaban": llm_text or plain,
-        "rekomendasi": recs,
-        "llm_model": os.getenv("OLLAMA_MODEL", "mistral") if llm_text else None
+        "rekomendasi": recs
     })
