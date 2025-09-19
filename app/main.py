@@ -5,19 +5,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, PlainTextResponse, JSONResponse
 
-# === Path dasar ===
 APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
 FRONTEND_DIR = ROOT_DIR / "frontend"
 
-# === ENV flags ===
-ENABLE_LLM = os.getenv("ENABLE_LLM", "1") == "1"   # default ON (boleh matikan)
+ENABLE_LLM = os.getenv("ENABLE_LLM", "1") == "1"
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*")
 
-# === Buat APP ===
 app = FastAPI(title="Recommender Cars (Zeabur + Ollama Mistral)")
 
-# === CORS ===
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"] if ALLOWED_ORIGINS == "*" else [o.strip() for o in ALLOWED_ORIGINS.split(",")],
@@ -26,21 +23,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# === Static/frontend ===
+# ⬇️ Mount frontend hanya di /static agar /api TIDAK ketimpa
 if FRONTEND_DIR.exists():
-    # Mount di root agar GET / merender index.html
-    app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
+    app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
 
-# === Health ===
+# Health
 @app.get("/healthz", response_class=PlainTextResponse)
 def healthz():
     return "ok"
 
-# === Rule-based API (selalu ON) ===
+# Home: render index.html dari frontend/
+@app.get("/")
+def home():
+    index_html = FRONTEND_DIR / "index.html"
+    if index_html.exists():
+        return FileResponse(index_html)
+    return {"message": "Car Recommender API. Open /docs for Swagger."}
+
+# === Rule-based API (selalu ON)
 from app.rule_based import router as rule_router, jawab_rule  # noqa: E402
 app.include_router(rule_router)
 
-# === LLM Router (opsional, expose /api/llm/chat) ===
+# === LLM Router (opsional, expose /api/llm/chat)
 if ENABLE_LLM:
     try:
         from app.llm_proxy import router as llm_router, ollama_chat  # noqa: E402
@@ -52,7 +56,7 @@ if ENABLE_LLM:
 else:
     ollama_chat = None
 
-# === Endpoint gabungan: rule-based + (opsional) Mistral untuk merangkum ===
+# === Endpoint gabungan: rule-based + (opsional) ringkasan Mistral
 @app.get("/api/ask")
 async def api_ask(
     pertanyaan: str = Query(..., description="Contoh: 'mobil listrik matic di bawah 500 jt'"),
@@ -60,7 +64,6 @@ async def api_ask(
 ):
     recs = jawab_rule(pertanyaan, topk=topk)
 
-    # Jika tidak ada hasil, langsung balikan
     if not recs:
         return {
             "jawaban": "Tidak ditemukan.",
@@ -68,29 +71,26 @@ async def api_ask(
             "llm_model": os.getenv("OLLAMA_MODEL", "mistral") if ENABLE_LLM else None
         }
 
-    # Teks sederhana default (kalau LLM mati)
     plain = "Hasil rekomendasi:\n\n" + "\n".join([
         f"{i+1}. {r['nama_mobil']} ({r['tahun']}) - {r['harga']} - "
         f"{r['bahan_bakar']}, {r['transmisi']}, {r['kapasitas_mesin']}"
         for i, r in enumerate(recs)
     ])
 
-    # Jika LLM aktif & tersedia, minta Mistral merangkum/menjelaskan
+    # Ringkas pakai Mistral (jika diaktifkan dan koneksi ada)
     if ENABLE_LLM and callable(ollama_chat):
-        # susun prompt yang ringkas dan aman
         items = "\n".join([
             f"{i+1}. {r['nama_mobil']} ({r['tahun']}), harga {r['harga']}, "
-            f"bahan bakar {r['bahan_bakar']}, transmisi {r['transmisi']}, kapasitas {r['kapasitas_mesin']}, usia {r['usia']} tahun"
+            f"bahan bakar {r['bahan_bakar']}, transmisi {r['transmisi']}, "
+            f"kapasitas {r['kapasitas_mesin']}, usia {r['usia']} tahun"
             for i, r in enumerate(recs)
         ])
         prompt = (
             "Anda adalah asisten showroom mobil bekas. "
-            "Ringkas rekomendasi untuk pengguna berdasarkan pertanyaan berikut dan daftar hasil yang sudah difilter. "
-            "Hindari mengarang data baru, hanya gunakan yang diberikan. Maks 5 bullet.\n\n"
-            f"Pertanyaan pengguna: {pertanyaan}\n\n"
-            "Daftar hasil:\n" + items + "\n\n"
-            "Tulis ringkasan yang menyorot kecocokan (bahan bakar, transmisi, harga), "
-            "lalu beri saran singkat model mana yang paling relevan."
+            "Ringkas rekomendasi berdasarkan pertanyaan dan daftar hasil berikut. "
+            "Jangan mengarang data baru. Maks 5 bullet.\n\n"
+            f"Pertanyaan: {pertanyaan}\n\nDaftar:\n{items}\n\n"
+            "Sorot kecocokan (bahan bakar, transmisi, harga) dan beri saran singkat."
         )
         try:
             llm_text = await ollama_chat(prompt)

@@ -26,6 +26,12 @@
     const chatBox = document.getElementById("chatBox");
     const input = document.getElementById("pertanyaan");
 
+    async function callAPI(url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    }
+
     async function kirimPertanyaan(){
       const pesan = input.value.trim();
       if(!pesan) return;
@@ -48,17 +54,18 @@
       }, 200);
 
       try {
-        const res = await fetch(`/api/rule?pertanyaan=${encodeURIComponent(pesan)}`);
+        // coba /api/ask dulu (rule-based + Mistral)
+        let data;
+        try {
+          data = await callAPI(`/api/ask?pertanyaan=${encodeURIComponent(pesan)}&topk=5`);
+        } catch (_) {
+          // fallback: /api/rule (rule-based murni)
+          data = await callAPI(`/api/rule?pertanyaan=${encodeURIComponent(pesan)}&topk=5`);
+        }
         clearInterval(dots);
 
-        if(!res.ok){
-          botMsg.textContent = "❌ Gagal mengambil jawaban (status " + res.status + ").";
-          return;
-        }
-
-        const data = await res.json();
-        let jawab = data.jawaban || "Berikut hasilnya:";
-        let list  = data.rekomendasi || [];
+        const jawab = data.jawaban || "Berikut hasilnya:";
+        const list  = data.rekomendasi || [];
 
         let html = `<div class="mb-2">${jawab}</div>`;
         for(let i=0;i<list.length;i++){
@@ -75,7 +82,7 @@
         botMsg.innerHTML = html;
       } catch (e) {
         clearInterval(dots);
-        botMsg.textContent = "❌ Gagal mengambil jawaban.";
+        botMsg.textContent = "❌ Gagal mengambil jawaban (" + e.message + ").";
       } finally {
         input.disabled = false;
         input.focus();
