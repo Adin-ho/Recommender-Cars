@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import re
+import math
 import pandas as pd
 from fastapi import APIRouter, Query
 
@@ -20,7 +21,7 @@ if "harga_angka" not in df.columns:
     )
 
 PREFER_MAX_USIA = int(os.getenv("PREFER_MAX_USIA", "5"))
-PRICE_MARGIN = float(os.getenv("PRICE_MARGIN", "0.10"))  # 10% jendela awal untuk "harga sekitar"
+PRICE_MARGIN = float(os.getenv("PRICE_MARGIN", "0.10"))  # 10% jendela awal utk harga sekitar
 
 # ===== Helpers =====
 def _clean_name(nm: str) -> str:
@@ -30,95 +31,59 @@ FUEL_KEYWORDS = {
     "listrik": ["listrik", "electric", "ev"],
     "hybrid":  ["hybrid", "hev", "phev", "plugin"],
     "diesel":  ["diesel"],
-    "bensin":  ["bensin", "gasoline", "pertalite", "pertamax"]
+    "bensin":  ["bensin", "gasoline", "pertalite", "pertamax"],
 }
 
-BRANDS = [
-    "bmw", "toyota", "daihatsu", "wuling", "hyundai",
-    "renault", "honda", "suzuki", "ford", "mitsubishi",
-    "innova", "fortuner", "ayla", "pajero", "mobilio"
-]
+BRANDS = ["bmw","toyota","daihatsu","wuling","hyundai","renault","honda",
+          "suzuki","ford","mitsubishi","innova","fortuner","ayla","pajero","mobilio"]
 
 def _as_rupiah(s: str) -> int:
-    """Parse angka + satuan (jt/juta). Jika tanpa satuan dan angka kecil (<= 10.000), diasumsikan 'juta'."""
+    """Parse angka + satuan (jt/juta). '500' dianggap 500 juta."""
     if not s:
         return 0
     s = s.lower().strip()
     m = re.match(r"([\d\.]+)\s*(jt|juta|jutaan)?", s)
     if not m:
-        # fallback: ambil semua digit yang ada
-        num = int("".join(re.findall(r"\d+", s)) or "0")
-        return num
+        return int("".join(re.findall(r"\d+", s)) or "0")
     raw, unit = m.group(1), m.group(2)
     val = int(raw.replace(".", ""))
     if unit in ("jt", "juta", "jutaan") or val <= 10000:
-        # 500 -> 500 juta
         return val * 1_000_000
     return val
 
 def _parse_query(q: str):
     ql = q.lower()
-
     parsed = {
-        "brand": None,
-        "fuel": None,          # normalized: listrik/hybrid/diesel/bensin
-        "transmisi": None,     # matic/manual
-        "harga_min": None,
-        "harga_max": None,
-        "harga_target": None,  # <-- baru: untuk "sekitar 500 juta" atau angka polos
+        "brand": None, "fuel": None, "transmisi": None,
+        "harga_min": None, "harga_max": None, "harga_target": None,
         "usia_max": None
     }
-
-    # brand
     for b in BRANDS:
         if b in ql:
-            parsed["brand"] = b
-            break
-
-    # fuel
+            parsed["brand"] = b; break
     for key, keys in FUEL_KEYWORDS.items():
         if any(k in ql for k in keys):
-            parsed["fuel"] = key
-            break
-
-    # transmisi
+            parsed["fuel"] = key; break
     if "matic" in ql or "otomatis" in ql:
         parsed["transmisi"] = "matic"
     elif "manual" in ql:
         parsed["transmisi"] = "manual"
 
-    # harga <= / di bawah
     m = re.search(r"(?:di\s*bawah|<=|maks(?:imal)?|max)\s*([^\s]+(?:\s*(?:jt|juta|jutaan))?)", ql)
-    if m:
-        parsed["harga_max"] = _as_rupiah(m.group(1))
-
-    # harga >= / di atas
+    if m: parsed["harga_max"] = _as_rupiah(m.group(1))
     m = re.search(r"(?:di\s*atas|lebih\s*dari|>=|min(?:imal)?)\s*([^\s]+(?:\s*(?:jt|juta|jutaan))?)", ql)
-    if m:
-        parsed["harga_min"] = _as_rupiah(m.group(1))
-
-    # kata kunci "sekitar/kisaran/±" -> harga_target
+    if m: parsed["harga_min"] = _as_rupiah(m.group(1))
     m = re.search(r"(?:sekitar|kisaran|~|±)\s*([^\s]+(?:\s*(?:jt|juta|jutaan))?)", ql)
-    if m:
-        parsed["harga_target"] = _as_rupiah(m.group(1))
-
-    # jika belum ada min/max/target dan ada angka polos -> anggap target
-    if (parsed["harga_min"] is None and parsed["harga_max"] is None and parsed["harga_target"] is None):
+    if m: parsed["harga_target"] = _as_rupiah(m.group(1))
+    if parsed["harga_min"] is None and parsed["harga_max"] is None and parsed["harga_target"] is None:
         m = re.search(r"(\d[\d\.]*)\s*(jt|juta|jutaan)?", ql)
-        if m:
-            parsed["harga_target"] = _as_rupiah(m.group(0))
-
-    # usia (contoh: di bawah 5 tahun)
+        if m: parsed["harga_target"] = _as_rupiah(m.group(0))
     m = re.search(r"di\s*bawah\s*(\d+)\s*tahun", ql)
-    if m:
-        parsed["usia_max"] = int(m.group(1))
-
+    if m: parsed["usia_max"] = int(m.group(1))
     return parsed
 
 def _match_fuel_value(val: str, want: str) -> bool:
-    """Cek 'bahan bakar' terhadap sinonim (listrik/electric/ev, hybrid/hev/phev, dst)."""
-    if not want:
-        return True
+    if not want: return True
     s = str(val).lower()
     return any(k in s for k in FUEL_KEYWORDS.get(want, [want]))
 
@@ -127,65 +92,62 @@ def jawab_rule(pertanyaan: str, topk: int = 5):
     p = _parse_query(pertanyaan)
     out = df.copy()
 
-    # BRAND
     if p["brand"]:
         out = out[out["nama mobil"].str.contains(p["brand"], case=False, na=False)]
-
-    # FUEL
     if p["fuel"]:
         out = out[out["bahan bakar"].apply(lambda x: _match_fuel_value(x, p["fuel"]))]
-
-    # TRANSMISI
     if p["transmisi"]:
         out = out[out["transmisi"].str.contains(p["transmisi"], case=False, na=False)]
 
-    # HARGA min/max
     if p["harga_min"] is not None:
         out = out[out["harga_angka"] >= p["harga_min"]]
     if p["harga_max"] is not None:
         out = out[out["harga_angka"] <= p["harga_max"]]
-
     if out.empty:
         return []
 
-    # USIA eksplisit dari user -> filter ketat
     if p["usia_max"] is not None:
         out = out[out["usia"] <= p["usia_max"]]
         if out.empty:
             return []
 
-    # === PRICE-ANCHOR: angka polos/sekitar 500 jt -> cari sekitar target ===
+    # === Harga target -> ambil mix bawah & atas yang paling dekat ===
     if p["harga_target"] is not None and p["harga_min"] is None and p["harga_max"] is None:
         target = p["harga_target"]
-        def _window(frac: float):
-            lo = int(target * (1.0 - frac))
-            hi = int(target * (1.0 + frac))
+
+        # jendela sekitar (±PRICE_MARGIN), kalau kosong melar jadi 2x, 3x
+        def window(frac):
+            lo = int(target * (1 - frac)); hi = int(target * (1 + frac))
             return out[(out["harga_angka"] >= lo) & (out["harga_angka"] <= hi)]
+        cand = window(PRICE_MARGIN)
+        if cand.empty: cand = window(max(PRICE_MARGIN*2, 0.20))
+        if cand.empty: cand = window(max(PRICE_MARGIN*3, 0.30))
+        if cand.empty: cand = out.copy()
 
-        # coba ±10% → ±20% → ±30%
-        cand = _window(PRICE_MARGIN)
-        if cand.empty:
-            cand = _window(max(PRICE_MARGIN * 2, 0.20))
-        if cand.empty:
-            cand = _window(max(PRICE_MARGIN * 3, 0.30))
+        # bagi menjadi bawah & atas, pilih yang terdekat
+        below = cand[cand["harga_angka"] <= target].copy()
+        above = cand[cand["harga_angka"] >= target].copy()
+        below["diff"] = (target - below["harga_angka"]).abs()
+        above["diff"] = (above["harga_angka"] - target).abs()
+        below = below.sort_values(by=["diff", "usia"]).drop(columns=["diff"], errors="ignore")
+        above = above.sort_values(by=["diff", "usia"]).drop(columns=["diff"], errors="ignore")
 
-        if cand.empty:
-            # fallback: pilih yang terdekat terhadap target
-            cand = out.copy()
-            cand["diff_abs"] = (cand["harga_angka"] - target).abs()
-            cand = cand.sort_values(by=["diff_abs", "usia"], ascending=[True, True]).head(topk)
-        else:
-            # prioritas: paling dekat ke target & lebih muda
-            cand["diff_abs"] = (cand["harga_angka"] - target).abs()
-            cand = cand.sort_values(by=["diff_abs", "usia"], ascending=[True, True]).head(topk)
+        n_below = math.ceil(topk / 2)
+        n_above = topk - n_below
+        pick_below = below.head(n_below)
+        pick_above = above.head(n_above)
 
-        out = cand.drop(columns=[c for c in ["diff_abs"] if c in cand.columns])
+        # jika salah satu sisi kurang, isi dari sisi lain
+        if len(pick_below) < n_below:
+            pick_above = pd.concat([pick_above, above.iloc[n_above:]]).head(topk - len(pick_below))
+        if len(pick_above) < n_above:
+            pick_below = pd.concat([pick_below, below.iloc[n_below:]]).head(topk - len(pick_above))
 
-    # PRIORITAS USIA <= PREFER_MAX_USIA, jika tidak ada pakai semua
+        out = pd.concat([pick_below, pick_above]).head(topk)
+
+    # prefer usia muda; urutkan harga naik & usia muda
     kandidat_muda = out[out["usia"] <= PREFER_MAX_USIA]
     prefer = kandidat_muda if not kandidat_muda.empty else out
-
-    # URUT default: termurah & termuda
     prefer = prefer.sort_values(by=["harga_angka", "usia"], ascending=[True, True]).head(topk)
 
     hasil = []
@@ -202,7 +164,6 @@ def jawab_rule(pertanyaan: str, topk: int = 5):
         })
     return hasil
 
-# ===== API =====
 @router.get("")
 def api_rule(
     pertanyaan: str = Query(..., description="Contoh: 'mobil listrik matic di bawah 500 juta' / 'mobil 500 juta'"),
