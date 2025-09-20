@@ -21,7 +21,7 @@ if "harga_angka" not in df.columns:
     )
 
 PREFER_MAX_USIA = int(os.getenv("PREFER_MAX_USIA", "5"))
-PRICE_MARGIN = float(os.getenv("PRICE_MARGIN", "0.10"))  # 10% jendela awal utk harga sekitar
+PRICE_MARGIN = float(os.getenv("PRICE_MARGIN", "0.10"))  # jendela longgar maksimal nanti
 
 # ===== Helpers =====
 def _clean_name(nm: str) -> str:
@@ -59,11 +59,9 @@ def _parse_query(q: str):
         "usia_max": None
     }
     for b in BRANDS:
-        if b in ql:
-            parsed["brand"] = b; break
+        if b in ql: parsed["brand"] = b; break
     for key, keys in FUEL_KEYWORDS.items():
-        if any(k in ql for k in keys):
-            parsed["fuel"] = key; break
+        if any(k in ql for k in keys): parsed["fuel"] = key; break
     if "matic" in ql or "otomatis" in ql:
         parsed["transmisi"] = "matic"
     elif "manual" in ql:
@@ -111,37 +109,49 @@ def jawab_rule(pertanyaan: str, topk: int = 5):
         if out.empty:
             return []
 
-    # === Harga target -> ambil mix bawah & atas yang paling dekat ===
+    # === Harga target: ambil mix < target & > target (yang paling dekat) ===
     if p["harga_target"] is not None and p["harga_min"] is None and p["harga_max"] is None:
         target = p["harga_target"]
 
-        # jendela sekitar (±PRICE_MARGIN), kalau kosong melar jadi 2x, 3x
-        def window(frac):
-            lo = int(target * (1 - frac)); hi = int(target * (1 + frac))
-            return out[(out["harga_angka"] >= lo) & (out["harga_angka"] <= hi)]
-        cand = window(PRICE_MARGIN)
-        if cand.empty: cand = window(max(PRICE_MARGIN*2, 0.20))
-        if cand.empty: cand = window(max(PRICE_MARGIN*3, 0.30))
-        if cand.empty: cand = out.copy()
+        # cari kandidat sisi bawah & atas dengan kelonggaran bertahap
+        relax_steps = [0.02, 0.05, PRICE_MARGIN, max(PRICE_MARGIN*2, 0.20), 0.30]
+        below = above = pd.DataFrame(columns=out.columns)
 
-        # bagi menjadi bawah & atas, pilih yang terdekat
-        below = cand[cand["harga_angka"] <= target].copy()
-        above = cand[cand["harga_angka"] >= target].copy()
+        for frac in relax_steps:
+            lo = int(target * (1 - frac))
+            hi = int(target * (1 + frac))
+            below = out[(out["harga_angka"] < target) & (out["harga_angka"] >= lo)]
+            above = out[(out["harga_angka"] > target) & (out["harga_angka"] <= hi)]
+            if not below.empty or not above.empty:
+                break
+
+        # kalau masih kosong juga, pakai semua data lalu pilih terdekat
+        if below.empty:
+            below = out[out["harga_angka"] < target]
+        if above.empty:
+            above = out[out["harga_angka"] > target]
+
+        # urutkan yang paling dekat ke target & lebih muda
+        below = below.copy()
+        above = above.copy()
         below["diff"] = (target - below["harga_angka"]).abs()
         above["diff"] = (above["harga_angka"] - target).abs()
         below = below.sort_values(by=["diff", "usia"]).drop(columns=["diff"], errors="ignore")
         above = above.sort_values(by=["diff", "usia"]).drop(columns=["diff"], errors="ignore")
 
+        # bagi jatah item: setengah bawah, setengah atas
         n_below = math.ceil(topk / 2)
         n_above = topk - n_below
         pick_below = below.head(n_below)
         pick_above = above.head(n_above)
 
-        # jika salah satu sisi kurang, isi dari sisi lain
+        # jika salah satu kurang, isi dari sisi lain (masih yang terdekat)
         if len(pick_below) < n_below:
-            pick_above = pd.concat([pick_above, above.iloc[n_above:]]).head(topk - len(pick_below))
+            extra = above.iloc[n_above: n_above + (n_below - len(pick_below))]
+            pick_above = pd.concat([pick_above, extra])
         if len(pick_above) < n_above:
-            pick_below = pd.concat([pick_below, below.iloc[n_below:]]).head(topk - len(pick_above))
+            extra = below.iloc[n_below: n_below + (n_above - len(pick_above))]
+            pick_below = pd.concat([pick_below, extra])
 
         out = pd.concat([pick_below, pick_above]).head(topk)
 
@@ -164,6 +174,7 @@ def jawab_rule(pertanyaan: str, topk: int = 5):
         })
     return hasil
 
+# ===== API =====
 @router.get("")
 def api_rule(
     pertanyaan: str = Query(..., description="Contoh: 'mobil listrik matic di bawah 500 juta' / 'mobil 500 juta'"),
