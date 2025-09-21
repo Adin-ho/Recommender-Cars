@@ -1,117 +1,154 @@
 # app/embedding.py
 from __future__ import annotations
-import os, json, math
+import os
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Dict, Any
+
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
+from sentence_transformers import SentenceTransformer
 
-# ===== Konfigurasi dasar =====
-APP_DIR = Path(__file__).resolve().parent
-ROOT_DIR = APP_DIR.parent
-DATA_CSV = APP_DIR / "data" / "data_mobil_final.csv"
+# ==== Konfigurasi ====
+BASE_DIR = Path(__file__).resolve().parent
+DATA_CSV = BASE_DIR / "data" / "data_mobil_final.csv"
 
-# Folder persist (gunakan /data di Zeabur agar persisten)
-PERSIST_DIR = Path(os.getenv("CHROMA_PERSIST_DIR", "/data/emb"))
-PERSIST_DIR.mkdir(parents=True, exist_ok=True)
-EMB_FILE = PERSIST_DIR / "embeddings.npz"
-META_FILE = PERSIST_DIR / "meta.json"
+# Model embedding (kecil & cepat)
+EMB_MODEL_NAME = os.getenv("EMB_MODEL", "all-MiniLM-L6-v2")
+# Prioritas usia (tahun) – hasil dengan usia <= PREFER_MAX_USIA akan didahulukan
+PREFER_MAX_USIA = int(os.getenv("PREFER_MAX_USIA", "5"))
 
-USE_MISTRAL = os.getenv("USE_MISTRAL_EMB", "1") == "1"
-MISTRAL_MODEL = os.getenv("MISTRAL_MODEL", "mistral-embed")
-MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY", "")
+# ==== Global state ====
+_df: pd.DataFrame | None = None
+_emb: np.ndarray | None = None
+_model: SentenceTransformer | None = None
 
-# ====== Helpers ======
-def _normalize_rows(x: np.ndarray) -> np.ndarray:
-    norm = np.linalg.norm(x, axis=1, keepdims=True) + 1e-12
-    return x / norm
 
-def _cosine_sim(q: np.ndarray, M: np.ndarray) -> np.ndarray:
-    # q shape: (d,), M: (N,d)
-    qn = q / (np.linalg.norm(q) + 1e-12)
-    return (M @ qn)
+def _to_int(x, default=0):
+    try:
+        return int(str(x).strip())
+    except Exception:
+        return default
 
-def _concat_text(row: pd.Series) -> str:
-    # Jadikan satu string per mobil agar embedding menangkap konteks
-    parts = [
-        str(row.get("nama mobil", "")),
-        str(row.get("tahun", "")),
-        str(row.get("bahan bakar", "")),
-        str(row.get("transmisi", "")),
-        str(row.get("kapasitas mesin", "")),
-        str(row.get("harga", "")),
-    ]
-    return " | ".join(p.strip() for p in parts if p is not None)
 
-# ====== Embedders ======
-class MistralEmbedder:
-    def __init__(self, api_key: str, model: str = "mistral-embed") -> None:
-        from mistralai import Mistral
-        self.client = Mistral(api_key=api_key)
-        self.model = model
+def _to_price(s: str | int | float) -> str:
+    """Normalisasi harga jadi 'Rp xxx.xxx.xxx' kalau memungkinkan."""
+    try:
+        n = int(float(str(s).replace(".", "").replace(",", "").replace("Rp", "").strip()))
+        return f"Rp {n:,}".replace(",", ".")
+    except Exception:
+        return str(s)
 
-    def embed_texts(self, texts: List[str], batch_size: int = 96) -> np.ndarray:
-        out: List[List[float]] = []
-        for i in tqdm(range(0, len(texts), batch_size), desc="Mistral embed"):
-            chunk = texts[i:i + batch_size]
-            resp = self.client.embeddings.create(model=self.model, inputs=chunk)
-            out.extend(e.embedding for e in resp.data)
-        return np.asarray(out, dtype=np.float32)
 
-    def embed_one(self, text: str) -> np.ndarray:
-        return self.embed_texts([text])[0]
+def _build_search_text(row: pd.Series) -> str:
+    """
+    Gabungkan fitur penting menjadi satu kalimat untuk di-embed.
+    Sesuaikan dengan kolom CSV kamu.
+    """
+    parts = []
+    for col in ["nama_mobil", "bahan_bakar", "transmisi", "kapasitas_mesin", "tipe", "merk", "model"]:
+        if col in row and pd.notna(row[col]):
+            parts.append(str(row[col]))
+    # tahun & harga ikut dimasukkan supaya query "500 juta" atau "2022" tetap nyantol
+    if "tahun" in row and pd.notna(row["tahun"]):
+        parts.append(f"tahun {row['tahun']}")
+    if "harga" in row and pd.notna(row["harga"]):
+        parts.append(f"harga {row['harga']}")
+    return " | ".join(parts).lower()
 
-class LocalEmbedder:
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2") -> None:
-        from sentence_transformers import SentenceTransformer
-        self.model = SentenceTransformer(model_name)
 
-    def embed_texts(self, texts: List[str], batch_size: int = 128) -> np.ndarray:
-        vecs = self.model.encode(texts, batch_size=batch_size, show_progress_bar=True, convert_to_numpy=True, normalize_embeddings=False)
-        return vecs.astype(np.float32)
+def _ensure_loaded():
+    global _df, _emb, _model
+    if _df is not None and _emb is not None and _model is not None:
+        return
 
-    def embed_one(self, text: str) -> np.ndarray:
-        v = self.model.encode([text], convert_to_numpy=True)[0].astype(np.float32)
-        return v
+    if not DATA_CSV.exists():
+        raise FileNotFoundError(f"CSV tidak ditemukan: {DATA_CSV}")
 
-def get_embedder():
-    if USE_MISTRAL and MISTRAL_API_KEY:
-        return MistralEmbedder(api_key=MISTRAL_API_KEY, model=MISTRAL_MODEL)
-    return LocalEmbedder()
+    # Baca CSV
+    df = pd.read_csv(DATA_CSV, dtype=str).fillna("")
+    # Normalisasi kolom umum
+    if "tahun" not in df.columns:
+        df["tahun"] = ""
+    if "harga" not in df.columns:
+        df["harga"] = ""
+    if "bahan_bakar" not in df.columns:
+        df["bahan_bakar"] = ""
+    if "transmisi" not in df.columns:
+        df["transmisi"] = ""
+    if "kapasitas_mesin" not in df.columns:
+        df["kapasitas_mesin"] = ""
+    if "nama_mobil" not in df.columns:
+        # fallback kalau nama_mobil tak ada — pakai gabungan merk+model
+        nm = []
+        for _, r in df.iterrows():
+            nm.append((r.get("nama") or r.get("model") or r.get("merk") or "Mobil").strip())
+        df["nama_mobil"] = nm
 
-# ====== Public APIs ======
-def load_dataset() -> pd.DataFrame:
-    df = pd.read_csv(DATA_CSV)
-    # Normalisasi kolom
-    df.columns = df.columns.str.strip().str.lower()
-    return df
+    # Hitung usia (dinamis: pakai tahun sekarang)
+    from datetime import datetime
 
-def build_corpus(df: pd.DataFrame) -> List[str]:
-    return [_concat_text(row) for _, row in df.iterrows()]
+    year_now = datetime.utcnow().year
+    df["tahun_i"] = df["tahun"].apply(_to_int)
+    df["usia"] = df["tahun_i"].apply(lambda y: max(0, year_now - y) if y > 0 else None)
 
-def build_and_persist_embeddings() -> Tuple[np.ndarray, List[int]]:
-    df = load_dataset()
-    texts = build_corpus(df)
-    emb = get_embedder().embed_texts(texts)
-    emb = _normalize_rows(emb)
+    # Harga normalisasi tampilan
+    df["harga_fmt"] = df["harga"].apply(_to_price)
 
-    ids = list(range(len(texts)))
-    np.savez_compressed(EMB_FILE, vectors=emb, ids=np.asarray(ids, dtype=np.int32))
-    META_FILE.write_text(json.dumps({"count": len(ids)}, ensure_ascii=False))
-    return emb, ids
+    # Teks pencarian
+    df["search_text"] = df.apply(_build_search_text, axis=1)
 
-def load_embeddings() -> Tuple[np.ndarray, List[int]]:
-    if not EMB_FILE.exists():
-        return build_and_persist_embeddings()
-    data = np.load(EMB_FILE)
-    return data["vectors"], list(data["ids"].tolist())
+    # Siapkan model & embedding
+    _model = SentenceTransformer(EMB_MODEL_NAME)
+    emb = _model.encode(df["search_text"].tolist(), convert_to_numpy=True, show_progress_bar=False)
 
-def query_topk(df: pd.DataFrame, vectors: np.ndarray, query: str, k: int = 5) -> List[Tuple[int, float]]:
-    # embed query
-    vq = get_embedder().embed_one(query).astype(np.float32)
-    scores = _cosine_sim(vq, vectors)  # (N,)
-    # top-k
-    idx = np.argpartition(-scores, kth=min(k, len(scores)-1))[:max(k,1)]
-    idx = idx[np.argsort(-scores[idx])]
-    return [(int(i), float(scores[i])) for i in idx]
+    # Simpan ke global
+    _df = df
+    _emb = emb
+
+
+def _cosine_sim(a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Cosine similarity baris vektor A vs B (2D vs 2D)."""
+    a_norm = a / (np.linalg.norm(a, axis=1, keepdims=True) + 1e-9)
+    b_norm = b / (np.linalg.norm(b, axis=1, keepdims=True) + 1e-9)
+    return a_norm @ b_norm.T
+
+
+def cosine_recommend(query: str, topk: int = 5) -> List[Dict[str, Any]]:
+    """
+    Cari rekomendasi dengan cosine similarity + prioritas usia <= PREFER_MAX_USIA.
+    Return list of dict siap dipakai frontend.
+    """
+    _ensure_loaded()
+    assert _df is not None and _emb is not None and _model is not None
+
+    q_emb = _model.encode([query], convert_to_numpy=True)
+    sims = _cosine_sim(q_emb, _emb)[0]  # (n_docs,)
+
+    df = _df.copy()
+    df["cosine_score"] = sims
+
+    # Urutkan desc
+    df = df.sort_values("cosine_score", ascending=False)
+
+    # Prioritaskan usia <= PREFER_MAX_USIA (kalau kolom usia tersedia)
+    young = df[df["usia"].apply(lambda x: x is not None and x <= PREFER_MAX_USIA)]
+    old = df[df["usia"].apply(lambda x: x is None or x > PREFER_MAX_USIA)]
+
+    # Ambil topk dengan prioritas
+    rows = pd.concat([young, old]).head(topk)
+
+    hasil = []
+    for _, r in rows.iterrows():
+        hasil.append(
+            {
+                "nama_mobil": r.get("nama_mobil", ""),
+                "tahun": _to_int(r.get("tahun", 0)) or r.get("tahun", ""),
+                "harga": r.get("harga_fmt") or r.get("harga", ""),
+                "usia": r.get("usia"),
+                "bahan_bakar": r.get("bahan_bakar", ""),
+                "transmisi": r.get("transmisi", ""),
+                "kapasitas_mesin": r.get("kapasitas_mesin", ""),
+                "cosine_score": round(float(r.get("cosine_score", 0.0)), 4),
+            }
+        )
+    return hasil

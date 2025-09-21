@@ -24,73 +24,73 @@
 
   <script>
   const chatBox = document.getElementById("chatBox");
-  const input   = document.getElementById("pertanyaan");
+  const input = document.getElementById("pertanyaan");
 
-  async function fetchJSON(url) {
+  async function fetchJSON(url){
     const res = await fetch(url);
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    return res.json();
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    return await res.json();
   }
 
-  async function kirimPertanyaan() {
+  async function kirimPertanyaan(){
     const pesan = input.value.trim();
-    if (!pesan) return;
+    if(!pesan) return;
 
-    // tampilkan pesan user
     const userMsg = document.createElement("div");
     userMsg.className = "text-right text-blue-700 mb-2";
-    userMsg.textContent = pesan;
+    userMsg.textContent = "👤 " + pesan;
     chatBox.appendChild(userMsg);
 
-    input.value = "";
-    input.disabled = true;
-
-    // placeholder bot
     const botMsg = document.createElement("div");
     botMsg.className = "text-left text-gray-800 whitespace-pre-wrap";
     chatBox.appendChild(botMsg);
 
+    // loading
     botMsg.textContent = "🤖";
-    const dots = setInterval(() => {
+    const itv = setInterval(() => {
       botMsg.textContent += ".";
       if (botMsg.textContent.length > 8) botMsg.textContent = "🤖";
-      chatBox.scrollTop = chatBox.scrollHeight;
     }, 200);
 
+    input.value = "";
+    input.disabled = true;
+
     try {
-      // 1) coba endpoint utama (relative path)
+      // panggil endpoint backend (relative path)
       let data;
       try {
         data = await fetchJSON(`api/cosine_rekomendasi?query=${encodeURIComponent(pesan)}&k=5`);
-      } catch (err) {
-        // 2) fallback ke alias tanpa prefix /api
+      } catch {
         data = await fetchJSON(`cosine_rekomendasi?query=${encodeURIComponent(pesan)}&k=5`);
       }
 
-      clearInterval(dots);
+      clearInterval(itv);
 
-      const list = (data && data.rekomendasi) ? data.rekomendasi : [];
-      if (!list.length) {
-        botMsg.innerHTML = "🤖 Maaf, tidak ada hasil untuk pencarian ini. Coba perjelas kata kunci (misal: <i>diesel matic di bawah 300 juta</i>).";
+      if (!data.ok) {
+        botMsg.textContent = "❌ Gagal: " + (data.error || "Unknown");
         return;
       }
 
-      let html = "<b>🤖 Rekomendasi berdasarkan Cosine Similarity:</b><br><br>";
+      const list = data.rekomendasi || [];
+      if (list.length === 0){
+        botMsg.textContent = "🤖 Maaf, tidak ada hasil yang cocok.";
+        return;
+      }
+
+      let html = "🤖 Rekomendasi berdasarkan Cosine Similarity:\n\n";
       list.forEach((r, i) => {
         html += `
-          <div class="mb-3 p-2 rounded bg-gray-50 border">
-            <b>${i + 1}. ${r.nama_mobil || "-" } (${r.tahun ?? "-"})</b><br>
-            <span class="text-xs">Skor: <b>${r.cosine_score ?? "-"}</b></span><br>
-            Harga: <b>${r.harga || "-"}</b><br>
-            Usia: <b>${r.usia ?? "-"}</b> tahun<br>
-            Bahan Bakar: ${r.bahan_bakar || "-"}<br>
-            Transmisi: ${r.transmisi || "-"}<br>
-            Kapasitas Mesin: ${r.kapasitas_mesin || "-"}<br>
-          </div>`;
+${i+1}. ${r.nama_mobil || ""} (${r.tahun || ""})
+Skor: ${r.cosine_score}
+Harga: ${r.harga}
+Usia: ${r.usia ?? "-"} tahun
+Bahan Bakar: ${r.bahan_bakar || "-"}
+Transmisi: ${r.transmisi || "-"}
+Kapasitas Mesin: ${r.kapasitas_mesin || "-"}\n`;
       });
-      botMsg.innerHTML = html;
-    } catch (e) {
-      clearInterval(dots);
+      botMsg.textContent = html;
+    } catch(e){
+      clearInterval(itv);
       botMsg.textContent = "❌ Gagal mengambil jawaban (" + e.message + ").";
     } finally {
       input.disabled = false;
