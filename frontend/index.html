@@ -23,75 +23,87 @@
   </div>
 
   <script>
-    const chatBox = document.getElementById("chatBox");
-    const input = document.getElementById("pertanyaan");
+  const chatBox = document.getElementById("chatBox");
+  const input   = document.getElementById("pertanyaan");
 
-    async function callAPI(url) {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
-    }
+  async function fetchJSON(url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return res.json();
+  }
 
-    async function kirimPertanyaan(){
-      const pesan = input.value.trim();
-      if(!pesan) return;
+  async function kirimPertanyaan() {
+    const pesan = input.value.trim();
+    if (!pesan) return;
 
-      const userMsg = document.createElement("div");
-      userMsg.className = "text-right text-blue-700 mb-2";
-      userMsg.textContent = pesan;
-      chatBox.appendChild(userMsg);
-      input.value = "";
-      input.disabled = true;
+    // tampilkan pesan user
+    const userMsg = document.createElement("div");
+    userMsg.className = "text-right text-blue-700 mb-2";
+    userMsg.textContent = pesan;
+    chatBox.appendChild(userMsg);
 
-      const botMsg = document.createElement("div");
-      botMsg.className = "text-left text-gray-800 whitespace-pre-wrap";
-      chatBox.appendChild(botMsg);
+    input.value = "";
+    input.disabled = true;
 
-      botMsg.textContent = "🤖";
-      let dots = setInterval(() => {
-        botMsg.textContent += ".";
-        if(botMsg.textContent.length > 8) botMsg.textContent = "🤖";
-      }, 200);
+    // placeholder bot
+    const botMsg = document.createElement("div");
+    botMsg.className = "text-left text-gray-800 whitespace-pre-wrap";
+    chatBox.appendChild(botMsg);
 
+    botMsg.textContent = "🤖";
+    const dots = setInterval(() => {
+      botMsg.textContent += ".";
+      if (botMsg.textContent.length > 8) botMsg.textContent = "🤖";
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }, 200);
+
+    try {
+      // 1) coba endpoint utama (relative path)
+      let data;
       try {
-        // coba /api/ask dulu (rule-based + Mistral)
-        let data;
-        try {
-          data = await callAPI(`/api/ask?pertanyaan=${encodeURIComponent(pesan)}&topk=5`);
-        } catch (_) {
-          // fallback: /api/rule (rule-based murni)
-          data = await callAPI(`/api/rule?pertanyaan=${encodeURIComponent(pesan)}&topk=5`);
-        }
-        clearInterval(dots);
+        data = await fetchJSON(`api/cosine_rekomendasi?query=${encodeURIComponent(pesan)}&k=5`);
+      } catch (err) {
+        // 2) fallback ke alias tanpa prefix /api
+        data = await fetchJSON(`cosine_rekomendasi?query=${encodeURIComponent(pesan)}&k=5`);
+      }
 
-        const jawab = data.jawaban || "Berikut hasilnya:";
-        const list  = data.rekomendasi || [];
+      clearInterval(dots);
 
-        let html = `<div class="mb-2">${jawab}</div>`;
-        for(let i=0;i<list.length;i++){
-          const r = list[i];
-          html += `<div class="mb-3 p-2 rounded bg-gray-50 border">
-            <b>${i+1}. ${r.nama_mobil || ""} (${r.tahun || ""})</b><br>
+      const list = (data && data.rekomendasi) ? data.rekomendasi : [];
+      if (!list.length) {
+        botMsg.innerHTML = "🤖 Maaf, tidak ada hasil untuk pencarian ini. Coba perjelas kata kunci (misal: <i>diesel matic di bawah 300 juta</i>).";
+        return;
+      }
+
+      let html = "<b>🤖 Rekomendasi berdasarkan Cosine Similarity:</b><br><br>";
+      list.forEach((r, i) => {
+        html += `
+          <div class="mb-3 p-2 rounded bg-gray-50 border">
+            <b>${i + 1}. ${r.nama_mobil || "-" } (${r.tahun ?? "-"})</b><br>
+            <span class="text-xs">Skor: <b>${r.cosine_score ?? "-"}</b></span><br>
             Harga: <b>${r.harga || "-"}</b><br>
-            Usia: <b>${r.usia || "-"}</b> tahun<br>
+            Usia: <b>${r.usia ?? "-"}</b> tahun<br>
             Bahan Bakar: ${r.bahan_bakar || "-"}<br>
             Transmisi: ${r.transmisi || "-"}<br>
             Kapasitas Mesin: ${r.kapasitas_mesin || "-"}<br>
           </div>`;
-        }
-        botMsg.innerHTML = html;
-      } catch (e) {
-        clearInterval(dots);
-        botMsg.textContent = "❌ Gagal mengambil jawaban (" + e.message + ").";
-      } finally {
-        input.disabled = false;
-        input.focus();
-        chatBox.scrollTop = chatBox.scrollHeight;
-      }
+      });
+      botMsg.innerHTML = html;
+    } catch (e) {
+      clearInterval(dots);
+      botMsg.textContent = "❌ Gagal mengambil jawaban (" + e.message + ").";
+    } finally {
+      input.disabled = false;
+      input.focus();
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
+  }
 
-    input.addEventListener("keypress", e => { if(e.key==="Enter") kirimPertanyaan(); });
-  </script>
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") kirimPertanyaan();
+  });
+</script>
+
 </body>
 
 </html>
