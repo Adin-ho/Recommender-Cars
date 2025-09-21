@@ -1,103 +1,136 @@
+from __future__ import annotations
 import os
 import re
-from fastapi import APIRouter, Query
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_chroma import Chroma
+from pathlib import Path
+from typing import List, Dict, Any
 
-router = APIRouter(prefix="/api/rag", tags=["RAG"])
+import numpy as np
+import pandas as pd
 
-PERSIST_DIR = os.getenv("CHROMA_PERSIST_DIR")
-MODEL_NAME = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
-PREFER_MAX_USIA = int(os.getenv("PREFER_MAX_USIA", "5"))
+from .embedding import embed_texts, embed_query
 
-FUEL_KEYWORDS = {
+APP_DIR = Path(__file__).resolve().parent
+CSV_PATH = APP_DIR / "data" / "data_mobil_final.csv"
+
+# ====== Konfigurasi preferensi ======
+PREFER_MAX_USIA = int(os.getenv("PREFER_MAX_USIA", "5")).__int__()
+
+# ====== Load data sekali saja ======
+_df = pd.read_csv(CSV_PATH)
+_df.columns = _df.columns.str.strip().str.lower()
+
+# normalisasi harga -> angka
+if "harga_angka" not in _df.columns:
+    _df["harga_angka"] = (
+        _df["harga"].astype(str).str.replace(r"[^\d]", "", regex=True).fillna("0").astype(int)
+    )
+
+# kolom gabungan untuk semantic search
+def _row_to_text(row: pd.Series) -> str:
+    parts = [
+        str(row.get("nama mobil", "")),
+        str(row.get("bahan bakar", "")),
+        str(row.get("transmisi", "")),
+        str(row.get("kapasitas mesin", "")),
+        str(row.get("tahun", "")),
+        str(row.get("harga", "")),
+    ]
+    return " | ".join([p for p in parts if p and p != "nan"])
+
+_corpus = _df.apply(_row_to_text, axis=1).tolist()
+# Precompute embeddings korpus (sekali saat pertama dipakai)
+_corpus_emb: np.ndarray | None = None
+
+
+def _ensure_corpus_emb() -> np.ndarray:
+    global _corpus_emb
+    if _corpus_emb is None:
+        _corpus_emb = embed_texts(_corpus)
+    return _corpus_emb
+
+
+# ====== Utility ======
+_FUEL_KEYS = {
     "listrik": ["listrik", "electric", "ev"],
     "hybrid": ["hybrid", "hev", "phev", "plugin"],
     "diesel": ["diesel"],
-    "bensin": ["bensin", "gasoline", "pertalite", "pertamax"]
+    "bensin": ["bensin", "gasoline", "pertalite", "pertamax"],
 }
-BRANDS = ["bmw","toyota","daihatsu","wuling","hyundai","renault","honda","suzuki","ford","mitsubishi","innova","fortuner","ayla","pajero","mobilio"]
 
-def get_collection():
-    emb = HuggingFaceEmbeddings(model_name=MODEL_NAME)
-    return Chroma(embedding_function=emb, persist_directory=PERSIST_DIR)
+def _fuel_match(val: str, want: str | None) -> bool:
+    if not want:
+        return True
+    s = str(val).lower()
+    keys = _FUEL_KEYS.get(want, [want])
+    return any(k in s for k in keys)
 
-def _parse_int(v: str) -> int:
-    if not v: return 0
-    v = v.lower().replace("juta", "000000").replace("jt", "000000")
-    return int("".join(re.findall(r"\d+", v)) or "0")
+def _parse_fuel_from_query(q: str) -> str | None:
+    ql = q.lower()
+    for k, keys in _FUEL_KEYS.items():
+        if any(x in ql for x in keys):
+            return k
+    return None
 
-def parse_query(q: str):
-    q = q.lower()
-    f = {"brand": None, "fuel": None, "transmisi": None, "harga_min": None, "harga_max": None}
-    for b in BRANDS:
-        if b in q: f["brand"]=b; break
-    for key, keys in FUEL_KEYWORDS.items():
-        if any(k in q for k in keys): f["fuel"]=key; break
-    if "matic" in q or "otomatis" in q: f["transmisi"]="matic"
-    elif "manual" in q: f["transmisi"]="manual"
-    m = re.search(r"(?:di bawah|<=|maks(?:imal)?|max)\s*([^\s]+(?:\s*(?:jt|juta))?)", q)
-    if m: f["harga_max"]=_parse_int(m.group(1))
-    m = re.search(r"(?:di atas|lebih dari|>=|min(?:imal)?)\s*([^\s]+(?:\s*(?:jt|juta))?)", q)
-    if m: f["harga_min"]=_parse_int(m.group(1))
-    return f
 
-def _fuel_match(meta_val: str, want: str) -> bool:
-    if not want: return True
-    s = str(meta_val).lower()
-    return any(k in s for k in FUEL_KEYWORDS.get(want,[want]))
+# ====== Cosine rekomendasi ======
+def cosine_rekomendasi(query: str, k: int = 5) -> Dict[str, Any]:
+    """
+    1) Hitung embedding query
+    2) Cosine similarity ke korpus
+    3) Ambil top-k, tetapi prioritaskan usia <= PREFER_MAX_USIA
+    4) Jika user menyebut jenis bahan bakar, filter dulu
+    """
+    if not (query and query.strip()):
+        return {"ok": False, "error": "Query kosong.", "rekomendasi": []}
 
-def match_filter(meta: dict, f: dict):
-    if not meta: return False
-    if f["brand"] and f["brand"] not in str(meta.get("nama_mobil","")).lower(): return False
-    if not _fuel_match(meta.get("bahan_bakar",""), f["fuel"]): return False
-    if f["transmisi"] and f["transmisi"] not in str(meta.get("transmisi","")).lower(): return False
-    if f["harga_min"]:
-        harga = int("".join(re.findall(r"\d+", str(meta.get("harga","")))) or "0")
-        if harga < f["harga_min"]: return False
-    if f["harga_max"]:
-        harga = int("".join(re.findall(r"\d+", str(meta.get("harga","")))) or "0")
-        if harga > f["harga_max"]: return False
-    return True
+    fuel_want = _parse_fuel_from_query(query)
+    df = _df.copy()
+    if fuel_want:
+        df = df[df["bahan bakar"].apply(lambda x: _fuel_match(str(x), fuel_want))]
+        if df.empty:
+            return {"ok": True, "rekomendasi": []}
 
-@router.get("")
-def rag(pertanyaan: str = Query(...), topk: int = Query(5, ge=1, le=50)):
-    f = parse_query(pertanyaan)
-    col = get_collection()
-    docs = col.similarity_search(pertanyaan, k=30)
+    # mapping index dataframe -> index korpus
+    # (karena kita filter df, kita perlu subset embedding sesuai index)
+    idx_keep = df.index.to_list()
+    if not idx_keep:
+        return {"ok": True, "rekomendasi": []}
 
-    results = []
-    for d in docs:
-        m = d.metadata or {}
-        if match_filter(m, f):
-            results.append({
-                "nama_mobil": m.get("nama_mobil"),
-                "tahun": m.get("tahun"),
-                "harga": m.get("harga"),
-                "usia": m.get("usia"),
-                "bahan_bakar": m.get("bahan_bakar"),
-                "transmisi": m.get("transmisi"),
-                "kapasitas_mesin": m.get("kapasitas_mesin"),
-                "cosine_score": getattr(d, "distance", None)
-            })
+    corpus_emb = _ensure_corpus_emb()[idx_keep]
+    q_emb = embed_query(query)  # shape (D,)
 
-    if not results:
-        return {"jawaban": "Tidak ditemukan.", "rekomendasi": []}
+    # cosine similarity -> vektor
+    # (embeddings telah dinormalisasi; cukup dot product)
+    scores = np.dot(corpus_emb, q_emb)  # shape (N,)
+    df = df.copy()
+    df["cosine_score"] = scores
 
-    muda = [r for r in results if r.get("usia") is not None and r["usia"] <= PREFER_MAX_USIA]
-    final = (muda if muda else results)[:topk]
+    # Prioritaskan usia muda (<= PREFER_MAX_USIA), lalu skor, lalu harga naik
+    muda = df[df["usia"] <= PREFER_MAX_USIA]
+    tua = df[df["usia"] > PREFER_MAX_USIA]
 
-    lines = []
-    for i, r in enumerate(final, 1):
-        score = r.get("cosine_score")
-        score_line = f"Skor: {score:.4f}\n" if isinstance(score, float) else ""
-        lines.append(
-            f"{i}. {r['nama_mobil']} ({r['tahun']})\n"
-            f"{score_line}"
-            f"Harga: {r['harga']}\n"
-            f"Usia: {r['usia']} tahun\n"
-            f"Bahan Bakar: {r['bahan_bakar']}\n"
-            f"Transmisi: {r['transmisi']}\n"
-            f"Kapasitas Mesin: {r['kapasitas_mesin']}\n"
-        )
-    return {"jawaban": "Rekomendasi berdasarkan kemiripan:\n\n" + "\n".join(lines), "rekomendasi": final}
+    def _pick(d: pd.DataFrame, top: int) -> pd.DataFrame:
+        if d.empty:
+            return d
+        return d.sort_values(by=["cosine_score", "harga_angka"], ascending=[False, True]).head(top)
+
+    n_muda = min(len(muda), k)
+    pick_muda = _pick(muda, n_muda)
+    pick_tua = _pick(tua, max(0, k - n_muda))
+
+    out = pd.concat([pick_muda, pick_tua]).head(k)
+
+    hasil: List[Dict[str, Any]] = []
+    for _, r in out.iterrows():
+        hasil.append({
+            "nama_mobil": str(r.get("nama mobil", "")),
+            "tahun": int(r.get("tahun", 0)),
+            "harga": r.get("harga", ""),
+            "usia": int(r.get("usia", 0)),
+            "bahan_bakar": r.get("bahan bakar", ""),
+            "transmisi": r.get("transmisi", ""),
+            "kapasitas_mesin": r.get("kapasitas mesin", ""),
+            "cosine_score": round(float(r.get("cosine_score", 0.0)), 4),
+        })
+
+    return {"ok": True, "rekomendasi": hasil}

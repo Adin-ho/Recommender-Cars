@@ -1,50 +1,39 @@
-from pathlib import Path
-import json
-import pandas as pd
-from tqdm import tqdm
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_chroma import Chroma
+from __future__ import annotations
+import os
+import threading
+from functools import lru_cache
+from typing import List
+import numpy as np
 
-ROOT = Path(__file__).resolve().parents[1]
-CSV = ROOT / "app" / "data" / "data_mobil_final.csv"
+# NOTE: model multilingual yang ringan & cocok untuk Indo
+# Bisa diganti via ENV: EMBED_MODEL (default di bawah)
+DEFAULT_MODEL = os.getenv("EMBED_MODEL", "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
 
-def simpan_vektor_mobil(persist_dir: str):
-    persist_path = Path(persist_dir)
-    persist_path.mkdir(parents=True, exist_ok=True)
+_model_lock = threading.Lock()
+_model = None
 
-    df = pd.read_csv(CSV)
-    req = ["Nama Mobil", "Harga", "Tahun", "Usia", "Bahan Bakar", "Transmisi", "Kapasitas Mesin"]
-    for c in req:
-        if c not in df.columns:
-            raise RuntimeError(f"Kolom wajib hilang: {c}")
 
-    # normalisasi
-    df.columns = [c.strip() for c in df.columns]
+def _load_model():
+    """Lazy-load sentence-transformers supaya start cepat & thread-safe."""
+    global _model
+    with _model_lock:
+        if _model is None:
+            from sentence_transformers import SentenceTransformer
+            _model = SentenceTransformer(DEFAULT_MODEL)
+    return _model
 
-    texts, metas = [], []
-    for _, r in tqdm(df.iterrows(), total=len(df), desc="Build texts"):
-        nama = str(r["Nama Mobil"]).strip()
-        tahun = int(r["Tahun"])
-        harga = str(r["Harga"]).strip()
-        usia = int(r["Usia"])
-        bb = str(r["Bahan Bakar"]).strip()
-        trans = str(r["Transmisi"]).strip()
-        cc = str(r["Kapasitas Mesin"]).strip()
 
-        text = f"{nama} tahun {tahun}. Harga {harga}. Usia {usia} tahun. Bahan bakar {bb}. Transmisi {trans}. Kapasitas mesin {cc}."
-        meta = {
-            "nama_mobil": nama,
-            "tahun": tahun,
-            "harga": harga,
-            "usia": usia,
-            "bahan_bakar": bb,
-            "transmisi": trans,
-            "kapasitas_mesin": cc,
-        }
-        texts.append(text)
-        metas.append(meta)
+def embed_texts(texts: List[str]) -> np.ndarray:
+    """
+    Mengembalikan embedding (np.ndarray; shape [N, D]) untuk list teks.
+    """
+    model = _load_model()
+    emb = model.encode(texts, show_progress_bar=False, convert_to_numpy=True, normalize_embeddings=True)
+    return emb
 
-    emb = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-    print("[INFO] Simpan ke:", persist_path)
-    Chroma.from_texts(texts=texts, embedding=emb, metadatas=metas, persist_directory=str(persist_path))
-    print("[OK] Embedding selesai. Contoh metadata:", json.dumps(metas[0], indent=2))
+
+@lru_cache(maxsize=1024)
+def embed_query(q: str) -> np.ndarray:
+    """Cache untuk single-query, mengurangi latensi/biaya encode ulang."""
+    vec = embed_texts([q])[0]
+    return vec
