@@ -1,136 +1,158 @@
-import os
-import re
+# app/main.py
+from __future__ import annotations
+import os, re
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 
 import pandas as pd
-import chromadb
-from fastapi import FastAPI, Query
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from .embedding_mistral import rebuild_index, embed_query
+from .embedding import load_dataset, load_embeddings, query_topk, build_and_persist_embeddings
 
-# ====== PATHS & ENV ======
 APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
-DATA_CSV = str(APP_DIR / "data" / "data_mobil_final.csv")
 FRONTEND_DIR = ROOT_DIR / "frontend"
-CHROMA_DIR = Path(os.getenv("CHROMA_DIR", "/data/chroma")).as_posix()
+
+# ====== ENV ======
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*")
+PREFER_MAX_USIA = int(os.getenv("PREFER_MAX_USIA", "5"))
 
 # ====== APP ======
-app = FastAPI(title="ChatCars (Mistral Embeddings)")
+app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],    # sesuaikan di produksi
+    allow_origins=[o.strip() for o in ALLOWED_ORIGINS.split(",")] if ALLOWED_ORIGINS else ["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Serve frontend (opsional)
-if FRONTEND_DIR.exists():
-    app.mount("/frontend", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
+# serve UI
+app.mount("/frontend", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
 
 @app.get("/")
 def root():
-    index_file = FRONTEND_DIR / "index.html"
-    if index_file.exists():
-        return FileResponse(str(index_file))
-    return {"ok": True, "msg": "Backend up. No frontend/index.html found."}
+    index_html = FRONTEND_DIR / "index.html"
+    return FileResponse(str(index_html))
 
-@app.get("/health")
-def health():
-    return {"ok": True}
+# ====== Data & index ======
+_df: pd.DataFrame = None
+_vectors = None
+_ids: List[int] = None
 
-# ====== DataFrame ringan untuk metadata harga/brand (opsional filter tambahan) ======
-def load_df() -> pd.DataFrame:
-    df = pd.read_csv(DATA_CSV)
-    df.columns = df.columns.str.strip().str.lower()
-    # harga angka (untuk rule filter)
-    def to_int_price(x):
-        if pd.isna(x): return 0
-        s = str(x).lower().replace("rp", "").replace(" ", "")
-        s = s.replace(",", ".")
-        m = re.search(r"(\d+)\s*juta", s)
-        if m: return int(m.group(1)) * 1_000_000
-        digits = re.sub(r"[^\d]", "", s)
-        return int(digits) if digits else 0
-    if "harga_angka" not in df.columns and "harga" in df.columns:
-        df["harga_angka"] = df["harga"].apply(to_int_price)
+def _ensure_loaded():
+    global _df, _vectors, _ids
+    if _df is None:
+        _df = load_dataset()
+        _df.columns = _df.columns.str.strip().str.lower()
+        # add harga_angka
+        if "harga_angka" not in _df.columns:
+            def to_int(s):
+                import re
+                if pd.isna(s): return 0
+                s = str(s)
+                m = re.findall(r"\d+", s)
+                return int("".join(m)) if m else 0
+            _df["harga_angka"] = _df["harga"].apply(to_int)
+        # usia
+        from datetime import datetime
+        tahun_now = datetime.now().year
+        _df["usia"] = _df["tahun"].apply(lambda t: max(0, tahun_now - int(t)))
+
+    if _vectors is None:
+        _vectors, _ids = load_embeddings()
+
+# ====== Helpers ======
+def _rule_filters(query: str, df: pd.DataFrame) -> pd.DataFrame:
+    q = query.lower()
+
+    # bahan bakar
+    fuels = ["diesel", "listrik", "hybrid", "bensin"]
+    for f in fuels:
+        if f in q:
+            df = df[df["bahan bakar"].str.contains(f, case=False, na=False)]
+
+    # brand (sederhana)
+    brands = ["toyota","honda","daihatsu","mitsubishi","wuling","bmw","mercedes","mazda","suzuki","nissan","hyundai","kia"]
+    for b in brands:
+        if re.search(rf"\b{re.escape(b)}\b", q):
+            df = df[df["nama mobil"].str.contains(b, case=False, na=False)]
+
+    # harga
+    m = re.search(r"(?:di\s*bawah|max|<=?)\s*rp?\s*([\d\.]+)", q)
+    if m:
+        lim = int(m.group(1).replace(".", ""))
+        df = df[df["harga_angka"] <= lim]
+
+    # tahun ke atas
+    m2 = re.search(r"tahun\s*(\d{4})\s*ke\s*atas", q)
+    if m2:
+        df = df[df["tahun"] >= int(m2.group(1))]
+
     return df
 
-DF = load_df()
+def _prefer_young_first(rows: List[Tuple[int,float]], df: pd.DataFrame, k: int) -> List[Tuple[int,float]]:
+    # Bagi: usia <= PREFER_MAX_USIA lalu sisanya, tetap mempertahankan urutan skor
+    young, other = [], []
+    for idx, sc in rows:
+        usia = int(df.iloc[idx]["usia"])
+        (young if usia <= PREFER_MAX_USIA else other).append((idx, sc))
+    out = young[:k]
+    if len(out) < k:
+        out += other[:k-len(out)]
+    return out
 
-# ====== Chroma client (persist) ======
-chromadb_client = chromadb.PersistentClient(path=CHROMA_DIR)
-COLL = chromadb_client.get_or_create_collection("cars")
+def _pack_row(row: pd.Series, score: float) -> Dict[str, Any]:
+    return {
+        "nama_mobil": row.get("nama mobil", ""),
+        "tahun": int(row.get("tahun", 0)),
+        "harga": row.get("harga", ""),
+        "usia": int(row.get("usia", 0)),
+        "bahan_bakar": row.get("bahan bakar", ""),
+        "transmisi": row.get("transmisi", ""),
+        "kapasitas_mesin": row.get("kapasitas mesin", ""),
+        "cosine_score": round(float(score), 4)
+    }
 
-# ====== Admin: build / rebuild index dari CSV ======
-@app.post("/admin/rebuild_chroma")
-def admin_rebuild_chroma():
+# ====== Endpoints ======
+@app.get("/cosine_rekomendasi")
+def cosine_rekomendasi(query: str, k: int = 5):
+    _ensure_loaded()
+    # filter rule-based ringan
+    df_f = _rule_filters(query, _df)
+    if df_f.empty:
+        df_f = _df
+
+    # mapping: baris hasil filter → index asli
+    # Untuk memanggil embedding, kita masih pakai urutan asli (satu vektor per baris)
+    idx_map = df_f.index.to_list()
+    if not idx_map:
+        return JSONResponse({"rekomendasi": []})
+
+    # lakukan top-k di seluruh data lalu saring ke subset dulu
+    top_global = query_topk(_df, _vectors, query, k=max(k*5, 20))  # ambil agak banyak
+    # keep hanya idx yang masuk filter
+    filtered = [(i, sc) for (i, sc) in top_global if i in idx_map]
+
+    if not filtered:
+        # kalau tidak ada yang lolos filter, fallback ke top_global
+        filtered = top_global
+
+    # prefer usia muda dulu
+    chosen = _prefer_young_first(filtered, _df, k)
+
+    out = []
+    for idx, sc in chosen:
+        out.append(_pack_row(_df.iloc[idx], sc))
+    return JSONResponse({"rekomendasi": out})
+
+@app.post("/admin/rebuild_embeddings")
+def rebuild_embeddings():
     try:
-        n = rebuild_index(DATA_CSV)
-        return {"ok": True, "count": n, "dir": CHROMA_DIR}
+        build_and_persist_embeddings()
+        return {"ok": True}
     except Exception as e:
         return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
-
-# ====== Debug kecil ======
-@app.get("/debug/chroma")
-def debug_chroma():
-    try:
-        info = COLL.get(limit=5)
-        return {"dir": CHROMA_DIR, "count": COLL.count(), "sample_ids": info.get("ids", [])}
-    except Exception as e:
-        return {"dir": CHROMA_DIR, "error": str(e)}
-
-# ====== Search berbasis cosine (Mistral embeddings) ======
-@app.get("/cosine_rekomendasi")
-def cosine_rekomendasi(query: str = Query(...), k: int = Query(5, ge=1, le=20)):
-    """
-    1) Embed kueri via Mistral
-    2) Query ke Chroma pakai query_embeddings
-    3) Kembalikan top-k + prioritas usia muda (≤ 5 tahun) dahulu
-    """
-    # embed kueri
-    qvec = embed_query(query)
-
-    res = COLL.query(
-        query_embeddings=[qvec],
-        n_results=k * 2,  # ambil lebih banyak sedikit → bisa diprioritaskan usia muda
-        include=["distances", "metadatas", "documents"]
-    )
-
-    items: List[Dict[str, Any]] = []
-    # jarak dari Chroma ~ (1 - cosine) karena vektor (umumnya) ter-normalisasi di sisi server
-    for meta, dist in zip(res["metadatas"][0], res["distances"][0]):
-        cosine_score = 1.0 - float(dist)
-        items.append({
-            "nama_mobil": meta.get("nama mobil") or meta.get("nama_mobil", ""),
-            "tahun": meta.get("tahun", ""),
-            "harga": meta.get("harga", ""),
-            "usia": meta.get("usia", ""),
-            "bahan_bakar": meta.get("bahan bakar") or meta.get("bahan_bakar",""),
-            "transmisi": meta.get("transmisi",""),
-            "kapasitas_mesin": meta.get("kapasitas mesin") or meta.get("kapasitas_mesin",""),
-            "cosine_score": round(cosine_score, 4),
-        })
-
-    # prioritas usia muda (≤ 5 tahun)
-    def usia_leq5(x) -> bool:
-        try:
-            u = int(x.get("usia") or 0)
-        except Exception:
-            # hitung dari tahun jika kolom usia tidak ada
-            try:
-                th = int(x.get("tahun") or 0)
-                u = max(0, 2025 - th) if th else 999
-            except Exception:
-                u = 999
-        return u <= 5
-
-    muda = [x for x in items if usia_leq5(x)]
-    tua = [x for x in items if not usia_leq5(x)]
-    hasil = (muda + tua)[:k]
-
-    return {"rekomendasi": hasil}

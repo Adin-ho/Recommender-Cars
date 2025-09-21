@@ -1,96 +1,117 @@
-import os
+# app/embedding.py
+from __future__ import annotations
+import os, json, math
 from pathlib import Path
-from typing import List, Dict
-
+from typing import List, Tuple
+import numpy as np
 import pandas as pd
-import chromadb
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-from mistralai.client import Mistral
-from mistralai.models.embeddings import EmbeddingRequest
+from tqdm import tqdm
 
-# ====== ENV ======
-CHROMA_DIR = Path(os.getenv("CHROMA_DIR", "/data/chroma")).as_posix()
+# ===== Konfigurasi dasar =====
+APP_DIR = Path(__file__).resolve().parent
+ROOT_DIR = APP_DIR.parent
+DATA_CSV = APP_DIR / "data" / "data_mobil_final.csv"
+
+# Folder persist (gunakan /data di Zeabur agar persisten)
+PERSIST_DIR = Path(os.getenv("CHROMA_PERSIST_DIR", "/data/emb"))
+PERSIST_DIR.mkdir(parents=True, exist_ok=True)
+EMB_FILE = PERSIST_DIR / "embeddings.npz"
+META_FILE = PERSIST_DIR / "meta.json"
+
+USE_MISTRAL = os.getenv("USE_MISTRAL_EMB", "1") == "1"
+MISTRAL_MODEL = os.getenv("MISTRAL_MODEL", "mistral-embed")
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY", "")
-MISTRAL_EMB_MODEL = os.getenv("MISTRAL_EMB_MODEL", "mistral-embed")  # bisa ganti "mistral-embed"
-BATCH_SIZE = int(os.getenv("EMB_BATCH", "96"))
 
-if not MISTRAL_API_KEY:
-    raise RuntimeError("MISTRAL_API_KEY belum diset di environment variables.")
+# ====== Helpers ======
+def _normalize_rows(x: np.ndarray) -> np.ndarray:
+    norm = np.linalg.norm(x, axis=1, keepdims=True) + 1e-12
+    return x / norm
 
-# ====== Mistral client ======
-client = Mistral(api_key=MISTRAL_API_KEY)
+def _cosine_sim(q: np.ndarray, M: np.ndarray) -> np.ndarray:
+    # q shape: (d,), M: (N,d)
+    qn = q / (np.linalg.norm(q) + 1e-12)
+    return (M @ qn)
 
-@retry(
-    reraise=True,
-    stop=stop_after_attempt(5),
-    wait=wait_exponential(multiplier=1, min=1, max=10),
-    retry=retry_if_exception_type(Exception),
-)
-def _embed_batch(texts: List[str]) -> List[List[float]]:
-    """
-    Panggil API embedding Mistral untuk satu batch teks.
-    Tenacity dipakai agar robust terhadap network hiccups / 429.
-    """
-    req = EmbeddingRequest(model=MISTRAL_EMB_MODEL, inputs=texts)
-    resp = client.embeddings.create(**req.dict())
-    # resp.data: list of objects {index, embedding, object}
-    # Urutannya sesuai inputs
-    return [d.embedding for d in resp.data]
+def _concat_text(row: pd.Series) -> str:
+    # Jadikan satu string per mobil agar embedding menangkap konteks
+    parts = [
+        str(row.get("nama mobil", "")),
+        str(row.get("tahun", "")),
+        str(row.get("bahan bakar", "")),
+        str(row.get("transmisi", "")),
+        str(row.get("kapasitas mesin", "")),
+        str(row.get("harga", "")),
+    ]
+    return " | ".join(p.strip() for p in parts if p is not None)
 
-def _row_to_text(row: pd.Series) -> str:
-    # Gabungkan atribut penting dalam format ringkas
-    return (
-        f"{row.get('nama mobil', row.get('nama_mobil',''))} ({row.get('tahun','')}); "
-        f"bahan bakar: {row.get('bahan bakar', row.get('bahan_bakar',''))}; "
-        f"transmisi: {row.get('transmisi','')}; "
-        f"kapasitas: {row.get('kapasitas mesin', row.get('kapasitas_mesin',''))}; "
-        f"harga: {row.get('harga','')}"
-    )
+# ====== Embedders ======
+class MistralEmbedder:
+    def __init__(self, api_key: str, model: str = "mistral-embed") -> None:
+        from mistralai import Mistral
+        self.client = Mistral(api_key=api_key)
+        self.model = model
 
-def load_dataframe(csv_path: str) -> pd.DataFrame:
-    df = pd.read_csv(csv_path)
+    def embed_texts(self, texts: List[str], batch_size: int = 96) -> np.ndarray:
+        out: List[List[float]] = []
+        for i in tqdm(range(0, len(texts), batch_size), desc="Mistral embed"):
+            chunk = texts[i:i + batch_size]
+            resp = self.client.embeddings.create(model=self.model, inputs=chunk)
+            out.extend(e.embedding for e in resp.data)
+        return np.asarray(out, dtype=np.float32)
+
+    def embed_one(self, text: str) -> np.ndarray:
+        return self.embed_texts([text])[0]
+
+class LocalEmbedder:
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2") -> None:
+        from sentence_transformers import SentenceTransformer
+        self.model = SentenceTransformer(model_name)
+
+    def embed_texts(self, texts: List[str], batch_size: int = 128) -> np.ndarray:
+        vecs = self.model.encode(texts, batch_size=batch_size, show_progress_bar=True, convert_to_numpy=True, normalize_embeddings=False)
+        return vecs.astype(np.float32)
+
+    def embed_one(self, text: str) -> np.ndarray:
+        v = self.model.encode([text], convert_to_numpy=True)[0].astype(np.float32)
+        return v
+
+def get_embedder():
+    if USE_MISTRAL and MISTRAL_API_KEY:
+        return MistralEmbedder(api_key=MISTRAL_API_KEY, model=MISTRAL_MODEL)
+    return LocalEmbedder()
+
+# ====== Public APIs ======
+def load_dataset() -> pd.DataFrame:
+    df = pd.read_csv(DATA_CSV)
+    # Normalisasi kolom
     df.columns = df.columns.str.strip().str.lower()
     return df
 
-def build_embeddings_for_texts(texts: List[str]) -> List[List[float]]:
-    """Batching + retry untuk seluruh dokumen."""
-    out: List[List[float]] = []
-    for i in range(0, len(texts), BATCH_SIZE):
-        batch = texts[i:i+BATCH_SIZE]
-        embs = _embed_batch(batch)
-        out.extend(embs)
-    return out
+def build_corpus(df: pd.DataFrame) -> List[str]:
+    return [_concat_text(row) for _, row in df.iterrows()]
 
-def upsert_chroma(docs: List[str], metadatas: List[Dict], ids: List[str], embeddings: List[List[float]]):
-    os.makedirs(CHROMA_DIR, exist_ok=True)
-    client_chroma = chromadb.PersistentClient(path=CHROMA_DIR)
-    coll = client_chroma.get_or_create_collection("cars")
+def build_and_persist_embeddings() -> Tuple[np.ndarray, List[int]]:
+    df = load_dataset()
+    texts = build_corpus(df)
+    emb = get_embedder().embed_texts(texts)
+    emb = _normalize_rows(emb)
 
-    # bersihkan isi lama (aman karena kita tulis ulang)
-    if coll.count() > 0:
-        existing = coll.get()["ids"]
-        if existing:
-            coll.delete(ids=existing)
+    ids = list(range(len(texts)))
+    np.savez_compressed(EMB_FILE, vectors=emb, ids=np.asarray(ids, dtype=np.int32))
+    META_FILE.write_text(json.dumps({"count": len(ids)}, ensure_ascii=False))
+    return emb, ids
 
-    coll.add(documents=docs, metadatas=metadatas, ids=ids, embeddings=embeddings)
+def load_embeddings() -> Tuple[np.ndarray, List[int]]:
+    if not EMB_FILE.exists():
+        return build_and_persist_embeddings()
+    data = np.load(EMB_FILE)
+    return data["vectors"], list(data["ids"].tolist())
 
-def rebuild_index(csv_path: str) -> int:
-    """
-    Bangun ulang index:
-    - Baca CSV
-    - Susun dokumen & metadata
-    - Minta embedding ke Mistral
-    - Simpan ke Chroma (persist directory)
-    """
-    df = load_dataframe(csv_path)
-    docs = [_row_to_text(r) for _, r in df.iterrows()]
-    metas = df.to_dict(orient="records")
-    ids = [f"car-{i}" for i in range(len(df))]
-
-    embs = build_embeddings_for_texts(docs)
-    upsert_chroma(docs, metas, ids, embs)
-    return len(docs)
-
-def embed_query(text: str) -> List[float]:
-    """Untuk query runtime (pencarian) pakai embedding Mistral juga."""
-    return _embed_batch([text])[0]
+def query_topk(df: pd.DataFrame, vectors: np.ndarray, query: str, k: int = 5) -> List[Tuple[int, float]]:
+    # embed query
+    vq = get_embedder().embed_one(query).astype(np.float32)
+    scores = _cosine_sim(vq, vectors)  # (N,)
+    # top-k
+    idx = np.argpartition(-scores, kth=min(k, len(scores)-1))[:max(k,1)]
+    idx = idx[np.argsort(-scores[idx])]
+    return [(int(i), float(scores[i])) for i in idx]
