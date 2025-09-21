@@ -9,3 +9,6 @@ langchain-chroma==0.1.4
 chromadb==0.5.3
 sentence-transformers==3.0.1
 tqdm==4.66.4
+chromadb==0.5.12
+mistralai==1.2.3
+tenacity==8.5.0

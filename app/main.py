@@ -1,93 +1,136 @@
 import os
+import re
 from pathlib import Path
+from typing import List, Dict, Any
+
+import pandas as pd
+import chromadb
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, PlainTextResponse, JSONResponse
 
+from .embedding_mistral import rebuild_index, embed_query
+
+# ====== PATHS & ENV ======
 APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
+DATA_CSV = str(APP_DIR / "data" / "data_mobil_final.csv")
 FRONTEND_DIR = ROOT_DIR / "frontend"
+CHROMA_DIR = Path(os.getenv("CHROMA_DIR", "/data/chroma")).as_posix()
 
-ENABLE_LLM = os.getenv("ENABLE_LLM", "1") == "1"
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*")
-
-app = FastAPI(title="Recommender Cars (Zeabur + Ollama Mistral)")
-
-# CORS
+# ====== APP ======
+app = FastAPI(title="ChatCars (Mistral Embeddings)")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if ALLOWED_ORIGINS == "*" else [o.strip() for o in ALLOWED_ORIGINS.split(",")],
-    allow_credentials=True,
+    allow_origins=["*"],    # sesuaikan di produksi
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Frontend di /static agar /api tidak ketimpa
+# Serve frontend (opsional)
 if FRONTEND_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
-
-@app.get("/healthz", response_class=PlainTextResponse)
-def healthz():
-    return "ok"
+    app.mount("/frontend", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
 
 @app.get("/")
-def home():
-    index_html = FRONTEND_DIR / "index.html"
-    if index_html.exists():
-        return FileResponse(index_html)
-    return {"message": "Car Recommender API. Open /docs for Swagger."}
+def root():
+    index_file = FRONTEND_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
+    return {"ok": True, "msg": "Backend up. No frontend/index.html found."}
 
-# === Rule-based API
-from app.rule_based import router as rule_router, jawab_rule  # noqa: E402
-app.include_router(rule_router)
+@app.get("/health")
+def health():
+    return {"ok": True}
 
-# === LLM (opsional)
-if ENABLE_LLM:
+# ====== DataFrame ringan untuk metadata harga/brand (opsional filter tambahan) ======
+def load_df() -> pd.DataFrame:
+    df = pd.read_csv(DATA_CSV)
+    df.columns = df.columns.str.strip().str.lower()
+    # harga angka (untuk rule filter)
+    def to_int_price(x):
+        if pd.isna(x): return 0
+        s = str(x).lower().replace("rp", "").replace(" ", "")
+        s = s.replace(",", ".")
+        m = re.search(r"(\d+)\s*juta", s)
+        if m: return int(m.group(1)) * 1_000_000
+        digits = re.sub(r"[^\d]", "", s)
+        return int(digits) if digits else 0
+    if "harga_angka" not in df.columns and "harga" in df.columns:
+        df["harga_angka"] = df["harga"].apply(to_int_price)
+    return df
+
+DF = load_df()
+
+# ====== Chroma client (persist) ======
+chromadb_client = chromadb.PersistentClient(path=CHROMA_DIR)
+COLL = chromadb_client.get_or_create_collection("cars")
+
+# ====== Admin: build / rebuild index dari CSV ======
+@app.post("/admin/rebuild_chroma")
+def admin_rebuild_chroma():
     try:
-        from app.llm_proxy import router as llm_router, ollama_chat  # noqa: E402
-        app.include_router(llm_router)
-        print("[INIT] LLM router aktif (Ollama Mistral)")
+        n = rebuild_index(DATA_CSV)
+        return {"ok": True, "count": n, "dir": CHROMA_DIR}
     except Exception as e:
-        print("[WARN] ENABLE_LLM=1 tapi gagal load llm_proxy:", e)
-        ollama_chat = None
-else:
-    ollama_chat = None
+        return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
 
-# === Endpoint gabungan
-@app.get("/api/ask")
-async def api_ask(
-    pertanyaan: str = Query(..., description="Contoh: 'mobil listrik matic di bawah 500 jt'"),
-    topk: int = Query(5, ge=1, le=50)
-):
-    recs = jawab_rule(pertanyaan, topk=topk)
-    if not recs:
-        return {"jawaban": "Tidak ditemukan.", "rekomendasi": []}
+# ====== Debug kecil ======
+@app.get("/debug/chroma")
+def debug_chroma():
+    try:
+        info = COLL.get(limit=5)
+        return {"dir": CHROMA_DIR, "count": COLL.count(), "sample_ids": info.get("ids", [])}
+    except Exception as e:
+        return {"dir": CHROMA_DIR, "error": str(e)}
 
-    plain = "Hasil rekomendasi:\n\n" + "\n".join([
-        f"{i+1}. {r['nama_mobil']} ({r['tahun']}) - {r['harga']} - "
-        f"{r['bahan_bakar']}, {r['transmisi']}, {r['kapasitas_mesin']}"
-        for i, r in enumerate(recs)
-    ])
+# ====== Search berbasis cosine (Mistral embeddings) ======
+@app.get("/cosine_rekomendasi")
+def cosine_rekomendasi(query: str = Query(...), k: int = Query(5, ge=1, le=20)):
+    """
+    1) Embed kueri via Mistral
+    2) Query ke Chroma pakai query_embeddings
+    3) Kembalikan top-k + prioritas usia muda (≤ 5 tahun) dahulu
+    """
+    # embed kueri
+    qvec = embed_query(query)
 
-    llm_text = None
-    if ENABLE_LLM and callable(ollama_chat):
-        items = "\n".join([
-            f"{i+1}. {r['nama_mobil']} ({r['tahun']}), harga {r['harga']}, "
-            f"bahan bakar {r['bahan_bakar']}, transmisi {r['transmisi']}, "
-            f"kapasitas {r['kapasitas_mesin']}, usia {r['usia']} tahun"
-            for i, r in enumerate(recs)
-        ])
-        prompt = (
-            "Anda adalah asisten showroom mobil bekas. "
-            "Ringkas rekomendasi berdasarkan pertanyaan dan daftar hasil berikut. "
-            "Jangan mengarang data baru. Maks 5 bullet.\n\n"
-            f"Pertanyaan: {pertanyaan}\n\nDaftar:\n{items}\n\n"
-            "Sorot kecocokan (bahan bakar, transmisi, harga) dan beri saran singkat."
-        )
+    res = COLL.query(
+        query_embeddings=[qvec],
+        n_results=k * 2,  # ambil lebih banyak sedikit → bisa diprioritaskan usia muda
+        include=["distances", "metadatas", "documents"]
+    )
+
+    items: List[Dict[str, Any]] = []
+    # jarak dari Chroma ~ (1 - cosine) karena vektor (umumnya) ter-normalisasi di sisi server
+    for meta, dist in zip(res["metadatas"][0], res["distances"][0]):
+        cosine_score = 1.0 - float(dist)
+        items.append({
+            "nama_mobil": meta.get("nama mobil") or meta.get("nama_mobil", ""),
+            "tahun": meta.get("tahun", ""),
+            "harga": meta.get("harga", ""),
+            "usia": meta.get("usia", ""),
+            "bahan_bakar": meta.get("bahan bakar") or meta.get("bahan_bakar",""),
+            "transmisi": meta.get("transmisi",""),
+            "kapasitas_mesin": meta.get("kapasitas mesin") or meta.get("kapasitas_mesin",""),
+            "cosine_score": round(cosine_score, 4),
+        })
+
+    # prioritas usia muda (≤ 5 tahun)
+    def usia_leq5(x) -> bool:
         try:
-            llm_text = await ollama_chat(prompt)
+            u = int(x.get("usia") or 0)
         except Exception:
-            llm_text = None  # silent fallback
+            # hitung dari tahun jika kolom usia tidak ada
+            try:
+                th = int(x.get("tahun") or 0)
+                u = max(0, 2025 - th) if th else 999
+            except Exception:
+                u = 999
+        return u <= 5
 
-    return JSONResponse({"jawaban": llm_text or plain, "rekomendasi": recs})
+    muda = [x for x in items if usia_leq5(x)]
+    tua = [x for x in items if not usia_leq5(x)]
+    hasil = (muda + tua)[:k]
+
+    return {"rekomendasi": hasil}
