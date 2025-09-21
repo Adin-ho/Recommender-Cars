@@ -53,7 +53,7 @@ def _ensure_corpus_emb() -> np.ndarray:
 _FUEL_KEYS = {
     "listrik": ["listrik", "electric", "ev"],
     "hybrid": ["hybrid", "hev", "phev", "plugin"],
-    "diesel": ["diesel"],
+    "diesel": ["diesel", "solar"],
     "bensin": ["bensin", "gasoline", "pertalite", "pertamax"],
 }
 

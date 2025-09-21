@@ -2,104 +2,125 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ChatCars</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Rekomendasi Mobil</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
 </head>
-<body class="bg-gray-100 flex flex-col items-center h-screen p-4">
-  <div class="flex flex-col w-full max-w-2xl bg-white shadow-lg rounded-lg p-6 h-full gap-2">
-    <h1 class="text-2xl font-bold text-center text-blue-600 mb-2">🚗 Rekomendasi Mobil</h1>
+<body class="bg-gray-100 min-h-screen">
+  <div class="max-w-3xl mx-auto p-4">
+    <header class="flex items-center justify-between mb-4">
+      <h1 class="text-2xl md:text-3xl font-bold text-blue-700">🚗 Rekomendasi Mobil</h1>
+      <nav class="text-sm space-x-3">
+        <a class="text-blue-600 hover:underline" href="#" onclick="quick('rekomendasi mobil diesel')">rekomendasi mobil diesel</a>
+        <a class="text-blue-600 hover:underline" href="#" onclick="quick('rekomendasi mobil hybrid')">rekomendasi mobil hybrid</a>
+        <a class="text-blue-600 hover:underline" href="#" onclick="quick('rekomendasi mobil listrik')">rekomendasi mobil listrik</a>
+      </nav>
+    </header>
 
-    <div id="chatBox" class="flex-1 min-h-0 overflow-y-auto p-4 border rounded bg-gray-50 text-sm"></div>
+    <main class="bg-white rounded-xl shadow p-4">
+      <div id="chatBox" class="space-y-3 min-h-[240px]"></div>
 
-    <div class="flex space-x-2">
-      <input id="pertanyaan" type="text" placeholder="Tanyakan mobil... contoh: diesel matic di bawah 300 juta"
-        class="flex-grow px-4 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"/>
-      <button onclick="kirimPertanyaan()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Kirim</button>
-    </div>
-
-    <div class="text-xs text-gray-500 mt-1">Contoh: “BMW diesel matic lebih dari 500 juta”</div>
+      <div class="mt-4 flex gap-2">
+        <input id="pertanyaan" class="flex-1 border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+               placeholder="Tanyakan mobil... contoh: diesel matic di bawah 300 juta"/>
+        <button onclick="kirimPertanyaan()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Kirim</button>
+      </div>
+      <p class="text-xs text-gray-500 mt-1">Contoh: “BMW diesel matic lebih dari 500 juta”</p>
+    </main>
   </div>
 
-<script>
-const chatBox = document.getElementById("chatBox");
-const input   = document.getElementById("pertanyaan");
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    const input   = document.getElementById("pertanyaan");
 
-async function fetchJSON(url){
-  const res = await fetch(url);
-  if(!res.ok) throw new Error("HTTP " + res.status);
-  return await res.json();
-}
+    function quick(text){ input.value = text; kirimPertanyaan(); }
 
-async function kirimPertanyaan(){
-  const pesan = input.value.trim();
-  if(!pesan) return;
-
-  const userMsg = document.createElement("div");
-  userMsg.className = "text-right text-blue-700 mb-2";
-  userMsg.textContent = "👤 " + pesan;
-  chatBox.appendChild(userMsg);
-
-  const botMsg = document.createElement("div");
-  botMsg.className = "text-left text-gray-800 whitespace-pre-wrap";
-  chatBox.appendChild(botMsg);
-
-  botMsg.textContent = "🤖";
-  const itv = setInterval(() => {
-    botMsg.textContent += ".";
-    if (botMsg.textContent.length > 8) botMsg.textContent = "🤖";
-  }, 200);
-
-  input.value = "";
-  input.disabled = true;
-
-  try {
-    let data;
-    // panggil /cosine_rekomendasi (coba /api/… kalau di belakang reverse proxy)
-    try {
-      data = await fetchJSON(`/cosine_rekomendasi?query=${encodeURIComponent(pesan)}&k=5`);
-    } catch {
-      data = await fetchJSON(`/api/cosine_rekomendasi?query=${encodeURIComponent(pesan)}&k=5`);
+    function addBubble(text, side="left", asHTML=false){
+      const wrap = document.createElement("div");
+      wrap.className = side==="right"
+        ? "text-right"
+        : "text-left";
+      const bubble = document.createElement("div");
+      bubble.className = side==="right"
+        ? "inline-block bg-blue-50 text-blue-700 px-3 py-2 rounded-lg"
+        : "inline-block bg-gray-50 text-gray-800 px-3 py-2 rounded-lg";
+      if(asHTML) bubble.innerHTML = text;
+      else bubble.textContent = text;
+      wrap.appendChild(bubble);
+      chatBox.appendChild(wrap);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return bubble;
     }
 
-    clearInterval(itv);
-
-    if (!data.ok) {
-      botMsg.textContent = "❌ Gagal: " + (data.error || "Unknown");
-      return;
+    async function callJSON(url){
+      const res = await fetch(url);
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      return res.json();
     }
 
-    const list = data.rekomendasi || [];
-    if (list.length === 0){
-      botMsg.textContent = "🤖 Maaf, tidak ada hasil yang cocok.";
-      return;
+    async function kirimPertanyaan(){
+      const q = (input.value || "").trim();
+      if(!q) return;
+
+      addBubble(q, "right");
+      input.value = ""; input.disabled = true;
+      const loading = addBubble("🤖", "left");
+      let dots = setInterval(()=>{
+        loading.textContent += ".";
+        if(loading.textContent.length>8) loading.textContent = "🤖";
+      }, 200);
+
+      try{
+        let data;
+        try {
+          data = await callJSON(`/api/ask?pertanyaan=${encodeURIComponent(q)}&topk=5`);
+        }catch(_){
+          data = await callJSON(`/api/rule?pertanyaan=${encodeURIComponent(q)}&topk=5`);
+        }
+        clearInterval(dots);
+
+        const list = data.rekomendasi || [];
+        const head = data.jawaban || "Rekomendasi berdasarkan Cosine Similarity:";
+        let html = `<div class="font-semibold mb-2">${head}</div>`;
+
+        if(list.length===0){
+          html += `<div class="text-sm text-gray-600">Tidak ada hasil yang cocok.</div>`;
+        }else{
+          for(let i=0;i<list.length;i++){
+            const r = list[i];
+            html += `
+            <div class="border rounded-lg p-3 mb-3 bg-white">
+              <div class="flex items-center justify-between">
+                <div class="font-semibold">
+                  ${i+1}. ${r.nama_mobil || "-"} ${r.tahun ? `(${r.tahun})` : "" }
+                </div>
+                <span class="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded-full">
+                  Skor: <b>${r.pretty_score ?? r.cosine_score}</b>
+                </span>
+              </div>
+              <div class="text-sm mt-1 grid md:grid-cols-2 gap-x-6 gap-y-0.5">
+                <div>Harga: <b>${r.harga || "-"}</b></div>
+                <div>Usia: <b>${r.usia ?? "-"}</b> tahun</div>
+                <div>Bahan Bakar: ${r.bahan_bakar || "-"}</div>
+                <div>Transmisi: ${r.transmisi || "-"}</div>
+                <div>Kapasitas Mesin: ${r.kapasitas_mesin || "-"}</div>
+              </div>
+            </div>`;
+          }
+        }
+        loading.remove();
+        addBubble(html, "left", true);
+      }catch(e){
+        clearInterval(dots);
+        loading.textContent = "❌ Gagal mengambil jawaban ("+e.message+").";
+      }finally{
+        input.disabled = false;
+        input.focus();
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
     }
 
-    let html = "🤖 Rekomendasi berdasarkan Cosine Similarity:\n\n";
-    list.forEach((r, i) => {
-      html += `
-${i+1}. ${r.nama_mobil || ""} (${r.tahun || ""})
-Skor: ${r.cosine_score}
-Harga: ${r.harga}
-Usia: ${r.usia ?? "-"} tahun
-Bahan Bakar: ${r.bahan_bakar || "-"}
-Transmisi: ${r.transmisi || "-"}
-Kapasitas Mesin: ${r.kapasitas_mesin || "-"}\n`;
-    });
-    botMsg.textContent = html;
-  } catch(e){
-    clearInterval(itv);
-    botMsg.textContent = "❌ Gagal mengambil jawaban (" + e.message + ").";
-  } finally {
-    input.disabled = false;
-    input.focus();
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-}
-
-input.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") kirimPertanyaan();
-});
-</script>
+    input.addEventListener("keypress", e => { if(e.key==="Enter") kirimPertanyaan(); });
+  </script>
 </body>
 </html>

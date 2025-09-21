@@ -1,55 +1,49 @@
-from __future__ import annotations
-import os
-from pathlib import Path
+# app/main.py (potongan /api/ask)
+from fastapi import APIRouter, Query
+from .rag_qa import detect_fuel_intent, pretty_scores, sort_young_first
 
-from fastapi import FastAPI, Query
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
+router = APIRouter()
 
-from .rag_qa import cosine_rekomendasi
-from .rule_based import router as rule_router
-from .llm_proxy import router as llm_router
+@router.get("/api/ask")
+def api_ask(pertanyaan: str = Query(...), topk: int = 5):
+    """
+    1) Tangkap niat (diesel/listrik/hybrid).
+    2) Jalankan cosine search (fungsi kamu yang sudah ada).
+    3) Terapkan filter fuel bila ada niat spesifik.
+    4) Urutkan usia muda dulu.
+    5) Normalisasi skor agar tampil konsisten antar kategori.
+    """
+    q = pertanyaan.strip()
+    intent = detect_fuel_intent(q)
 
-HERE = Path(__file__).resolve().parent
-FRONT_DIR = HERE.parent / "frontend"
-INDEX_HTML = FRONT_DIR / "index.html"
+    # ---- panggil mesin kamu (biarkan sesuai implementasi sekarang)
+    # hasil = search_cosine(q, topk= max(20, topk))  # ambil agak banyak biar bisa difilter
+    hasil = engine_cosine_retrieve(q, topk=max(20, topk))  # <-- ganti sesuai nama fungsi kamu
+    # hasil: list[dict] dengan kunci: nama_mobil, tahun, harga, usia, bahan_bakar, transmisi, kapasitas_mesin, cosine_score
 
-app = FastAPI(title="ChatCars")
+    # ---- filter ketat sesuai intent
+    if intent == "diesel":
+        hasil = [h for h in hasil if str(h.get("bahan_bakar","")).strip().lower() == "diesel"]
+    elif intent == "listrik":
+        bb = str
+        hasil = [h for h in hasil if "listrik" in str(h.get("bahan_bakar","")).lower()]
+    elif intent == "hybrid":
+        hasil = [h for h in hasil if "hybrid" in str(h.get("bahan_bakar","")).lower()]
 
-# ===== CORS =====
-ALLOWED = os.getenv("ALLOWED_ORIGINS", "*")
-origins = [o.strip() for o in ALLOWED.split(",")] if ALLOWED else ["*"]
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    # kalau setelah filter terlalu sedikit, fallback longgar (biarkan topk terpenuhi)
+    if len(hasil) < topk:
+        hasil = hasil[:topk]
+    else:
+        hasil = hasil[: max(50, topk*3)]  # pool lebih banyak → sort → ambil topk
 
-# ===== Routers =====
-app.include_router(rule_router)
-app.include_router(llm_router)
+    # ---- urutkan usia muda dulu (≤ PREFER_MAX_USIA) lalu skor
+    hasil = sort_young_first(hasil)
 
-# ===== Static Frontend =====
-# (opsional mount folder; index dilayani manual supaya 200 OK di "/")
-if FRONT_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(FRONT_DIR)), name="static")
+    # ---- normalisasi skor tampil (pretty) agar tidak “terlihat kecil” di EV
+    hasil = pretty_scores(hasil)
 
-@app.get("/")
-def home():
-    return FileResponse(str(INDEX_HTML))
+    # ambil topk terakhir
+    rekom = hasil[:topk]
 
-@app.get("/healthz")
-def healthz():
-    return {"ok": True}
-
-# ===== Cosine endpoint =====
-@app.get("/cosine_rekomendasi")
-def api_cosine_rekomendasi(query: str = Query(...), k: int = Query(5, ge=1, le=50)):
-    try:
-        result = cosine_rekomendasi(query, k)
-        return JSONResponse(result)
-    except Exception as e:
-        return JSONResponse({"ok": False, "error": f"{type(e).__name__}: {e}"}, status_code=500)
+    judul = "Rekomendasi berdasarkan Cosine Similarity:"
+    return {"jawaban": judul, "rekomendasi": rekom}
