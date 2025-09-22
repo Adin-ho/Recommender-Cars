@@ -1,123 +1,136 @@
-# app/main.py
-from fastapi import FastAPI, Query
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from __future__ import annotations
 import os
+import re
+from pathlib import Path
 from typing import List, Dict, Any
 
-# ==== IMPORT HELPER INTENT + SORT + PRETTY SCORE ====
-from .rag_qa import detect_fuel_intent, pretty_scores, sort_young_first
+import numpy as np
+import pandas as pd
 
-app = FastAPI(title="Recommender Cars")
+from .embedding import embed_texts, embed_query
 
-# === Static frontend ===
-FRONT_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
-FRONT_DIR = os.path.abspath(FRONT_DIR)
-if os.path.isdir(FRONT_DIR):
-    app.mount("/",
-              StaticFiles(directory=FRONT_DIR, html=True),
-              name="frontend")
+APP_DIR = Path(__file__).resolve().parent
+CSV_PATH = APP_DIR / "data" / "data_mobil_final.csv"
 
-# ---- Cari fungsi retrieval cosine dari embedding.py (apapun nama fungsinya) ----
-def _load_engine():
-    """
-    Cari fungsi retrieval cosine yang ada di embedding.py dengan beberapa kemungkinan nama.
-    Return: callable(query: str, topk: int) -> List[Dict]
-    """
-    from . import embedding  # module kamu sendiri
-    candidates = [
-        "engine_cosine_retrieve",
-        "get_cosine_recommendations",
-        "cosine_recommendations",
-        "cosine_recommend",
-        "cosine_search",
-        "search_cosine",
-        "retrieve_cosine",
-    ]
-    for name in candidates:
-        fn = getattr(embedding, name, None)
-        if callable(fn):
-            return fn
+# ====== Konfigurasi preferensi ======
+PREFER_MAX_USIA = int(os.getenv("PREFER_MAX_USIA", "5")).__int__()
 
-    # Kalau tidak ada yang cocok, bikin raise yang jelas
-    raise RuntimeError(
-        "Tidak menemukan fungsi retrieval cosine di embedding.py. "
-        "Harap ekspor salah satu nama fungsi ini: "
-        + ", ".join(candidates)
+# ====== Load data sekali saja ======
+_df = pd.read_csv(CSV_PATH)
+_df.columns = _df.columns.str.strip().str.lower()
+
+# normalisasi harga -> angka
+if "harga_angka" not in _df.columns:
+    _df["harga_angka"] = (
+        _df["harga"].astype(str).str.replace(r"[^\d]", "", regex=True).fillna("0").astype(int)
     )
 
-_engine_fn = None
+# kolom gabungan untuk semantic search
+def _row_to_text(row: pd.Series) -> str:
+    parts = [
+        str(row.get("nama mobil", "")),
+        str(row.get("bahan bakar", "")),
+        str(row.get("transmisi", "")),
+        str(row.get("kapasitas mesin", "")),
+        str(row.get("tahun", "")),
+        str(row.get("harga", "")),
+    ]
+    return " | ".join([p for p in parts if p and p != "nan"])
 
-def engine_cosine_retrieve(query: str, topk: int = 10) -> List[Dict[str, Any]]:
-    global _engine_fn
-    if _engine_fn is None:
-        _engine_fn = _load_engine()
-    return _engine_fn(query, topk=topk)
+_corpus = _df.apply(_row_to_text, axis=1).tolist()
+# Precompute embeddings korpus (sekali saat pertama dipakai)
+_corpus_emb: np.ndarray | None = None
 
-# ====== API ======
 
-@app.get("/healthz")
-def healthz():
-    return {"ok": True}
+def _ensure_corpus_emb() -> np.ndarray:
+    global _corpus_emb
+    if _corpus_emb is None:
+        _corpus_emb = embed_texts(_corpus)
+    return _corpus_emb
 
-@app.get("/api/rule")
-def api_rule(pertanyaan: str = Query(...), topk: int = 5):
+
+# ====== Utility ======
+_FUEL_KEYS = {
+    "listrik": ["listrik", "electric", "ev"],
+    "hybrid": ["hybrid", "hev", "phev", "plugin"],
+    "diesel": ["diesel", "solar"],
+    "bensin": ["bensin", "gasoline", "pertalite", "pertamax"],
+}
+
+def _fuel_match(val: str, want: str | None) -> bool:
+    if not want:
+        return True
+    s = str(val).lower()
+    keys = _FUEL_KEYS.get(want, [want])
+    return any(k in s for k in keys)
+
+def _parse_fuel_from_query(q: str) -> str | None:
+    ql = q.lower()
+    for k, keys in _FUEL_KEYS.items():
+        if any(x in ql for x in keys):
+            return k
+    return None
+
+
+# ====== Cosine rekomendasi ======
+def cosine_rekomendasi(query: str, k: int = 5) -> Dict[str, Any]:
     """
-    Endpoint rule-based yang sudah kamu punya (biarkan sederhana).
-    Kalau sebelumnya kamu sudah menulis di file lain, panggil dari sana.
-    Di sini aku return kosong agar tidak mem-break existing.
+    1) Hitung embedding query
+    2) Cosine similarity ke korpus
+    3) Ambil top-k, tetapi prioritaskan usia <= PREFER_MAX_USIA
+    4) Jika user menyebut jenis bahan bakar, filter dulu
     """
-    try:
-        from .rule_based import rule_answer
-        data = rule_answer(pertanyaan, topk=topk)
-        return data
-    except Exception:
-        return {"jawaban": "Maaf, tidak ada hasil dari rule-based.", "rekomendasi": []}
+    if not (query and query.strip()):
+        return {"ok": False, "error": "Query kosong.", "rekomendasi": []}
 
-@app.get("/api/ask")
-def api_ask(pertanyaan: str = Query(...), topk: int = 5):
-    """
-    1) Deteksi intent (diesel / listrik / hybrid).
-    2) Ambil pool kandidat via cosine retrieval (topk besar).
-    3) Filter ketat sesuai intent.
-    4) Urut usia muda dulu lalu skor menurun.
-    5) Normalisasi skor tampil (pretty_score) agar angka terlihat konsisten.
-    """
-    q = (pertanyaan or "").strip()
-    intent = detect_fuel_intent(q)
+    fuel_want = _parse_fuel_from_query(query)
+    df = _df.copy()
+    if fuel_want:
+        df = df[df["bahan bakar"].apply(lambda x: _fuel_match(str(x), fuel_want))]
+        if df.empty:
+            return {"ok": True, "rekomendasi": []}
 
-    # Ambil pool lumayan besar biar filter tidak bikin kosong
-    pool = engine_cosine_retrieve(q, topk=max(20, topk * 5))
+    # mapping index dataframe -> index korpus
+    # (karena kita filter df, kita perlu subset embedding sesuai index)
+    idx_keep = df.index.to_list()
+    if not idx_keep:
+        return {"ok": True, "rekomendasi": []}
 
-    # Filter sesuai intent
-    if intent == "diesel":
-        pool = [x for x in pool if str(x.get("bahan_bakar", "")).lower().strip() == "diesel"]
-    elif intent == "listrik":
-        pool = [x for x in pool if "listrik" in str(x.get("bahan_bakar", "")).lower()]
-    elif intent == "hybrid":
-        pool = [x for x in pool if "hybrid" in str(x.get("bahan_bakar", "")).lower()]
+    corpus_emb = _ensure_corpus_emb()[idx_keep]
+    q_emb = embed_query(query)  # shape (D,)
 
-    # Kalau kosong setelah filter, fallback: pakai top pool saja
-    if not pool:
-        pool = engine_cosine_retrieve(q, topk=max(20, topk * 3))
+    # cosine similarity -> vektor
+    # (embeddings telah dinormalisasi; cukup dot product)
+    scores = np.dot(corpus_emb, q_emb)  # shape (N,)
+    df = df.copy()
+    df["cosine_score"] = scores
 
-    # Urut usia muda dulu → skor desc
-    sort_young_first(pool)
-    # Normalisasi tampilan skor (pretty_score: 60..98/100 per-batch)
-    pretty_scores(pool)
+    # Prioritaskan usia muda (<= PREFER_MAX_USIA), lalu skor, lalu harga naik
+    muda = df[df["usia"] <= PREFER_MAX_USIA]
+    tua = df[df["usia"] > PREFER_MAX_USIA]
 
-    # Ambil topk
-    rekom = pool[:topk]
+    def _pick(d: pd.DataFrame, top: int) -> pd.DataFrame:
+        if d.empty:
+            return d
+        return d.sort_values(by=["cosine_score", "harga_angka"], ascending=[False, True]).head(top)
 
-    return {
-        "jawaban": "Rekomendasi berdasarkan Cosine Similarity:",
-        "rekomendasi": rekom
-    }
+    n_muda = min(len(muda), k)
+    pick_muda = _pick(muda, n_muda)
+    pick_tua = _pick(tua, max(0, k - n_muda))
 
-# (opsional) kembalikan index.html saat root dipanggil, kalau tidak pakai StaticFiles
-@app.get("/index.html")
-def index_page():
-    path = os.path.join(FRONT_DIR, "index.html")
-    if os.path.exists(path):
-        return FileResponse(path)
-    return JSONResponse({"ok": True})
+    out = pd.concat([pick_muda, pick_tua]).head(k)
+
+    hasil: List[Dict[str, Any]] = []
+    for _, r in out.iterrows():
+        hasil.append({
+            "nama_mobil": str(r.get("nama mobil", "")),
+            "tahun": int(r.get("tahun", 0)),
+            "harga": r.get("harga", ""),
+            "usia": int(r.get("usia", 0)),
+            "bahan_bakar": r.get("bahan bakar", ""),
+            "transmisi": r.get("transmisi", ""),
+            "kapasitas_mesin": r.get("kapasitas mesin", ""),
+            "cosine_score": round(float(r.get("cosine_score", 0.0)), 4),
+        })
+
+    return {"ok": True, "rekomendasi": hasil}
